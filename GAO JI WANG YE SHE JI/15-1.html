@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数七游戏（100个盒子）</title>
+    <!-- 姓名：张浩扬  日期：2026-10-26  功能：数七游戏——100个盒子，命中数七规则的显示空盒子，其余显示数字 -->
+    <style>
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background: #f5f7fa;
+            margin: 0;
+            padding: 40px 20px;
+            color: #333;
+        }
+        .yl_wrap {
+            max-width: 760px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        .yl_desc {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .yl_grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 8px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 16px;
+        }
+        .yl_box {
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #3498db;
+            border-radius: 6px;
+            background: #eaf4fc;
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .yl_box_blank {
+            border-color: #d0d7de;
+            background: #f0f3f6;
+            color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div class="yl_wrap">
+        <h1>数七游戏</h1>
+        <p class="yl_desc">共 100 个盒子：是 7 的倍数或数字中含 7 的盒子为空盒（需喊“过”），其余盒子显示数字。</p>
+        <div id="yl_grid" class="yl_grid"></div>
+    </div>
+
+    <script>
+        // 姓名：张浩扬  日期：2026-10-26  功能：数七游戏——按规则生成 100 个盒子
+        var yl_grid = document.getElementById('yl_grid');
+
+        // 判断一个数是否命中“数七”规则：7 的倍数，或数字中包含数字 7
+        function yl_isHit(yl_n) {
+            if (yl_n % 7 === 0) {
+                return true;
+            }
+            return String(yl_n).indexOf('7') !== -1;
+        }
+
+        for (var yl_i = 1; yl_i <= 100; yl_i++) {
+            var yl_box = document.createElement('div');
+            yl_box.className = 'yl_box';
+
+            if (yl_isHit(yl_i)) {
+                // 命中规则的显示为空盒子
+                yl_box.className += ' yl_box_blank';
+                yl_box.textContent = '';
+            } else {
+                yl_box.textContent = yl_i;
+            }
+
+            yl_grid.appendChild(yl_box);
+        }
+    </script>
+</body>
+</html>

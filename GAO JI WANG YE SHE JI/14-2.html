@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript 六种基本数据类型</title>
+    <!-- 姓名：张浩扬  日期：2026-10-22  功能：演示 JavaScript 六种基本数据类型 -->
+    <style>
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background: #f5f7fa;
+            margin: 0;
+            padding: 40px 20px;
+            color: #333;
+        }
+        .yl_wrap {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .yl_card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+        }
+        .yl_type {
+            width: 90px;
+            flex-shrink: 0;
+            font-weight: bold;
+            color: #2980b9;
+        }
+        .yl_code {
+            font-family: Consolas, monospace;
+            background: #f0f3f6;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #c0392b;
+        }
+        .yl_note {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="yl_wrap">
+        <h1>JavaScript 六种基本数据类型</h1>
+        <div id="yl_list"></div>
+    </div>
+
+    <script>
+        // 姓名：张浩扬  日期：2026-10-22  功能：演示 JavaScript 六种基本数据类型
+        // 1. Number（数字）
+        var yl_number = 100;
+        // 2. String（字符串）
+        var yl_string = 'Hello JavaScript';
+        // 3. Boolean（布尔）
+        var yl_boolean = true;
+        // 4. Undefined（未定义）
+        var yl_undefined;
+        // 5. Null（空）
+        var yl_null = null;
+        // 6. Object（对象）
+        var yl_object = { name: '张浩扬', 学号: '24001010302' };
+
+        // 用于展示的数据数组：每项为 [类型名, 值, 说明]
+        var yl_datas = [
+            ['Number（数字）', yl_number, '整数或小数'],
+            ['String（字符串）', yl_string, '用引号包裹的文本'],
+            ['Boolean（布尔）', yl_boolean, 'true 或 false'],
+            ['Undefined（未定义）', yl_undefined, '声明但未赋值'],
+            ['Null（空）', yl_null, '表示空值'],
+            ['Object（对象）', yl_object, '键值对集合']
+        ];
+
+        var yl_list = document.getElementById('yl_list');
+
+        // 遍历生成每张类型卡片
+        for (var yl_i = 0; yl_i < yl_datas.length; yl_i++) {
+            var yl_item = yl_datas[yl_i];
+            var yl_card = document.createElement('div');
+            yl_card.className = 'yl_card';
+
+            var yl_type = document.createElement('span');
+            yl_type.className = 'yl_type';
+            yl_type.textContent = yl_item[0];
+
+            var yl_code = document.createElement('span');
+            yl_code.className = 'yl_code';
+            // Object 类型单独序列化显示
+            yl_code.textContent = (typeof yl_item[1] === 'object' && yl_item[1] !== null)
+                ? JSON.stringify(yl_item[1])
+                : String(yl_item[1]);
+
+            var yl_note = document.createElement('span');
+            yl_note.className = 'yl_note';
+            yl_note.textContent = '  ——  ' + yl_item[2] + '（typeof: ' + typeof yl_item[1] + '）';
+
+            yl_card.appendChild(yl_type);
+            yl_card.appendChild(yl_code);
+            yl_card.appendChild(yl_note);
+            yl_list.appendChild(yl_card);
+        }
+    </script>
+</body>
+</html>

@@ -2,8 +2,8 @@
 """Commit and push a local project to a GitHub repository over SSH.
 
 Example:
-    python push_to_github.py owner/repo -m "Initial commit"
-    python push_to_github.py https://github.com/owner/repo.git -m "Update docs" -b main
+    python push_to_github.py -m "Update docs"                 # default repo (yikuyu229733414-ai/zhy)
+    python push_to_github.py owner/repo -m "Initial commit"   # explicit repo
 """
 
 import argparse
@@ -12,6 +12,9 @@ import re
 import shutil
 import subprocess
 import sys
+
+# Designated default repository: used when the user says "提交到github" without naming a target.
+DEFAULT_REPO = "yikuyu229733414-ai/zhy"
 
 
 def run(cmd, cwd, check=True):
@@ -64,7 +67,8 @@ def check_ssh_access(cwd):
 
 def main():
     parser = argparse.ArgumentParser(description="Commit and push a project to GitHub via SSH.")
-    parser.add_argument("repo", help="GitHub repository URL or owner/repo")
+    parser.add_argument("repo", nargs="?", default=DEFAULT_REPO,
+                        help=f"GitHub repository URL or owner/repo (default: {DEFAULT_REPO})")
     parser.add_argument("-m", "--message", default="Update project", help="Commit message")
     parser.add_argument("-b", "--branch", default=None, help="Branch to push (default: current branch, else 'main')")
     parser.add_argument("--path", default=".", help="Project directory (default: current directory)")

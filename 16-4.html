@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>点击排行组件</title>
+    <!-- 姓名：张浩扬  建立时间：2026-10-30 10:35:16  模型：Xiaomi MiMo-V2.6-Pro  功能：点击排行组件（实时点击 / 24小时排行选项卡切换） -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        ul { list-style: none; }
+        a { text-decoration: none; }
+        img { border: 0; }
+
+        /* ========== 页面标题 ========== */
+        .yl_wrap {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .yl_title {
+            text-align: center;
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 6px;
+        }
+        .yl_desc {
+            text-align: center;
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-bottom: 28px;
+        }
+
+        /* ========== 点击排行卡片 ========== */
+        .yl_widget {
+            width: 276px;
+            margin: 0 auto;
+            padding: 15px 16px 18px;
+            background: #fff;
+            border: 1px solid #ececec;
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+        }
+
+        /* 标题：小图标 + 点击排行 */
+        .yl_widget-head {
+            display: flex;
+            align-items: center;
+            margin-bottom: 13px;
+        }
+        .yl_widget-ico {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            margin-right: 8px;
+            background: #4a4a4a;
+            border-radius: 5px;
+        }
+        .yl_widget-ico img {
+            width: 13px;
+            height: 13px;
+            filter: brightness(0) invert(1);
+        }
+        .yl_widget-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        /* 选项卡：实时点击 / 24小时排行 */
+        .yl_tab-bar {
+            display: flex;
+            margin-bottom: 8px;
+        }
+        .yl_tab {
+            position: relative;
+            flex: 1;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            font-size: 13px;
+            color: #555;
+            background: #d9d9d9;
+            cursor: pointer;
+        }
+        .yl_tab:hover { color: #ff6600; }
+        .yl_tab-on,
+        .yl_tab-on:hover {
+            background: #fff;
+            color: #ff6600;
+            font-weight: 700;
+        }
+        /* 选中项橙色下划线 */
+        .yl_tab-on::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -2px;
+            height: 2px;
+            background: #ff6600;
+        }
+        /* 下划线中间的向下箭头 */
+        .yl_tab-on::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: -7px;
+            width: 8px;
+            height: 8px;
+            margin-left: -4px;
+            border-right: 2px solid #ff6600;
+            border-bottom: 2px solid #ff6600;
+            transform: rotate(45deg);
+        }
+
+        /* 排行列表 */
+        .yl_list { display: none; }
+        .yl_list-show { display: block; }
+        .yl_item {
+            display: flex;
+            align-items: center;
+            height: 32px;
+        }
+        .yl_num {
+            flex: none;
+            width: 15px;
+            height: 15px;
+            line-height: 15px;
+            margin-right: 7px;
+            text-align: center;
+            font-size: 13px;
+            color: #555;
+        }
+        /* 前三名橙色方框序号 */
+        .yl_num-top {
+            border: 2px solid #ff6600;
+            color: #ff6600;
+            font-size: 10px;
+            line-height: 11px;
+        }
+        .yl_item-title {
+            flex: 1;
+            min-width: 0;
+            margin-right: 7px;
+            font-size: 12px;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .yl_item:hover .yl_item-title { color: #ff6600; }
+        .yl_item-count {
+            flex: none;
+            width: 42px;
+            text-align: right;
+            font-size: 11px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="yl_wrap">
+        <h1 class="yl_title">点击排行组件</h1>
+        <p class="yl_desc">仿新闻门户侧栏"点击排行"：实时点击 / 24小时排行 选项卡切换，前三名橙色方框序号，标题超宽自动裁切（图标取自 tu biao）</p>
+
+        <div class="yl_widget">
+            <div class="yl_widget-head">
+                <span class="yl_widget-ico"><img src="./tu biao/dianzan.png" alt="排行"></span>
+                <span class="yl_widget-title">点击排行</span>
+            </div>
+
+            <div class="yl_tab-bar">
+                <a class="yl_tab" id="yl_tabReal" href="javascript:;">实时点击</a>
+                <a class="yl_tab yl_tab-on" id="yl_tab24" href="javascript:;">24小时排行</a>
+            </div>
+
+            <!-- 实时点击榜 -->
+            <ul class="yl_list" id="yl_listReal">
+                <li class="yl_item">
+                    <span class="yl_num yl_num-top">1</span>
+                    <a class="yl_item-title" href="javascript:;">我国成功发射新一代气象卫星</a>
+                    <span class="yl_item-count">156322</span>
+                </li>
+                <li class="yl_item">
+                    <span class="yl_num yl_num-top">2</span>
+                    <a class="yl_item-title" href="javascript:;">研究显示常吃坚果或可延缓衰老</a>
+                    <span class="yl_item-count">131246</span>
+                </li>
+                <li class="yl_item">
+                    <span class="yl_num yl_num-top">3</span>
+                    <a class="yl_item-title" href="javascript:;">新款电动汽车续航突破一千公里</a>
+                    <span class="yl_item-count">105883</span>
+                </li>
+                <li class="yl_item">
+                    <span class="yl_num">4</span>
+                    <a class="yl_item-title" href="javascript:;">全国铁路今起实施新列车运行图</a>
+                    <span class="yl_item-count">96061</span>
+                </li>
+                <li class="yl_item">
+                    <span class="yl_num">5</span>
+                    <a class="yl_item-title" href="javascript:;">天文爱好者拍到罕见红色极光</a>
+                    <span class="yl_item-count">84936</span>
+                </li>
+                <li class="yl_item">
+                    <span class="yl_num">6</span>
+                    <a class="yl_item-title" href="javascript:;">城市绿道建设惠及千万居民</a>
+                    <span class="yl_item-count">74346</span>
+                </li>
+                <li class="yl_item">
+                    <span class="yl_num">7</span>
+                    <a class="yl_item-title" href="javascript:;">传统手工艺在校园里焕发新生</a>
+                    <span class="yl_item-count">62694</span>
+                </li>
+                <li class="yl_item">
+                    <span class="yl_num">8</span>
+                    <a class="yl_item-title" href="javascript:;">中小学生研学旅行热度持续攀升</a>
+                    <span class="yl_item-count">48789</span>
+                </li>
+            </ul>
+
+            <!-- 24小时排行（默认显示，同截图） -->
+            <ul class="yl_list yl_list-show" id="yl_list24">
+                <li class="yl_item">
+                    <span class="yl_num yl_num-top">1</span>
+                    <a class="yl_item-title" href="javascript:;">灯塔水母：地球上唯一不死生物</a>
+                    <span class="yl_item-count">356322</span>
+                </li>
+                <li class="yl_item">
+                    <span class="yl_num yl_num-top">2</span>
+                    <a class="yl_item-title" href="javascript:;">阿里巴巴全资收购UC 俞永福称U</a>
+                    <span class="yl_item-count">311246</span>
+                </li>
+                <li class="yl_item">
+                    <span class="yl_num yl_num-top">3</span>
+                    <a class="yl_item-title" href="javascript:;">亚马逊近三米长巨滑舌鱼用肺</a>
+                    <span class="yl_item-count">295883</span>
+                </li>
+                <li class="yl_item">
+                    <span class="yl_num">4</span>
+                    <a class="yl_item-title" href="javascript:;">奉化男子上山抓野味 遭遇极端</a>
+                    <span class="yl_item-count">266061</span>
+                </li>
+                <li class="yl_item">
+                    <span class="yl_num">5</span>
+                    <a class="yl_item-title" href="javascript:;">大白鲨深海失踪 或被大型生物</a>
+                    <span class="yl_item-count">243936</span>
+                </li>
+                <li class="yl_item">
+                    <span class="yl_num">6</span>
+                    <a class="yl_item-title" href="javascript:;">南非小犀牛目睹母亲被猎杀不育</a>
+                    <span class="yl_item-count">224346</span>
+                </li>
+                <li class="yl_item">
+                    <span class="yl_num">7</span>
+                    <a class="yl_item-title" href="javascript:;">余额宝周岁：收益率“过山车”</a>
+                    <span class="yl_item-count">172694</span>
+                </li>
+                <li class="yl_item">
+                    <span class="yl_num">8</span>
+                    <a class="yl_item-title" href="javascript:;">“尸油入菜肴”纯属无稽之谈</a>
+                    <span class="yl_item-count">128789</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+    // 姓名：张浩扬  建立时间：2026-10-30 10:35:16  模型：Xiaomi MiMo-V2.6-Pro  功能：点击排行组件（选项卡切换）
+    (function () {
+        var yl_tabRealEl = document.getElementById('yl_tabReal');
+        var yl_tab24El = document.getElementById('yl_tab24');
+        var yl_listRealEl = document.getElementById('yl_listReal');
+        var yl_list24El = document.getElementById('yl_list24');
+
+        function yl_switchTab(yl_show24) {
+            yl_tab24El.className = yl_show24 ? 'yl_tab yl_tab-on' : 'yl_tab';
+            yl_tabRealEl.className = yl_show24 ? 'yl_tab' : 'yl_tab yl_tab-on';
+            yl_list24El.className = yl_show24 ? 'yl_list yl_list-show' : 'yl_list';
+            yl_listRealEl.className = yl_show24 ? 'yl_list' : 'yl_list yl_list-show';
+        }
+
+        yl_tabRealEl.addEventListener('click', function () {
+            yl_switchTab(false);
+        });
+        yl_tab24El.addEventListener('click', function () {
+            yl_switchTab(true);
+        });
+    })();
+    </script>
+</body>
+</html>

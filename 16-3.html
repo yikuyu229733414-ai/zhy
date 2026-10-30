@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>百度_百度百科</title>
+    <!-- 姓名：张浩扬  建立时间：2026-10-29 14:36:35  模型：Xiaomi MiMo-V2.6-Pro  功能：百度百科词条页模仿（顶栏/搜索/警示条/蓝色导航/词条正文/相关星图/概述图/TA说） -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f4f5f7;
+            color: #333;
+        }
+        ul { list-style: none; }
+        a { text-decoration: none; }
+        img { border: 0; }
+
+        /* ========== 顶部黑色工具条 ========== */
+        .yl_topbar { background: #2d2d2d; font-size: 12px; }
+        .yl_topbar-inner {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 34px;
+            padding: 0 24px;
+        }
+        .yl_topnav {
+            display: flex;
+            gap: 16px;
+        }
+        .yl_topnav a { color: #b8b8b8; }
+        .yl_topnav a:hover,
+        .yl_topnav-cur a { color: #fff; }
+        .yl_topbar-right {
+            position: absolute;
+            right: 24px;
+            top: 0;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .yl_topbar-right a { color: #b8b8b8; }
+        .yl_topbar-right a:hover { color: #fff; }
+
+        /* ========== Logo + 搜索区 ========== */
+        .yl_header { background: #fff; }
+        .yl_header-inner {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+        }
+        .yl_logo {
+            display: inline-flex;
+            align-items: flex-end;
+            line-height: 1;
+            flex: none;
+        }
+        .yl_logo-word {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 34px;
+            font-weight: 700;
+            font-style: italic;
+            color: #e33b2e;
+            letter-spacing: -1px;
+        }
+        .yl_logo-paw {
+            position: relative;
+            width: 26px;
+            height: 26px;
+            margin: 0 3px 8px 2px;
+            flex: none;
+        }
+        .yl_logo-paw i {
+            position: absolute;
+            background: #4779f6;
+            border-radius: 50%;
+        }
+        .yl_logo-toe1 { width: 7px; height: 8px; left: 0; top: 7px; }
+        .yl_logo-toe2 { width: 7px; height: 9px; left: 6px; top: 1px; }
+        .yl_logo-toe3 { width: 7px; height: 9px; left: 13px; top: 0; }
+        .yl_logo-toe4 { width: 7px; height: 8px; left: 19px; top: 5px; }
+        .yl_logo-palm { width: 15px; height: 11px; left: 5px; top: 13px; }
+        .yl_logo-baike {
+            font-size: 32px;
+            font-weight: 700;
+            color: #4779f6;
+            margin-bottom: 3px;
+        }
+        .yl_search {
+            display: flex;
+            align-items: center;
+            width: 430px;
+            height: 38px;
+            margin-left: 24px;
+            padding: 0 10px;
+            border: 1px solid #4779f6;
+            border-radius: 4px;
+        }
+        .yl_search-ico {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            opacity: .55;
+        }
+        .yl_search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 14px;
+            color: #222;
+        }
+        .yl_search-clear {
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+            text-align: center;
+            color: #999;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        .yl_search-clear:hover { background: #eef0f3; color: #666; }
+        .yl_btn {
+            height: 38px;
+            padding: 0 18px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+        .yl_btn-enter {
+            margin-left: 12px;
+            background: #4779f6;
+            border-color: #4779f6;
+            color: #fff;
+        }
+        .yl_btn-enter:hover { background: #3a6be0; border-color: #3a6be0; }
+        .yl_btn-all {
+            margin-left: 10px;
+            background: #fff;
+            border-color: #d9dee6;
+            color: #222;
+        }
+        .yl_btn-all:hover { border-color: #4779f6; color: #4779f6; }
+        .yl_header-links {
+            margin-left: auto;
+            display: flex;
+            gap: 16px;
+        }
+        .yl_header-links a { color: #666; font-size: 13px; }
+        .yl_header-links a:hover { color: #4779f6; }
+
+        /* ========== 黄色防骗警示条 ========== */
+        .yl_notice {
+            background: #fdf6e3;
+            border-bottom: 1px solid #f0e2bd;
+        }
+        .yl_notice-inner {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 7px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .yl_notice-text {
+            flex: 1;
+            font-size: 12px;
+            line-height: 1.7;
+            color: #666;
+        }
+        .yl_notice-more {
+            color: #4779f6;
+            white-space: nowrap;
+        }
+        .yl_notice-close {
+            flex: none;
+            color: #b3a890;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 2px 4px;
+        }
+        .yl_notice-close:hover { color: #8a8a8a; }
+
+        /* ========== 蓝色主导航 ========== */
+        .yl_navbar { background: #4779f6; }
+        .yl_navbar-inner {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 0 20px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+        }
+        .yl_nav {
+            display: flex;
+            gap: 46px;
+        }
+        .yl_nav a {
+            color: #fff;
+            font-size: 15px;
+        }
+        .yl_nav-cur a { font-weight: 700; }
+        .yl_nav a:hover { opacity: .85; }
+        .yl_nav-user {
+            margin-left: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: #fff;
+            font-size: 14px;
+        }
+        .yl_nav-user img {
+            width: 15px;
+            height: 15px;
+            filter: brightness(0) invert(1);
+        }
+
+        /* ========== 主体布局 ========== */
+        .yl_main {
+            background: #f4f5f7;
+            padding: 16px 0 48px;
+            min-height: 560px;
+        }
+        .yl_layout {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .yl_content {
+            flex: 1;
+            min-width: 0;
+            background: #fff;
+            border-radius: 4px;
+            padding: 10px 22px 26px;
+        }
+        .yl_side {
+            flex: none;
+            width: 236px;
+        }
+
+        /* ========== 词条标题行 ========== */
+        .yl_title-row {
+            display: flex;
+            align-items: center;
+            padding-top: 10px;
+        }
+        .yl_title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #222;
+            white-space: nowrap;
+        }
+        .yl_pinyin {
+            font-style: normal;
+            font-size: 22px;
+            font-weight: 400;
+            color: #4779f6;
+            margin-left: 8px;
+        }
+        .yl_title-btns {
+            display: flex;
+            align-items: center;
+            margin-left: 18px;
+            flex: 1;
+            min-width: 0;
+        }
+        .yl_tool-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            height: 22px;
+            padding: 0 7px;
+            margin-right: 6px;
+            border: 1px solid #e3e5e7;
+            border-radius: 3px;
+            background: #fff;
+            color: #555;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .yl_tool-btn img { width: 12px; height: 12px; }
+        .yl_tool-btn:hover {
+            border-color: #4779f6;
+            color: #4779f6;
+        }
+        .yl_badge {
+            position: absolute;
+            top: -9px;
+            right: -9px;
+            min-width: 16px;
+            height: 15px;
+            padding: 0 4px;
+            background: #f5222d;
+            color: #fff;
+            font-size: 10px;
+            line-height: 15px;
+            text-align: center;
+            border-radius: 8px;
+        }
+        .yl_title-acts {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            padding-left: 12px;
+        }
+        .yl_act {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #666;
+            font-size: 13px;
+        }
+        .yl_act img {
+            width: 14px;
+            height: 14px;
+            opacity: .75;
+        }
+        .yl_act:hover { color: #4779f6; }
+        .yl_act-sep {
+            width: 1px;
+            height: 12px;
+            background: #ddd;
+            margin: 0 12px;
+        }
+
+        /* ========== 义项行 + 同名词条 ========== */
+        .yl_sub-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0 16px;
+            font-size: 13px;
+        }
+        .yl_sense { color: #555; }
+        .yl_sense:hover { color: #4779f6; }
+        .yl_sub-sep { color: #e0e0e0; }
+        .yl_expand {
+            color: #4779f6;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .yl_caret { font-size: 11px; }
+        .yl_sense-list {
+            display: none;
+            margin: -8px 0 16px;
+            padding: 8px 14px;
+            background: #f7f8fa;
+            border: 1px solid #ececec;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .yl_sense-list li { line-height: 26px; }
+        .yl_sense-list a { color: #4779f6; }
+
+        /* ========== 词条正文 ========== */
+        .yl_para {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.95;
+            margin-bottom: 14px;
+        }
+        .yl_link { color: #4779f6; }
+        .yl_link:hover { text-decoration: underline; }
+        .yl_ref {
+            color: #4779f6;
+            font-size: 12px;
+        }
+
+        /* ========== 相关星图 ========== */
+        .yl_star-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin: 26px 0 14px;
+        }
+        .yl_star-head h2 {
+            font-size: 20px;
+            color: #222;
+        }
+        .yl_more {
+            color: #999;
+            font-size: 12px;
+        }
+        .yl_more:hover { color: #4779f6; }
+        .yl_star-row {
+            display: flex;
+            gap: 10px;
+            overflow: hidden;
+            padding-bottom: 4px;
+        }
+        .yl_star-card {
+            position: relative;
+            flex: 0 0 306px;
+            padding: 12px 14px 14px;
+            border: 1px solid #e7e9ec;
+            border-radius: 8px;
+            background: #fff;
+        }
+        .yl_star-edit {
+            position: absolute;
+            right: 12px;
+            top: 13px;
+            width: 14px;
+            height: 14px;
+            opacity: .45;
+        }
+        .yl_star-title {
+            max-width: 82%;
+            font-size: 15px;
+            color: #222;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .yl_star-title a { color: inherit; }
+        .yl_star-title a:hover { color: #4779f6; }
+        .yl_star-meta {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 8px 0 12px;
+            font-size: 12px;
+            color: #999;
+        }
+        .yl_star-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .yl_star-meta img {
+            width: 12px;
+            height: 12px;
+            opacity: .55;
+        }
+        .yl_prod-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 8px;
+        }
+        .yl_rank-item,
+        .yl_prod-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+        .yl_rank-item { margin-bottom: 12px; }
+        .yl_rank-item:last-child { margin-bottom: 0; }
+        .yl_rank-num {
+            flex: none;
+            width: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #999;
+            text-align: center;
+        }
+        .yl_prod-ico {
+            flex: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .yl_prod-ico--blue { background: #4779f6; }
+        .yl_prod-ico--sky { background: #2b8fd6; }
+        .yl_prod-ico--green { background: #34b27c; }
+        .yl_prod-ico--violet { background: #5b5bd6; }
+        .yl_prod-ico--red { background: #e1251b; }
+        .yl_prod-ico--orange { background: #ff6a00; }
+        .yl_prod-ico--dark { background: #c4291c; }
+        .yl_prod-ico--rose { background: #d6336c; }
+        .yl_prod-txt {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .yl_prod-name {
+            font-size: 13px;
+            color: #4779f6;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .yl_rank-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #222;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .yl_prod-desc {
+            font-size: 11px;
+            color: #999;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ========== 右栏：概述图 ========== */
+        .yl_side-card {
+            background: #fff;
+            border: 1px solid #ececec;
+            border-radius: 4px;
+            margin-bottom: 14px;
+        }
+        .yl_intro-img {
+            height: 172px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .yl_intro-logo { transform: scale(1.12); }
+        .yl_intro-cap {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 9px 10px;
+            font-size: 13px;
+            color: #555;
+        }
+        .yl_intro-cap img {
+            width: 14px;
+            height: 14px;
+            opacity: .6;
+        }
+
+        /* ========== 右栏：TA说 ========== */
+        .yl_talk { padding: 12px 12px 14px; }
+        .yl_talk-head {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .yl_talk-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #222;
+        }
+        .yl_talk-sub {
+            flex: 1;
+            font-size: 12px;
+            color: #999;
+        }
+        .yl_talk-img {
+            height: 98px;
+            margin-bottom: 10px;
+            border: 1px solid #ececec;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            background: #fff;
+        }
+        .yl_oa-mark {
+            position: relative;
+            width: 46px;
+            height: 46px;
+            flex: none;
+        }
+        .yl_oa-mark i {
+            position: absolute;
+            left: 50%;
+            top: 3px;
+            width: 10px;
+            height: 20px;
+            margin-left: -5px;
+            background: #111;
+            border-radius: 5px;
+            transform-origin: 5px 20px;
+        }
+        .yl_oa-mark i:nth-child(1) { transform: rotate(0deg); }
+        .yl_oa-mark i:nth-child(2) { transform: rotate(60deg); }
+        .yl_oa-mark i:nth-child(3) { transform: rotate(120deg); }
+        .yl_oa-mark i:nth-child(4) { transform: rotate(180deg); }
+        .yl_oa-mark i:nth-child(5) { transform: rotate(240deg); }
+        .yl_oa-mark i:nth-child(6) { transform: rotate(300deg); }
+        .yl_oa-core {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 12px;
+            height: 12px;
+            margin: -6px 0 0 -6px;
+            background: #fff;
+            border-radius: 50%;
+            border: 3px solid #111;
+        }
+        .yl_oa-name {
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #111;
+            letter-spacing: .5px;
+        }
+        .yl_oa-prod {
+            display: inline-block;
+            margin-top: 3px;
+            padding: 1px 8px;
+            border: 2px solid #111;
+            border-radius: 6px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #111;
+        }
+        .yl_talk-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: #222;
+            line-height: 1.65;
+            margin-bottom: 8px;
+        }
+        .yl_talk-src {
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部黑色工具条 -->
+    <div class="yl_topbar">
+        <div class="yl_topbar-inner">
+            <ul class="yl_topnav">
+                <li><a href="javascript:;">网页</a></li>
+                <li><a href="javascript:;">新闻</a></li>
+                <li><a href="javascript:;">贴吧</a></li>
+                <li><a href="javascript:;">知道</a></li>
+                <li><a href="javascript:;">网盘</a></li>
+                <li><a href="javascript:;">图片</a></li>
+                <li><a href="javascript:;">视频</a></li>
+                <li><a href="javascript:;">地图</a></li>
+                <li><a href="javascript:;">文库</a></li>
+                <li><a href="javascript:;">资讯</a></li>
+                <li><a href="javascript:;">采购</a></li>
+                <li class="yl_topnav-cur"><a href="javascript:;">百科</a></li>
+            </ul>
+            <div class="yl_topbar-right">
+                <a href="javascript:;">百度首页</a>
+                <a href="javascript:;">百度用户#720549340</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logo + 搜索区 -->
+    <div class="yl_header">
+        <div class="yl_header-inner">
+            <a class="yl_logo" href="javascript:;">
+                <span class="yl_logo-word">Baidu</span>
+                <span class="yl_logo-paw">
+                    <i class="yl_logo-toe1"></i>
+                    <i class="yl_logo-toe2"></i>
+                    <i class="yl_logo-toe3"></i>
+                    <i class="yl_logo-toe4"></i>
+                    <i class="yl_logo-palm"></i>
+                </span>
+                <span class="yl_logo-baike">百科</span>
+            </a>
+            <div class="yl_search">
+                <img class="yl_search-ico" src="./tu biao/sousuo.png" alt="搜索">
+                <input class="yl_search-input" id="yl_searchInput" type="text" value="百度">
+                <span class="yl_search-clear" id="yl_searchClear" title="清除">×</span>
+            </div>
+            <button class="yl_btn yl_btn-enter" type="button">进入词条</button>
+            <button class="yl_btn yl_btn-all" type="button">全站搜索</button>
+            <div class="yl_header-links">
+                <a href="javascript:;">国际版</a>
+                <a href="javascript:;">帮助</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 黄色防骗警示条 -->
+    <div class="yl_notice" id="yl_notice">
+        <div class="yl_notice-inner">
+            <p class="yl_notice-text">近期有不法分子冒充百度百科官方人员，以删除词条为由威胁并敲诈相关企业。在此严正声明：百度百科是免费编辑平台，绝不存在收费代编服务，请勿上当受骗！ <a class="yl_notice-more" href="javascript:;">详情&gt;&gt;</a></p>
+            <span class="yl_notice-close" id="yl_noticeClose" title="关闭">×</span>
+        </div>
+    </div>
+
+    <!-- 蓝色主导航 -->
+    <div class="yl_navbar">
+        <div class="yl_navbar-inner">
+            <ul class="yl_nav">
+                <li class="yl_nav-cur"><a href="javascript:;">首页</a></li>
+                <li><a href="javascript:;">秒懂百科</a></li>
+                <li><a href="javascript:;">特色百科</a></li>
+                <li><a href="javascript:;">知识专题</a></li>
+                <li><a href="javascript:;">加入百科</a></li>
+                <li><a href="javascript:;">百科团队</a></li>
+                <li><a href="javascript:;">权威合作</a></li>
+            </ul>
+            <a class="yl_nav-user" href="javascript:;">
+                <img src="./tu biao/wode.png" alt="">个人中心
+            </a>
+        </div>
+    </div>
+
+    <!-- 主体 -->
+    <div class="yl_main">
+        <div class="yl_layout">
+            <!-- 左侧词条正文 -->
+            <div class="yl_content">
+                <div class="yl_title-row">
+                    <h1 class="yl_title">百度<em class="yl_pinyin">[bǎi dù]</em></h1>
+                    <div class="yl_title-btns">
+                        <a class="yl_tool-btn" href="javascript:;"><img src="./tu biao/a-fabudaifabu.png" alt="播报">播报</a>
+                        <a class="yl_tool-btn" href="javascript:;"><img src="./tu biao/jubao.png" alt="锁定">锁定</a>
+                        <a class="yl_tool-btn" href="javascript:;"><img src="./tu biao/pinglun.png" alt="讨论">讨论<span class="yl_badge">30</span></a>
+                        <a class="yl_tool-btn" href="javascript:;"><img src="./tu biao/fabusekuai.png" alt="上传视频">上传视频</a>
+                        <a class="yl_tool-btn" href="javascript:;"><img src="./tu biao/tiwen.png" alt="中文">中文</a>
+                    </div>
+                    <div class="yl_title-acts">
+                        <a class="yl_act" href="javascript:;"><img src="./tu biao/shoucang.png" alt="订阅">订阅更新</a>
+                        <span class="yl_act-sep"></span>
+                        <a class="yl_act" href="javascript:;"><img src="./tu biao/dianzan.png" alt="赞">53704</a>
+                        <span class="yl_act-sep"></span>
+                        <a class="yl_act" href="javascript:;"><img src="./tu biao/cai.png" alt="踩">8003</a>
+                    </div>
+                </div>
+
+                <div class="yl_sub-row">
+                    <a class="yl_sense" href="javascript:;">百度公司</a>
+                    <span class="yl_sub-sep">|</span>
+                    <a class="yl_expand" id="yl_expandBtn">展开3个同名词条 <span class="yl_caret">▾</span></a>
+                </div>
+                <ul class="yl_sense-list" id="yl_senseList">
+                    <li><a href="javascript:;">百度（汉语词语）</a></li>
+                    <li><a href="javascript:;">百度（动画短片）</a></li>
+                    <li><a href="javascript:;">百度（流行歌曲）</a></li>
+                </ul>
+
+                <p class="yl_para">百度（Baidu）是拥有强大互联网基础的领先AI公司。百度愿景是：成为最懂用户，并能帮助人们成长的全球顶级高科技公司。<a class="yl_ref" href="javascript:;">[1]</a></p>
+                <p class="yl_para">“百度”二字，来自于八百年前南宋词人<a class="yl_link" href="javascript:;">辛弃疾</a>的一句词：众里寻他千百度。这句词描述了词人对理想的执着追求。1999年底，身在美国硅谷的李彦宏看到了中国互联网及中文搜索引擎服务的巨大发展潜力，抱着技术改变世界的梦想，他毅然辞掉硅谷的高薪工作，携搜索引擎专利技术，于2000年1月1日在中关村创建了百度公司。</p>
+                <p class="yl_para">百度拥有数万名研发工程师，这是中国乃至全球最为顶尖的技术团队。这支队伍掌握着世界上最为先进的搜索引擎技术，使百度成为中国掌握世界尖端科学核心技术的中国高科技企业，也使中国成为美国、俄罗斯和韩国之外，全球仅有的4个拥有搜索引擎核心技术的国家之一。<a class="yl_ref" href="javascript:;">[1]</a></p>
+
+                <!-- 相关星图 -->
+                <div class="yl_star-head">
+                    <h2>相关星图</h2>
+                    <a class="yl_more" href="javascript:;">查看更多 &gt;</a>
+                </div>
+                <div class="yl_star-row">
+                    <div class="yl_star-card">
+                        <img class="yl_star-edit" src="./tu biao/fankui.png" alt="编辑">
+                        <h3 class="yl_star-title"><a href="javascript:;">百度公司旗下产品 &gt;</a></h3>
+                        <div class="yl_star-meta">
+                            <span><img src="./tu biao/tiwen1.png" alt="">共453个词条</span>
+                            <span><img src="./tu biao/wodefankui.png" alt="">57.2万阅读</span>
+                        </div>
+                        <div class="yl_prod-grid">
+                            <a class="yl_prod-item" href="javascript:;">
+                                <span class="yl_prod-ico yl_prod-ico--blue">du</span>
+                                <span class="yl_prod-txt">
+                                    <span class="yl_prod-name">百度搜索</span>
+                                    <span class="yl_prod-desc">搜索引擎</span>
+                                </span>
+                            </a>
+                            <a class="yl_prod-item" href="javascript:;">
+                                <span class="yl_prod-ico yl_prod-ico--sky">百</span>
+                                <span class="yl_prod-txt">
+                                    <span class="yl_prod-name">百度</span>
+                                    <span class="yl_prod-desc">搜索引擎、AI助手</span>
+                                </span>
+                            </a>
+                            <a class="yl_prod-item" href="javascript:;">
+                                <span class="yl_prod-ico yl_prod-ico--green">图</span>
+                                <span class="yl_prod-txt">
+                                    <span class="yl_prod-name">百度地图</span>
+                                    <span class="yl_prod-desc">智能导航</span>
+                                </span>
+                            </a>
+                            <a class="yl_prod-item" href="javascript:;">
+                                <span class="yl_prod-ico yl_prod-ico--violet">盘</span>
+                                <span class="yl_prod-txt">
+                                    <span class="yl_prod-name">百度网盘</span>
+                                    <span class="yl_prod-desc">云存储服务</span>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="yl_star-card">
+                        <img class="yl_star-edit" src="./tu biao/fankui.png" alt="编辑">
+                        <h3 class="yl_star-title"><a href="javascript:;">2026中国民营企业500强 &gt;</a></h3>
+                        <div class="yl_star-meta">
+                            <span><img src="./tu biao/tiwen1.png" alt="">共500个词条</span>
+                            <span><img src="./tu biao/wodefankui.png" alt="">4.7万阅读</span>
+                        </div>
+                        <div class="yl_rank-list">
+                            <a class="yl_rank-item" href="javascript:;">
+                                <span class="yl_rank-num">1</span>
+                                <span class="yl_prod-ico yl_prod-ico--red">JD</span>
+                                <span class="yl_prod-txt">
+                                    <span class="yl_rank-name">京东</span>
+                                    <span class="yl_prod-desc">营收总额（亿元）：10847</span>
+                                </span>
+                            </a>
+                            <a class="yl_rank-item" href="javascript:;">
+                                <span class="yl_rank-num">2</span>
+                                <span class="yl_prod-ico yl_prod-ico--orange">阿</span>
+                                <span class="yl_prod-txt">
+                                    <span class="yl_rank-name">阿里巴巴</span>
+                                    <span class="yl_prod-desc">营收总额（亿元）：9412</span>
+                                </span>
+                            </a>
+                            <a class="yl_rank-item" href="javascript:;">
+                                <span class="yl_rank-num">3</span>
+                                <span class="yl_prod-ico yl_prod-ico--dark">恒</span>
+                                <span class="yl_prod-txt">
+                                    <span class="yl_rank-name">恒力集团</span>
+                                    <span class="yl_prod-desc">营收总额（亿元）：8118</span>
+                                </span>
+                            </a>
+                            <a class="yl_rank-item" href="javascript:;">
+                                <span class="yl_rank-num">4</span>
+                                <span class="yl_prod-ico yl_prod-ico--rose">华</span>
+                                <span class="yl_prod-txt">
+                                    <span class="yl_rank-name">华为</span>
+                                    <span class="yl_prod-desc">营收总额（亿元）：7042</span>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="yl_star-card">
+                        <img class="yl_star-edit" src="./tu biao/fankui.png" alt="编辑">
+                        <h3 class="yl_star-title"><a href="javascript:;">在浙江的知名企业 &gt;</a></h3>
+                        <div class="yl_star-meta">
+                            <span><img src="./tu biao/tiwen1.png" alt="">共86个词条</span>
+                            <span><img src="./tu biao/wodefankui.png" alt="">2.3万阅读</span>
+                        </div>
+                        <div class="yl_rank-list">
+                            <a class="yl_rank-item" href="javascript:;">
+                                <span class="yl_rank-num">1</span>
+                                <span class="yl_prod-ico yl_prod-ico--orange">阿</span>
+                                <span class="yl_prod-txt">
+                                    <span class="yl_rank-name">阿里巴巴</span>
+                                    <span class="yl_prod-desc">总部位于杭州</span>
+                                </span>
+                            </a>
+                            <a class="yl_rank-item" href="javascript:;">
+                                <span class="yl_rank-num">2</span>
+                                <span class="yl_prod-ico yl_prod-ico--blue">物</span>
+                                <span class="yl_prod-txt">
+                                    <span class="yl_rank-name">物产中大</span>
+                                    <span class="yl_prod-desc">总部位于杭州</span>
+                                </span>
+                            </a>
+                            <a class="yl_rank-item" href="javascript:;">
+                                <span class="yl_rank-num">3</span>
+                                <span class="yl_prod-ico yl_prod-ico--sky">吉</span>
+                                <span class="yl_prod-txt">
+                                    <span class="yl_rank-name">吉利控股</span>
+                                    <span class="yl_prod-desc">总部位于杭州</span>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧边栏 -->
+            <div class="yl_side">
+                <div class="yl_side-card">
+                    <div class="yl_intro-img">
+                        <div class="yl_intro-logo">
+                            <a class="yl_logo" href="javascript:;">
+                                <span class="yl_logo-word">Baidu</span>
+                                <span class="yl_logo-paw">
+                                    <i class="yl_logo-toe1"></i>
+                                    <i class="yl_logo-toe2"></i>
+                                    <i class="yl_logo-toe3"></i>
+                                    <i class="yl_logo-toe4"></i>
+                                    <i class="yl_logo-palm"></i>
+                                </span>
+                                <span class="yl_logo-baike">百科</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="yl_intro-cap">
+                        <img src="./tu biao/fabusekuai.png" alt="">百度的概述图（1张）
+                    </div>
+                </div>
+
+                <div class="yl_side-card yl_talk">
+                    <div class="yl_talk-head">
+                        <span class="yl_talk-title">TA说</span>
+                        <span class="yl_talk-sub">分享你的世界</span>
+                        <a class="yl_more" href="javascript:;">查看更多 &gt;</a>
+                    </div>
+                    <div class="yl_talk-img">
+                        <div class="yl_oa-mark">
+                            <i></i><i></i><i></i><i></i><i></i><i></i>
+                            <span class="yl_oa-core"></span>
+                        </div>
+                        <div class="yl_oa-txt">
+                            <div class="yl_oa-name">OpenAI</div>
+                            <div class="yl_oa-prod">ChatGPT</div>
+                        </div>
+                    </div>
+                    <p class="yl_talk-text">别急着给中国版ChatGPT唱赞歌：“追风者”无缘“星辰大海”</p>
+                    <p class="yl_talk-src">After嚼科技-知名科技自媒体</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // 姓名：张浩扬  建立时间：2026-10-29 14:36:35  模型：Xiaomi MiMo-V2.6-Pro  功能：百度百科词条页模仿
+    (function () {
+        var yl_noticeEl = document.getElementById('yl_notice');
+        var yl_noticeCloseEl = document.getElementById('yl_noticeClose');
+        yl_noticeCloseEl.addEventListener('click', function () {
+            yl_noticeEl.style.display = 'none';
+        });
+
+        var yl_searchInputEl = document.getElementById('yl_searchInput');
+        var yl_searchClearEl = document.getElementById('yl_searchClear');
+        yl_searchClearEl.addEventListener('click', function () {
+            yl_searchInputEl.value = '';
+            yl_searchInputEl.focus();
+        });
+
+        var yl_expandBtnEl = document.getElementById('yl_expandBtn');
+        var yl_senseListEl = document.getElementById('yl_senseList');
+        yl_expandBtnEl.addEventListener('click', function () {
+            var yl_opened = yl_senseListEl.style.display === 'block';
+            yl_senseListEl.style.display = yl_opened ? 'none' : 'block';
+            yl_expandBtnEl.innerHTML = yl_opened
+                ? '展开3个同名词条 <span class="yl_caret">▾</span>'
+                : '收起同名词条 <span class="yl_caret">▴</span>';
+        });
+    })();
+    </script>
+</body>
+</html>

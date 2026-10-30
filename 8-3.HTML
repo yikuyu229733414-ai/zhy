@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>网格布局</title>
+    <style>
+        .container {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px; /* 格子间隙 */
+        }
+        .item {
+            background-color: #ffffff; /*白底*/
+            color: #000000; /*黑字*/
+            border:1px solid #999;
+            aspect-ratio: 1/1; /*强制正方形*/
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size:30px;
+        }
+        /* 偶数格子 hover变色 */
+        .item:nth-child(even):hover{
+            background-color:#333;
+            color:#fff;
+        }
+        /* 5号线性渐变 */
+        .item5{
+            background: linear-gradient(#fff, #222);
+            color:white;
+        }
+        /*6号径向渐变*/
+        .item6{
+            background: radial-gradient(circle, #fff, #111);
+            color:white;
+        }
+        /* 12号hover切换文字 */
+        .item12 .text-show{
+            display:none;
+        }
+        .item12:hover .text-show{
+            display:block;
+        }
+        .item12:hover .origin{
+            display:none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="item">1</div>
+        <div class="item">2</div>
+        <div class="item">3</div>
+        <div class="item">4</div>
+        <div class="item item5">5</div>
+        <div class="item item6">6</div>
+        <div class="item">7</div>
+
+        <div class="item">8</div>
+        <div class="item">9</div>
+        <div class="item">10</div>
+        <div class="item">#11</div>
+        <div class="item item12">
+            <span class="origin">12</span>
+            <span class="text-show">zhy</span>
+        </div>
+        <div class="item"></div>
+        <div class="item"></div>
+    </div>
+</body>
+</html>

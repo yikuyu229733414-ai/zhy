@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>zhy 的《高级网页设计》课堂实践</title>
+    <style>
+        :root {
+            --bg1: #f4f7ff;
+            --bg2: #edf2ff;
+            --primary: #3d5afe;
+            --primary-2: #6f6af8;
+            --text: #1f2a37;
+            --muted: #667085;
+            --card: rgba(255,255,255,0.82);
+            --border: rgba(61,90,254,0.14);
+            --shadow: 0 20px 45px rgba(69, 87, 155, 0.15);
+        }
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(111,106,248,0.18), transparent 24%),
+                radial-gradient(circle at bottom right, rgba(61,90,254,0.18), transparent 30%),
+                linear-gradient(135deg, var(--bg1), var(--bg2));
+        }
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 36px 20px 60px;
+        }
+        .hero {
+            position: relative;
+            overflow: hidden;
+            padding: 42px 34px;
+            border-radius: 28px;
+            background: linear-gradient(135deg, rgba(61,90,254,0.94), rgba(111,106,248,0.9));
+            box-shadow: var(--shadow);
+            color: #fff;
+            animation: fadeUp 0.9s ease both;
+        }
+        .hero::before,
+        .hero::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            animation: floatOrb 14s ease-in-out infinite alternate;
+        }
+        .hero::before {
+            width: 360px;
+            height: 360px;
+            right: -80px;
+            top: -100px;
+        }
+        .hero::after {
+            width: 260px;
+            height: 260px;
+            left: -40px;
+            bottom: -110px;
+            animation-delay: 0.6s;
+        }
+        .badge {
+            position: relative;
+            z-index: 1;
+            display: inline-block;
+            padding: 8px 18px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.35);
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(6px);
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+        h1 {
+            position: relative;
+            z-index: 1;
+            margin: 18px 0 10px;
+            font-size: clamp(28px, 3vw, 52px);
+            line-height: 1.2;
+            animation: fadeUp 1s ease 0.12s both;
+        }
+        .subtitle {
+            position: relative;
+            z-index: 1;
+            margin: 0;
+            font-size: 17px;
+            color: rgba(255,255,255,0.9);
+            animation: fadeUp 1s ease 0.22s both;
+        }
+        .main {
+            display: grid;
+            grid-template-columns: 1.8fr 1fr;
+            gap: 24px;
+            margin-top: 28px;
+            align-items: start;
+        }
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            padding: 24px;
+            backdrop-filter: blur(6px);
+            animation: fadeUp 0.9s ease both;
+        }
+        .panel:nth-child(2) { animation-delay: 0.12s; }
+        .panel h2 {
+            margin: 0 0 18px;
+            font-size: 24px;
+        }
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+        }
+        .link-card {
+            position: relative;
+            display: block;
+            overflow: hidden;
+            padding: 20px 18px;
+            border-radius: 18px;
+            text-decoration: none;
+            color: var(--text);
+            background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(243,247,255,0.96));
+            border: 1px solid rgba(61,90,254,0.12);
+            box-shadow: 0 10px 24px rgba(61,90,254,0.08);
+            transition:
+                transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+                box-shadow 0.28s ease,
+                border-color 0.28s ease,
+                filter 0.28s ease;
+            opacity: 0;
+            animation: cardIn 0.75s ease forwards;
+        }
+        .link-card:nth-child(1) { animation-delay: 0.08s; }
+        .link-card:nth-child(2) { animation-delay: 0.16s; }
+        .link-card:nth-child(3) { animation-delay: 0.24s; }
+        .link-card:nth-child(4) { animation-delay: 0.32s; }
+        .link-card:nth-child(5) { animation-delay: 0.40s; }
+        .link-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.7) 45%, transparent 100%);
+            transform: translateX(-130%);
+            transition: transform 0.85s ease;
+        }
+        .link-card:hover {
+            transform: translateY(-6px) scale(1.01);
+            border-color: rgba(61,90,254,0.28);
+            box-shadow: 0 18px 34px rgba(61,90,254,0.14);
+            filter: saturate(1.05);
+        }
+        .link-card:hover::before {
+            transform: translateX(130%);
+        }
+        .link-card:hover .file-index {
+            transform: rotate(-8deg) scale(1.06);
+        }
+        .file-index {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            margin-bottom: 14px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            color: #fff;
+            font-weight: 700;
+            box-shadow: 0 8px 16px rgba(61,90,254,0.25);
+            transition: transform 0.28s ease;
+        }
+        .link-card h3 {
+            margin: 0 0 10px;
+            font-size: 18px;
+            color: var(--text);
+        }
+        .link-card p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.65;
+            font-size: 14px;
+        }
+        .prompt-box {
+            background: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(245,248,255,0.96));
+            border: 1px solid rgba(61,90,254,0.12);
+            border-radius: 18px;
+            padding: 18px;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+        .prompt-box:hover {
+            transform: translateY(-2px);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3), 0 14px 22px rgba(61,90,254,0.08);
+        }
+        .prompt-box h3 {
+            margin: 0 0 12px;
+            font-size: 18px;
+        }
+        .prompt-box pre {
+            margin: 0;
+            padding: 16px;
+            border-left: 4px solid var(--primary);
+            border-radius: 12px;
+            background: rgba(97,121,255,0.05);
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: var(--text);
+            line-height: 1.8;
+            font-size: 14px;
+            font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+        }
+        .footer-note {
+            margin-top: 28px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 14px;
+            animation: fadeUp 0.9s ease 0.5s both;
+        }
+
+        /* ========== 新增：上图下文 横向铺满 ========== */
+        .img-top-bottom ul.top-bottom-list{
+            list-style:none;
+            display:flex;
+            width:100%;
+            gap:12px;
+        }
+        .img-top-bottom ul.top-bottom-list li{
+            flex:1;
+            text-align:center;
+        }
+        .img-top-bottom ul.top-bottom-list li img{
+            width:100%;
+            display:block;
+            border-radius:12px;
+            object-fit:cover;
+            border:1px solid var(--border);
+        }
+        .img-top-bottom ul.top-bottom-list li p{
+            margin-top:10px;
+            font-size:17px;
+        }
+
+        /* ========== 新增：左图右文 ========== */
+        .img-left-right ul.left-right-list{
+            list-style:none;
+        }
+        .img-left-right ul.left-right-list li{
+            display:flex;
+            align-items:center;
+            margin-bottom:16px;
+            gap:16px;
+            border:1px solid var(--border);
+            border-radius:14px;
+            padding:12px;
+            background:rgba(255,255,255,0.6);
+        }
+        .img-left-right ul.left-right-list li img{
+            width:50%;
+            display:block;
+            border-radius:10px;
+            object-fit:cover;
+        }
+        .img-left-right ul.left-right-list li p{
+            width:50%;
+            text-align:center;
+            font-size:17px;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        @keyframes floatOrb {
+            0% {
+                transform: translate3d(0, 0, 0) scale(1);
+            }
+            50% {
+                transform: translate3d(12px, -10px, 0) scale(1.05);
+            }
+            100% {
+                transform: translate3d(-10px, 14px, 0) scale(1.08);
+            }
+        }
+        @media (max-width: 900px) {
+            .main {
+                grid-template-columns: 1fr;
+            }
+            /* 手机端上图下文改为竖排 */
+            .img-top-bottom ul.top-bottom-list{
+                flex-direction:column;
+            }
+            /* 手机端左图右文改为上图下文 */
+            .img-left-right ul.left-right-list li{
+                flex-direction:column;
+            }
+            .img-left-right ul.left-right-list li img,
+            .img-left-right ul.left-right-list li p{
+                width:100%;
+            }
+        }
+        @media (max-width: 520px) {
+            .page {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+            .hero {
+                padding: 30px 22px;
+            }
+            .panel {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header class="hero">
+            <div class="badge">zhy 的《高级网页设计》课堂实践</div>
+            <h1>高级网页设计课程作业导航页</h1>
+            <p class="subtitle">本页面汇总了当前目录下的所有网页链接，使用原生 HTML + CSS 美化，便于查看与跳转。</p>
+        </header>
+        <main class="main">
+            <section class="panel">
+                <h2>网页目录</h2>
+                <div class="links-grid">
+                    <a class="link-card" href="./2-1.html" target="_blank">
+                        <div class="file-index">01</div>
+                        <h3>2-1.html</h3>
+                        <p>zhy 的第一个网页；HTML 元素示例，包含静夜思、列表、DIV、SPAN 等内容。</p>
+                    </a>
+                    <a class="link-card" href="./2-2.html" target="_blank">
+                        <div class="file-index">02</div>
+                        <h3>2-2.html</h3>
+                        <p>超链接与图片链接示例，包含图像、表格及当前目录访问方式演示。</p>
+                    </a>
+                    <a class="link-card" href="./3-1.html" target="_blank">
+                        <div class="file-index">03</div>
+                        <h3>3-1.html</h3>
+                        <p>HTML 表单 form 使用示例，包括文本框、密码框、单选、多选、下拉框、文本域、日期、文件上传和按钮。</p>
+                    </a>
+                    <a class="link-card" href="./3-2.html" target="_blank">
+                        <div class="file-index">04</div>
+                        <h3>3-2.html</h3>
+                        <p>CSS 进阶示例，展示层叠样式表、选择器、颜色设定及样式应用方式。</p>
+                    </a>
+                    <a class="link-card" href="./4-1 css.html" target="_blank">
+                        <div class="file-index">05</div>
+                        <h3>4-1 css.html</h3>
+                        <p>CSS 进阶页面，演示群组选择器、后代选择器、层叠与继承，以及页面文案样式布局。</p>
+                    </a>
+                    <a class="link-card" href="./5-2.html" target="_blank" rel="noopener">
+                        <div class="file-index">06</div>
+                        <h3>5-2.html</h3>
+                        <p>盒模型示例，展示边框、内边距和外边距。</p>
+                    </a>
+                    <a class="link-card" href="./5-1.HTML" target="_blank" rel="noopener">
+                        <div class="file-index">07</div>
+                        <h3>5-1.HTML</h3>
+                        <p>CSS 选择器优先级、层叠与继承示例。</p>
+                    </a>
+                    <a class="link-card" href="./6-1.HTML" target="_blank" rel="noopener">
+                        <div class="file-index">08</div>
+                        <h3>6-1.HTML</h3>
+                        <p>Flex 布局与列表排列练习。</p>
+                    </a>
+                    <a class="link-card" href="./6-2.html" target="_blank" rel="noopener">
+                        <div class="file-index">09</div>
+                        <h3>6-2.html</h3>
+                        <p>使用 Flex 布局制作标题栏示例。</p>
+                    </a>
+                    <a class="link-card" href="./7-1.html" target="_blank" rel="noopener">
+                        <div class="file-index">10</div>
+                        <h3>7-1.html</h3>
+                        <p>图片横向等分排列，上图下文布局练习。</p>
+                    </a>
+                    <a class="link-card" href="./7-2.html" target="_blank" rel="noopener">
+                        <div class="file-index">11</div>
+                        <h3>7-2.html</h3>
+                        <p>图片与文字左右排列布局练习。</p>
+                    </a>
+                    <a class="link-card" href="./8-3.HTML" target="_blank" rel="noopener">
+                        <div class="file-index">12</div>
+                        <h3>8-3.HTML</h3>
+                        <p>CSS Grid 网格布局、渐变与悬停效果示例。</p>
+                    </a>
+                    <a class="link-card" href="./9-1.HTML" target="_blank" rel="noopener">
+                        <div class="file-index">13</div>
+                        <h3>9-1.HTML</h3>
+                        <p>图片卡片网格，包含悬停放大和文字遮罩效果。</p>
+                    </a>
+                    <a class="link-card" href="./11.2.html" target="_blank" rel="noopener">
+                        <div class="file-index">14</div>
+                        <h3>11.2.html</h3>
+                        <p>CSS3 3D 动画展示：旋转立方体、环形轮播、翻转卡片与 3D 阶梯。</p>
+                    </a>
+                    <a class="link-card" href="./11.1.html" target="_blank" rel="noopener">
+                        <div class="file-index">15</div>
+                        <h3>11.1.html</h3>
+                        <p>CSS 长度单位展示：px、pt/cm/in、%、em、rem、vw、vh、vmin/vmax、ch、ex 可视化对比。</p>
+                    </a>
+                    <a class="link-card" href="./zhihu-elements.html" target="_blank" rel="noopener">
+                        <div class="file-index">16</div>
+                        <h3>zhihu-elements.html</h3>
+                        <p>知乎网站模仿·网页元素设计：顶部导航、左图右文帖子卡片（含操作栏）、上图下文配图卡片、底部导航、功能入口（炫狗素材 + tu biao 图标，flex 布局）。</p>
+                    </a>
+                    <a class="link-card" href="./13-1.html" target="_blank" rel="noopener">
+                        <div class="file-index">17</div>
+                        <h3>13-1.html</h3>
+                        <p>Font Awesome 字体图标展示：solid / regular / brands 图标集，字号、颜色、动画控制（资源在 cdn/fontawesome/）。</p>
+                    </a>
+                    <a class="link-card" href="./13-2.html" target="_blank" rel="noopener">
+                        <div class="file-index">18</div>
+                        <h3>13-2.html</h3>
+                        <p>Lucide SVG 图标展示：img 引用本地 SVG 与内联 SVG 两种方式，描边色、线宽、尺寸控制（资源在 cdn/lucide/）。</p>
+                    </a>
+                    <a class="link-card" href="./13-3.html" target="_blank" rel="noopener">
+                        <div class="file-index">19</div>
+                        <h3>13-3.html</h3>
+                        <p>移动端固定自适应底部导航（字体图标版）：Font Awesome 四项导航 + 右上角数字徽章与红点，含 tu biao 素材对照。</p>
+                    </a>
+                    <a class="link-card" href="./13-4.html" target="_blank" rel="noopener">
+                        <div class="file-index">20</div>
+                        <h3>13-4.html</h3>
+                        <p>移动端固定自适应底部导航（SVG 版）：Lucide 内联 SVG 四项导航 + 右上角数字徽章与红点，含 tu biao 素材对照。</p>
+                    </a>
+                    <a class="link-card" href="./14-2.html" target="_blank" rel="noopener">
+                        <div class="file-index">21</div>
+                        <h3>14-2.html</h3>
+                        <p>JavaScript 六种基本数据类型演示：Number、String、Boolean、Undefined、Null、Object，含 typeof 类型检测。</p>
+                    </a>
+                    <a class="link-card" href="./15-1.html" target="_blank" rel="noopener">
+                        <div class="file-index">22</div>
+                        <h3>15-1.html</h3>
+                        <p>数七游戏：100 个盒子，7 的倍数或含数字 7 的盒子显示为空盒，其余盒子显示数字。</p>
+                    </a>
+                    <a class="link-card" href="./15-2.html" target="_blank" rel="noopener">
+                        <div class="file-index">23</div>
+                        <h3>15-2.html</h3>
+                        <p>JavaScript 程序结构演示：条件结构（if / else if / else、switch）与循环结构（for、while、do...while、break、continue）。</p>
+                    </a>
+                    <a class="link-card" href="./16-3.html" target="_blank" rel="noopener">
+                        <div class="file-index">24</div>
+                        <h3>16-3.html</h3>
+                        <p>百度百科词条页模仿：顶部黑色工具条、Logo+搜索区、防骗警示条、蓝色主导航、词条正文工具条（播报/锁定/讨论/上传视频/中文）、相关星图卡片、右侧概述图与 TA 说栏目（图标取自 tu biao）。</p>
+                    </a>
+                    <a class="link-card" href="./16-4.html" target="_blank" rel="noopener">
+                        <div class="file-index">25</div>
+                        <h3>16-4.html</h3>
+                        <p>点击排行组件：实时点击 / 24小时排行选项卡切换（橙色下划线 + 向下箭头），前三名橙色方框序号，标题超宽裁切与点击量列（图标取自 tu biao）。</p>
+                    </a>
+                </div>
+            </section>
+            <aside class="panel">
+                <h2>本提示词</h2>
+                <div class="prompt-box">
+                    <h3>提示内容</h3>
+                    <pre>创建一个新页面，包括本目录下的所有网页的超链接，使用原生代码，不使用cdn，新页面名称为index.html，主题为zhy的《高级网页设计》课堂实践，美化页面，页面中包括本提示词。</pre>
+                </div>
+            </aside>
+        </main>
+
+        <!-- 新增：图片布局演示区域 -->
+        <section class="panel" style="margin-top:24px;">
+            <h2>图片布局练习</h2>
+
+            <div class="img-top-bottom" style="margin-bottom:32px;">
+                <h3 style="margin-bottom:14px;font-size:20px;">上图‑下文（横向等分填充）</h3>
+                <ul class="top-bottom-list">
+                    <li><img src="./img/炫狗.jpg" alt="炫狗"><p>炫狗</p></li>
+                    <li><img src="./img/炫狗1.jpg" alt="炫狗1"><p>炫狗1</p></li>
+                    <li><img src="./img/炫狗2.jpg" alt="炫狗2"><p>炫狗2</p></li>
+                </ul>
+            </div>
+
+            <div class="img-left-right">
+                <h3 style="margin-bottom:14px;font-size:20px;">左图‑右文</h3>
+                <ul class="left-right-list">
+                    <li><img src="./img/炫狗.jpg" alt="炫狗"><p>炫狗</p></li>
+                    <li><img src="./img/炫狗1.jpg" alt="炫狗1"><p>炫狗1</p></li>
+                    <li><img src="./img/炫狗2.jpg" alt="炫狗2"><p>炫狗2</p></li>
+                </ul>
+            </div>
+        </section>
+
+        <div class="footer-note">
+            说明：本页面为原生 HTML/CSS 构建，不依赖任何 CDN，适合直接在本地浏览器中打开查看。
+        </div>
+    </div>
+</body>
+</html>

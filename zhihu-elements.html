@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<!-- 24001010302 张浩扬 · 高级网页设计I · 网页元素设计 · 选题：知乎网站模仿 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知乎网站模仿·网页元素设计 - 24001010302 张浩扬</title>
+    <style>
+        /* ========== 全局 CSS（24001010302 张浩扬） ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+            background: #f6f6f6;
+            color: #121212;
+            font-size: 14px;
+        }
+        a {
+            text-decoration: none;
+                    color: inherit;
+        }
+        img {
+            display: block;
+        }
+
+        /* 元素标签（仅展示用途） */
+        .yuan-zhy-tag {
+            max-width: 1000px;
+            margin: 28px auto 10px;
+            padding: 0 16px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #0084ff;
+        }
+
+        /* ========== 网页元素1：顶部导航（知乎风） ========== */
+        .yuan-zhy-nav {
+            background: #ffffff;
+            border-bottom: 1px solid #ebebeb;
+        }
+        .yuan-zhy-nav-inner {
+            max-width: 1200px;
+            height: 52px;
+            margin: 0 auto;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .yuan-zhy-logo {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .yuan-zhy-logo-mark {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            background: #0084ff;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .yuan-zhy-logo-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: #175199;
+            letter-spacing: 1px;
+        }
+        .yuan-zhy-menu {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .yuan-zhy-menu-link {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #666;
+            white-space: nowrap;
+        }
+        .yuan-zhy-menu-active {
+            color: #175199;
+            font-weight: 600;
+        }
+        .yuan-zhy-search {
+            flex: 1;
+            max-width: 380px;
+            height: 34px;
+            background: #f6f6f6;
+            border-radius: 17px;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            gap: 8px;
+            color: #999;
+            font-size: 13px;
+        }
+        .yuan-zhy-search-ico {
+            width: 16px;
+            height: 16px;
+            opacity: 0.55;
+        }
+        .yuan-zhy-nav-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-shrink: 0;
+        }
+        .yuan-zhy-btn {
+            background: #0084ff;
+            color: #fff;
+            font-size: 14px;
+            padding: 6px 16px;
+            border-radius: 4px;
+        }
+        .yuan-zhy-btn img {
+            width: 16px;
+            height: 16px;
+            margin-right: 4px;
+            display: inline-block;
+            vertical-align: -3px;
+            filter: brightness(0) invert(1);
+        }
+        .yuan-zhy-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #ebebeb;
+        }
+
+        /* ========== 网页元素2：左图右文（帖子卡片） ========== */
+        .yuan-zhy-post-list {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+        .yuan-zhy-post {
+            display: flex;
+            gap: 16px;
+            background: #ffffff;
+            border: 1px solid #ebebeb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 14px;
+            align-items: stretch;
+        }
+        .yuan-zhy-post-img {
+            width: 190px;
+            height: 130px;
+            flex-shrink: 0;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        .yuan-zhy-post-text {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .yuan-zhy-post-title {
+            font-size: 17px;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+        .yuan-zhy-post-sum {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.7;
+            flex: 1;
+            overflow: hidden;
+        }
+        .yuan-zhy-post-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+            color: #8590a6;
+            font-size: 13px;
+        }
+        .yuan-zhy-post-author {
+            color: #666;
+            font-weight: 600;
+        }
+        .yuan-zhy-post-up {
+            background: #ebf5ff;
+            color: #0084ff;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+
+        /* ========== 网页元素3：上图下文（配图卡片） ========== */
+        .yuan-zhy-grid {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 16px;
+            display: flex;
+            gap: 16px;
+        }
+        .yuan-zhy-cell {
+            flex: 1;
+            background: #ffffff;
+            border: 1px solid #ebebeb;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .yuan-zhy-cell-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        .yuan-zhy-cell-body {
+            padding: 12px 14px 14px;
+        }
+        .yuan-zhy-cell-title {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 6px;
+        }
+        .yuan-zhy-cell-sum {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* ========== 网页元素2+：帖子操作栏（tu biao 图标） ========== */
+        .yuan-zhy-actions {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid #f0f0f0;
+            flex-wrap: wrap;
+        }
+        .yuan-zhy-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border: none;
+            background: none;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .yuan-zhy-action:hover {
+            background: #f6f6f6;
+            color: #175199;
+        }
+        .yuan-zhy-action img {
+            width: 18px;
+            height: 18px;
+        }
+        .yuan-zhy-action-on {
+            color: #0084ff;
+            font-weight: 600;
+        }
+        .yuan-zhy-action-end {
+            margin-left: auto;
+        }
+
+        /* ========== 网页元素4：底部导航 ========== */
+        .yuan-zhy-bottom-wrap {
+            max-width: 420px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+        .yuan-zhy-bottom {
+            display: flex;
+            background: #ffffff;
+            border: 1px solid #ebebeb;
+            border-radius: 12px;
+            padding: 8px 0 6px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+        }
+        .yuan-zhy-bottom-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: #8590a6;
+            padding: 4px 0;
+        }
+        .yuan-zhy-bottom-item img {
+            width: 24px;
+            height: 24px;
+        }
+        .yuan-zhy-bottom-on {
+            color: #0084ff;
+            font-weight: 600;
+        }
+
+        /* ========== 网页元素5：功能入口 ========== */
+        .yuan-zhy-quick-wrap {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+        .yuan-zhy-quick {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            background: #ffffff;
+            border: 1px solid #ebebeb;
+            border-radius: 8px;
+            padding: 14px 10px;
+        }
+        .yuan-zhy-quick-item {
+            flex: 1 1 90px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 4px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #444;
+        }
+        .yuan-zhy-quick-item:hover {
+            background: #f6f6f6;
+            color: #0084ff;
+        }
+        .yuan-zhy-quick-item img {
+            width: 26px;
+            height: 26px;
+        }
+
+        /* 页脚 */
+        .yuan-zhy-footer {
+            max-width: 1000px;
+            margin: 32px auto 24px;
+            padding: 0 16px;
+            text-align: center;
+            color: #8590a6;
+            font-size: 12px;
+        }
+
+        /* 响应式：多视口适配 */
+        @media (max-width: 900px) {
+            .yuan-zhy-menu {
+                display: none;
+            }
+            .yuan-zhy-grid {
+                flex-direction: column;
+            }
+        }
+        @media (max-width: 560px) {
+            .yuan-zhy-post {
+                flex-direction: column;
+            }
+            .yuan-zhy-post-img {
+                width: 100%;
+                height: 180px;
+            }
+            .yuan-zhy-search {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 网页元素1：顶部导航 -->
+    <div class="yuan-zhy-tag">网页元素1 · 顶部导航</div>
+    <header class="yuan-zhy-nav" id="yuanElem1">
+        <div class="yuan-zhy-nav-inner">
+            <a class="yuan-zhy-logo" href="javascript:;">
+                <span class="yuan-zhy-logo-mark">知</span>
+                <span class="yuan-zhy-logo-text">知乎</span>
+            </a>
+            <nav class="yuan-zhy-menu">
+                <a class="yuan-zhy-menu-link yuan-zhy-menu-active" href="javascript:;">首页</a>
+                <a class="yuan-zhy-menu-link" href="javascript:;">会员</a>
+                <a class="yuan-zhy-menu-link" href="javascript:;">发现</a>
+                <a class="yuan-zhy-menu-link" href="javascript:;">消息</a>
+            </nav>
+            <div class="yuan-zhy-search">
+                <img class="yuan-zhy-search-ico" src="./tu biao/sousuo.png" alt="搜索">
+                <span>搜索：炫狗、狗狗、表情包</span>
+            </div>
+            <div class="yuan-zhy-nav-right">
+                <a class="yuan-zhy-btn" href="javascript:;"><img src="./tu biao/tiwen.png" alt="">提问</a>
+                <img class="yuan-zhy-avatar" src="./img/炫狗.jpg" alt="炫狗头像">
+            </div>
+        </div>
+    </header>
+
+    <!-- 网页元素2：左图右文 -->
+    <div class="yuan-zhy-tag">网页元素2 · 左图右文</div>
+    <main class="yuan-zhy-post-list" id="yuanElem2">
+        <article class="yuan-zhy-post">
+            <img class="yuan-zhy-post-img" src="./img/炫狗.jpg" alt="炫狗">
+            <div class="yuan-zhy-post-text">
+                <h3 class="yuan-zhy-post-title">为什么这只「炫狗」的表情包在网上这么火？</h3>
+                <p class="yuan-zhy-post-sum">炫狗以其独特的神态和魔性的动作走红网络，网友们纷纷制作了大量表情包，成为聊天斗图的必备素材。本回答从传播学角度分析这只小狗的走红路径，以及表情包文化背后的群体心理。</p>
+                <div class="yuan-zhy-post-meta">
+                    <span class="yuan-zhy-post-author">@爱狗人士</span>
+                    <span class="yuan-zhy-post-up">12 万赞同</span>
+                    <span>386 条评论</span>
+                </div>
+                <div class="yuan-zhy-actions">
+                    <button class="yuan-zhy-action yuan-zhy-action-on" type="button"><img src="./tu biao/dianzan.png" alt="赞同">赞同 12 万</button>
+                    <button class="yuan-zhy-action" type="button"><img src="./tu biao/cai.png" alt="反对">反对</button>
+                    <button class="yuan-zhy-action" type="button"><img src="./tu biao/pinglun.png" alt="评论">评论 386</button>
+                    <button class="yuan-zhy-action" type="button"><img src="./tu biao/shoucang.png" alt="收藏">收藏</button>
+                    <button class="yuan-zhy-action yuan-zhy-action-end" type="button"><img src="./tu biao/jubao.png" alt="举报">举报</button>
+                </div>
+            </div>
+        </article>
+        <article class="yuan-zhy-post">
+            <img class="yuan-zhy-post-img" src="./img/炫狗1.jpg" alt="炫狗1">
+            <div class="yuan-zhy-post-text">
+                <h3 class="yuan-zhy-post-title">养一只像炫狗一样乖的狗是什么体验？</h3>
+                <p class="yuan-zhy-post-sum">家里这只小狗从小就特别懂事，不拆家、不乱叫，客人来了还会作揖。铲屎官分享了日常相处的几个小故事，并总结了幼犬社会化训练的实用经验，欢迎交流养狗心得。</p>
+                <div class="yuan-zhy-post-meta">
+                    <span class="yuan-zhy-post-author">@柴犬饲养员</span>
+                    <span class="yuan-zhy-post-up">8.6 万赞同</span>
+                    <span>1,024 条评论</span>
+                </div>
+                <div class="yuan-zhy-actions">
+                    <button class="yuan-zhy-action yuan-zhy-action-on" type="button"><img src="./tu biao/dianzan1.png" alt="已赞同">已赞同 8.6 万</button>
+                    <button class="yuan-zhy-action" type="button"><img src="./tu biao/cai1.png" alt="反对">反对</button>
+                    <button class="yuan-zhy-action" type="button"><img src="./tu biao/pinglun.png" alt="评论">评论 1,024</button>
+                    <button class="yuan-zhy-action" type="button"><img src="./tu biao/ego-fav.png" alt="喜欢">喜欢</button>
+                    <button class="yuan-zhy-action yuan-zhy-action-end" type="button"><img src="./tu biao/fankui.png" alt="反馈">反馈</button>
+                </div>
+            </div>
+        </article>
+        <article class="yuan-zhy-post">
+            <img class="yuan-zhy-post-img" src="./img/炫狗2.jpg" alt="炫狗2">
+            <div class="yuan-zhy-post-text">
+                <h3 class="yuan-zhy-post-title">如何用手机给狗狗拍出杂志感照片？</h3>
+                <p class="yuan-zhy-post-sum">不需要单反，一部手机加几个小技巧就能拍出大片：低角度平视狗狗、抓住眼神光、善用逆光黄金时刻。本文附多张实拍样张与参数设置，摄影小白也能轻松上手。</p>
+                <div class="yuan-zhy-post-meta">
+                    <span class="yuan-zhy-post-author">@宠物摄影师</span>
+                    <span class="yuan-zhy-post-up">5.2 万赞同</span>
+                    <span>728 条评论</span>
+                </div>
+                <div class="yuan-zhy-actions">
+                    <button class="yuan-zhy-action" type="button"><img src="./tu biao/dianzan.png" alt="赞同">赞同 5.2 万</button>
+                    <button class="yuan-zhy-action" type="button"><img src="./tu biao/cai.png" alt="反对">反对</button>
+                    <button class="yuan-zhy-action" type="button"><img src="./tu biao/pinglun.png" alt="评论">评论 728</button>
+                    <button class="yuan-zhy-action" type="button"><img src="./tu biao/shoucang.png" alt="收藏">收藏</button>
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <!-- 网页元素3：上图下文 -->
+    <div class="yuan-zhy-tag">网页元素3 · 上图下文</div>
+    <section class="yuan-zhy-grid" id="yuanElem3">
+        <article class="yuan-zhy-cell">
+            <img class="yuan-zhy-cell-img" src="./img/炫狗1.jpg" alt="炫狗1">
+            <div class="yuan-zhy-cell-body">
+                <h3 class="yuan-zhy-cell-title">炫狗的正确打开方式</h3>
+                <p class="yuan-zhy-cell-sum">原来狗狗还可以这样玩，学会这几招，你也是养狗达人。</p>
+            </div>
+        </article>
+        <article class="yuan-zhy-cell">
+            <img class="yuan-zhy-cell-img" src="./img/炫狗2.jpg" alt="炫狗2">
+            <div class="yuan-zhy-cell-body">
+                <h3 class="yuan-zhy-cell-title">一分钟学会狗狗摄影构图</h3>
+                <p class="yuan-zhy-cell-sum">中心构图、三分法、框架式构图，三种最实用的宠物摄影构图技巧。</p>
+            </div>
+        </article>
+        <article class="yuan-zhy-cell">
+            <img class="yuan-zhy-cell-img" src="./img/炫狗.jpg" alt="炫狗">
+            <div class="yuan-zhy-cell-body">
+                <h3 class="yuan-zhy-cell-title">新手养狗避坑指南</h3>
+                <p class="yuan-zhy-cell-sum">从选粮到疫苗，整理了新手铲屎官最容易踩的十个坑，建议收藏。</p>
+            </div>
+        </article>
+    </section>
+
+    <!-- 网页元素4：底部导航 -->
+    <div class="yuan-zhy-tag">网页元素4 · 底部导航</div>
+    <nav class="yuan-zhy-bottom-wrap" id="yuanElem4">
+        <div class="yuan-zhy-bottom">
+            <a class="yuan-zhy-bottom-item yuan-zhy-bottom-on" href="javascript:;">
+                <img src="./tu biao/zhuye.png" alt="首页">
+                <span>首页</span>
+            </a>
+            <a class="yuan-zhy-bottom-item" href="javascript:;">
+                <img src="./tu biao/sousuo.png" alt="搜索">
+                <span>搜索</span>
+            </a>
+            <a class="yuan-zhy-bottom-item" href="javascript:;">
+                <img src="./tu biao/fabusekuai.png" alt="发布">
+                <span>发布</span>
+            </a>
+            <a class="yuan-zhy-bottom-item" href="javascript:;">
+                <img src="./tu biao/pinglun.png" alt="消息">
+                <span>消息</span>
+            </a>
+            <a class="yuan-zhy-bottom-item" href="javascript:;">
+                <img src="./tu biao/wode.png" alt="我的">
+                <span>我的</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- 网页元素5：功能入口 -->
+    <div class="yuan-zhy-tag">网页元素5 · 功能入口</div>
+    <div class="yuan-zhy-quick-wrap" id="yuanElem5">
+        <div class="yuan-zhy-quick">
+            <a class="yuan-zhy-quick-item" href="javascript:;">
+                <img src="./tu biao/zhuye1.png" alt="个人主页">
+                <span>个人主页</span>
+            </a>
+            <a class="yuan-zhy-quick-item" href="javascript:;">
+                <img src="./tu biao/wodedangxuan.png" alt="我的账号">
+                <span>我的账号</span>
+            </a>
+            <a class="yuan-zhy-quick-item" href="javascript:;">
+                <img src="./tu biao/tiwen1.png" alt="写回答">
+                <span>写回答</span>
+            </a>
+            <a class="yuan-zhy-quick-item" href="javascript:;">
+                <img src="./tu biao/a-fabudaifabu.png" alt="草稿箱">
+                <span>草稿箱</span>
+            </a>
+            <a class="yuan-zhy-quick-item" href="javascript:;">
+                <img src="./tu biao/wodefankui.png" alt="我的反馈">
+                <span>我的反馈</span>
+            </a>
+            <a class="yuan-zhy-quick-item" href="javascript:;">
+                <img src="./tu biao/xinfangjubao.png" alt="安全警示">
+                <span>安全警示</span>
+            </a>
+        </div>
+    </div>
+
+    <footer class="yuan-zhy-footer">
+        高级网页设计I · 网页元素设计 · 知乎网站模仿 · 24001010302 张浩扬
+    </footer>
+</body>
+</html>

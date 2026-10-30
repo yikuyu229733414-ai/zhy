@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript 程序结构：循环与条件</title>
+    <!-- 姓名：张浩扬  建立时间：2026-10-26 14:41:39  模型：Xiaomi MiMo-V2.6-Pro  功能：JavaScript程序结构——循环与条件 -->
+    <style>
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background: #f5f7fa;
+            margin: 0;
+            padding: 40px 20px;
+            color: #333;
+        }
+        .yl_wrap {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 6px;
+        }
+        .yl_desc {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .yl_section {
+            color: #2980b9;
+            font-size: 20px;
+            border-left: 4px solid #2980b9;
+            padding-left: 10px;
+            margin: 28px 0 14px;
+        }
+        .yl_card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 16px 20px;
+            margin-bottom: 16px;
+        }
+        .yl_title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+        .yl_row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .yl_input {
+            flex: 1;
+            padding: 8px 10px;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+        .yl_input:focus {
+            border-color: #3498db;
+        }
+        .yl_btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            background: #3498db;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .yl_btn:hover {
+            background: #2980b9;
+        }
+        .yl_code {
+            font-family: Consolas, monospace;
+            background: #f0f3f6;
+            padding: 6px 10px;
+            border-radius: 4px;
+            color: #c0392b;
+            font-size: 13px;
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+        .yl_out {
+            min-height: 20px;
+            color: #27ae60;
+            font-size: 14px;
+        }
+        .yl_log {
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            background: #2c3e50;
+            color: #ecf0f1;
+            border-radius: 6px;
+            padding: 12px 16px;
+        }
+        .yl_log_line {
+            padding: 3px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
+        }
+    </style>
+</head>
+<body>
+    <div class="yl_wrap">
+        <h1>JavaScript 程序结构：循环与条件</h1>
+        <p class="yl_desc">演示 JavaScript 两种基本程序结构：条件结构（if / else if / else、switch）与循环结构（for、while、do...while、break、continue）。</p>
+
+        <h2 class="yl_section">一、条件结构</h2>
+
+        <div class="yl_card">
+            <div class="yl_title">1. if / else if / else —— 成绩等级判定</div>
+            <div class="yl_row">
+                <input id="yl_score" class="yl_input" type="number" placeholder="输入 0 ~ 100 的分数">
+                <button id="yl_score_btn" class="yl_btn">判定等级</button>
+            </div>
+            <div class="yl_code">if (score &gt;= 90) 优秀 → else if (score &gt;= 80) 良好 → else if (score &gt;= 60) 及格 → else 不及格</div>
+            <div id="yl_if_out" class="yl_out">等待输入…</div>
+        </div>
+
+        <div class="yl_card">
+            <div class="yl_title">2. switch —— 星期判定</div>
+            <div class="yl_row">
+                <input id="yl_day" class="yl_input" type="number" placeholder="输入 1 ~ 7 的数字">
+                <button id="yl_day_btn" class="yl_btn">判定星期</button>
+            </div>
+            <div class="yl_code">switch (day) { case 1 … case 7 … break; default: 提示输入 1 ~ 7 }</div>
+            <div id="yl_switch_out" class="yl_out">等待输入…</div>
+        </div>
+
+        <h2 class="yl_section">二、循环结构</h2>
+
+        <div class="yl_card">
+            <div class="yl_title">3. for / while / do...while / break / continue —— 页面加载时自动运行</div>
+            <div id="yl_log" class="yl_log"></div>
+        </div>
+    </div>
+
+    <script>
+        // 姓名：张浩扬  建立时间：2026-10-26 14:41:39  模型：Xiaomi MiMo-V2.6-Pro  功能：JavaScript程序结构——循环与条件
+
+        /* ========== 一、条件结构 ========== */
+
+        // 1. if / else if / else：按分数判定等级
+        function yl_judgeLevel() {
+            var yl_raw = document.getElementById('yl_score').value;
+            var yl_score = Number(yl_raw);
+            var yl_result;
+            if (yl_raw === '' || isNaN(yl_score) || yl_score < 0 || yl_score > 100) {
+                yl_result = '请输入 0 ~ 100 之间的分数（if：参数不合法分支）';
+            } else if (yl_score >= 90) {
+                yl_result = '成绩 ' + yl_score + ' → 优秀（else if：score >= 90）';
+            } else if (yl_score >= 80) {
+                yl_result = '成绩 ' + yl_score + ' → 良好（else if：score >= 80）';
+            } else if (yl_score >= 60) {
+                yl_result = '成绩 ' + yl_score + ' → 及格（else if：score >= 60）';
+            } else {
+                yl_result = '成绩 ' + yl_score + ' → 不及格（else 分支）';
+            }
+            document.getElementById('yl_if_out').textContent = yl_result;
+        }
+
+        // 2. switch：按数字 1 ~ 7 输出星期
+        function yl_judgeWeek() {
+            var yl_day = Number(document.getElementById('yl_day').value);
+            var yl_result;
+            switch (yl_day) {
+                case 1: yl_result = '1 → 星期一（case 1）'; break;
+                case 2: yl_result = '2 → 星期二（case 2）'; break;
+                case 3: yl_result = '3 → 星期三（case 3）'; break;
+                case 4: yl_result = '4 → 星期四（case 4）'; break;
+                case 5: yl_result = '5 → 星期五（case 5）'; break;
+                case 6: yl_result = '6 → 星期六（case 6）'; break;
+                case 7: yl_result = '7 → 星期日（case 7）'; break;
+                default: yl_result = '请输入 1 ~ 7（default 分支）';
+            }
+            document.getElementById('yl_switch_out').textContent = yl_result;
+        }
+
+        /* ========== 二、循环结构 ========== */
+
+        var yl_log = document.getElementById('yl_log');
+
+        // 往结果区打印一行
+        function yl_print(yl_text) {
+            var yl_line = document.createElement('div');
+            yl_line.className = 'yl_log_line';
+            yl_line.textContent = yl_text;
+            yl_log.appendChild(yl_line);
+        }
+
+        // 1. for：累加 1 ~ 100
+        var yl_sum = 0;
+        for (var yl_i = 1; yl_i <= 100; yl_i++) {
+            yl_sum += yl_i;
+        }
+        yl_print('for：1+2+…+100 = ' + yl_sum);
+
+        // 2. while：取出 1 ~ 10 的偶数
+        var yl_evens = [];
+        var yl_j = 2;
+        while (yl_j <= 10) {
+            yl_evens.push(yl_j);
+            yl_j += 2;
+        }
+        yl_print('while：1~10 的偶数 = ' + yl_evens.join('、'));
+
+        // 3. do...while：循环体至少执行一次（初始 k 已大于 100，仍执行一次）
+        var yl_k = 120;
+        var yl_times = 0;
+        do {
+            yl_k += 20;
+            yl_times++;
+        } while (yl_k <= 100);
+        yl_print('do...while：初始 k=120 已不满足条件，仍执行 ' + yl_times + ' 次，结果 k = ' + yl_k);
+
+        // 4. break / continue：取 1~20 中 15 之前能被 3 整除的数
+        var yl_picked = [];
+        for (var yl_m = 1; yl_m <= 20; yl_m++) {
+            if (yl_m === 15) {
+                break;                    // 数到 15 直接结束整个循环
+            }
+            if (yl_m % 3 !== 0) {
+                continue;                 // 跳过不能被 3 整除的数
+            }
+            yl_picked.push(yl_m);
+        }
+        yl_print('break/continue：1~20 中 15 之前能被 3 整除的数 = ' + yl_picked.join('、'));
+
+        // 绑定按钮事件
+        document.getElementById('yl_score_btn').addEventListener('click', yl_judgeLevel);
+        document.getElementById('yl_day_btn').addEventListener('click', yl_judgeWeek);
+    </script>
+</body>
+</html>

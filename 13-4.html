@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>13-4 移动端底部导航（SVG 图标版）</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            min-height: 100vh;
+            font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+            color: #1f2a37;
+            background:
+                radial-gradient(circle at top left, rgba(46, 158, 107, 0.12), transparent 30%),
+                linear-gradient(160deg, #f3fbf7, #eef4ff);
+            padding-bottom: 96px;
+        }
+        .yuan-wrap {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 28px 16px 40px;
+        }
+        .yuan-header {
+            text-align: center;
+            margin-bottom: 26px;
+        }
+        .yuan-header .yuan-tag {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(46, 158, 107, 0.92), rgba(61, 140, 210, 0.9));
+            color: #fff;
+            font-size: 12px;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        .yuan-header h1 {
+            font-size: clamp(22px, 4vw, 32px);
+            margin-bottom: 8px;
+        }
+        .yuan-header p {
+            color: #667085;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        .yuan-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(46, 158, 107, 0.16);
+            border-radius: 18px;
+            box-shadow: 0 14px 34px rgba(60, 110, 90, 0.12);
+            padding: 22px;
+            margin-bottom: 22px;
+        }
+        .yuan-card h2 {
+            font-size: 18px;
+            margin-bottom: 6px;
+        }
+        .yuan-card .yuan-tip {
+            color: #667085;
+            font-size: 13px;
+            margin-bottom: 16px;
+            line-height: 1.7;
+        }
+        .yuan-feed-item {
+            display: flex;
+            gap: 12px;
+            padding: 14px 0;
+            border-bottom: 1px dashed #dceee4;
+        }
+        .yuan-feed-item:last-child { border-bottom: none; }
+        .yuan-feed-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #2e9e6b, #3d8cd2);
+            flex-shrink: 0;
+        }
+        .yuan-feed-text h3 {
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+        .yuan-feed-text p {
+            font-size: 12px;
+            color: #8590a6;
+            line-height: 1.6;
+        }
+        .yuan-demo-nav {
+            display: flex;
+            align-items: stretch;
+            justify-content: space-around;
+            max-width: 430px;
+            margin: 0 auto;
+            background: #fff;
+            border: 1px solid #dceee4;
+            border-radius: 16px;
+            padding: 8px 4px;
+            box-shadow: 0 10px 26px rgba(60, 110, 90, 0.12);
+        }
+        .yuan-demo-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 0;
+            font-size: 11px;
+            color: #8590a6;
+            text-decoration: none;
+        }
+        .yuan-demo-active {
+            color: #2e9e6b;
+            font-weight: 600;
+        }
+
+        .yuan-svg-ico {
+            width: 22px;
+            height: 22px;
+            display: block;
+            color: #5a6472;
+        }
+        .yuan-demo-active .yuan-svg-ico { color: #2e9e6b; }
+
+        .yuan-ico-wrap {
+            position: relative;
+            display: inline-flex;
+        }
+        .yuan-badge {
+            position: absolute;
+            top: -7px;
+            left: 100%;
+            transform: translateX(-50%);
+            min-width: 17px;
+            height: 17px;
+            padding: 0 4px;
+            border-radius: 999px;
+            background: #f5222d;
+            border: 2px solid #fff;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            font-style: normal;
+            line-height: 13px;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            box-sizing: content-box;
+        }
+        .yuan-dot {
+            position: absolute;
+            top: -2px;
+            left: 100%;
+            transform: translateX(-60%);
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #f5222d;
+            border: 2px solid #fff;
+            box-sizing: content-box;
+        }
+
+        .yuan-variants {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            justify-content: center;
+            padding: 18px 10px;
+            background: rgba(238, 247, 242, 0.8);
+            border-radius: 14px;
+        }
+        .yuan-variant {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            color: #667085;
+        }
+        .yuan-variant .yuan-svg-ico {
+            width: 26px;
+            height: 26px;
+            color: #2e9e6b;
+        }
+
+        .yuan-code {
+            display: block;
+            margin-top: 14px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #10231a;
+            color: #a8e6c9;
+            font-family: Consolas, monospace;
+            font-size: 12.5px;
+            line-height: 1.7;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        code.inline {
+            background: rgba(46, 158, 107, 0.1);
+            border: 1px solid rgba(46, 158, 107, 0.18);
+            border-radius: 5px;
+            padding: 1px 5px;
+            font-family: Consolas, monospace;
+            font-size: 12px;
+        }
+
+        /* ===== 真机：固定自适应宽度底部导航 ===== */
+        .yuan-tabbar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            display: flex;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid #dceee4;
+            padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+            z-index: 999;
+            box-shadow: 0 -6px 20px rgba(60, 110, 90, 0.1);
+        }
+        .yuan-tab {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            padding: 4px 0;
+            font-size: 10px;
+            color: #8590a6;
+            text-decoration: none;
+        }
+        .yuan-tab .yuan-svg-ico {
+            width: 21px;
+            height: 21px;
+        }
+        .yuan-tab-on {
+            color: #2e9e6b;
+            font-weight: 600;
+        }
+        .yuan-tab-on .yuan-svg-ico { color: #2e9e6b; }
+
+        /* ===== tu biao 素材对照版 ===== */
+        .yuan-demo-nav.tu-biao img {
+            width: 22px;
+            height: 22px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 24001010302 张浩扬 · 13-4 移动端底部导航（SVG 图标版） -->
+    <div class="yuan-wrap">
+        <header class="yuan-header">
+            <div class="yuan-tag">13-4 · SVG 图标版</div>
+            <h1>移动端底部导航 · Lucide SVG</h1>
+            <p>四个导航项 + 右上角数字徽章 / 红点。SVG 以 <code class="inline">stroke="currentColor"</code> 内联进 HTML，
+            颜色跟随文字色（激活项自动变绿）；徽章结构与 13-3 相同：外层 <code class="inline">position: relative</code>，
+            徽章 <code class="inline">absolute</code> 到右上角。导航 <code class="inline">position: fixed</code> + <code class="inline">max-width: 430px</code> 自适应居中。</p>
+        </header>
+
+        <section class="yuan-card">
+            <h2>模拟内容区</h2>
+            <p class="yuan-tip">滚动页面时，底部导航始终固定在视口底部（本卡片仅提供滚动内容）</p>
+            <div class="yuan-feed-item">
+                <div class="yuan-feed-dot"></div>
+                <div class="yuan-feed-text">
+                    <h3>SVG 图标如何跟随主题色？</h3>
+                    <p>Lucide SVG 使用 stroke="currentColor"，CSS 里给父级设 color，描边自动同步，无需改文件。</p>
+                </div>
+            </div>
+            <div class="yuan-feed-item">
+                <div class="yuan-feed-dot"></div>
+                <div class="yuan-feed-text">
+                    <h3>徽章为什么能盖在图标右上角？</h3>
+                    <p>图标和徽章放进同一个 relative 容器，徽章 absolute 定位，left:100% + translateX(-50%) 对齐图标右缘。</p>
+                </div>
+            </div>
+            <div class="yuan-feed-item">
+                <div class="yuan-feed-dot"></div>
+                <div class="yuan-feed-text">
+                    <h3>内联 SVG 与 img 引用怎么选？</h3>
+                    <p>需要改颜色/线宽/加动画时内联；只是展示时用 img 引用本地 svg 文件更省代码。本页导航采用内联。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="yuan-card">
+            <h2>静态展示（同款导航）</h2>
+            <p class="yuan-tip">与页面底部固定导航相同的结构；「消息」带数字徽章，「我的」带红点</p>
+            <nav class="yuan-demo-nav">
+                <a class="yuan-demo-item yuan-demo-active" href="javascript:;">
+                    <span class="yuan-ico-wrap"><svg class="yuan-svg-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>
+                    <span>首页</span>
+                </a>
+                <a class="yuan-demo-item" href="javascript:;">
+                    <span class="yuan-ico-wrap"><svg class="yuan-svg-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
+                    <span>搜索</span>
+                </a>
+                <a class="yuan-demo-item" href="javascript:;">
+                    <span class="yuan-ico-wrap"><svg class="yuan-svg-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg><em class="yuan-badge">8</em></span>
+                    <span>消息</span>
+                </a>
+                <a class="yuan-demo-item" href="javascript:;">
+                    <span class="yuan-ico-wrap"><svg class="yuan-svg-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><em class="yuan-dot"></em></span>
+                    <span>我的</span>
+                </a>
+            </nav>
+        </section>
+
+        <section class="yuan-card">
+            <h2>徽章与红点样式变体</h2>
+            <p class="yuan-tip">同一种定位结构，换内容即可：单数字 / 两位数 / 99+ 上限 / 纯红点</p>
+            <div class="yuan-variants">
+                <div class="yuan-variant">
+                    <span class="yuan-ico-wrap"><svg class="yuan-svg-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg><em class="yuan-badge">1</em></span>
+                    <span>单数字</span>
+                </div>
+                <div class="yuan-variant">
+                    <span class="yuan-ico-wrap"><svg class="yuan-svg-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><em class="yuan-badge">12</em></span>
+                    <span>两位数</span>
+                </div>
+                <div class="yuan-variant">
+                    <span class="yuan-ico-wrap"><svg class="yuan-svg-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg><em class="yuan-badge">99+</em></span>
+                    <span>99+ 上限</span>
+                </div>
+                <div class="yuan-variant">
+                    <span class="yuan-ico-wrap"><svg class="yuan-svg-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg><em class="yuan-dot"></em></span>
+                    <span>红点提示</span>
+                </div>
+            </div>
+            <code class="yuan-code">&lt;span class="yuan-ico-wrap"&gt;
+  &lt;svg class="yuan-svg-ico" stroke="currentColor" ...&gt;...&lt;/svg&gt;
+  &lt;em class="yuan-badge"&gt;8&lt;/em&gt;&lt;/!-- 数字徽章 --&gt;
+&lt;/span&gt;
+.yuan-ico-wrap { position: relative; }
+.yuan-svg-ico  { color: #5a6472; } /* 描边跟随文字色 */
+.yuan-tab-on .yuan-svg-ico { color: #2e9e6b; }</code>
+        </section>
+
+        <section class="yuan-card">
+            <h2>tu biao 素材对照版</h2>
+            <p class="yuan-tip">用 tu biao 目录里的 PNG 图标实现同款四项导航（zhuye / sousuo / pinglun / wode）与同样的徽章、红点</p>
+            <nav class="yuan-demo-nav tu-biao">
+                <a class="yuan-demo-item yuan-demo-active" href="javascript:;">
+                    <span class="yuan-ico-wrap"><img src="./tu biao/zhuye.png" alt="首页"></span>
+                    <span>首页</span>
+                </a>
+                <a class="yuan-demo-item" href="javascript:;">
+                    <span class="yuan-ico-wrap"><img src="./tu biao/sousuo.png" alt="搜索"></span>
+                    <span>搜索</span>
+                </a>
+                <a class="yuan-demo-item" href="javascript:;">
+                    <span class="yuan-ico-wrap"><img src="./tu biao/pinglun.png" alt="消息"><em class="yuan-badge">8</em></span>
+                    <span>消息</span>
+                </a>
+                <a class="yuan-demo-item" href="javascript:;">
+                    <span class="yuan-ico-wrap"><img src="./tu biao/wode.png" alt="我的"><em class="yuan-dot"></em></span>
+                    <span>我的</span>
+                </a>
+            </nav>
+        </section>
+    </div>
+
+    <!-- ===== 真机固定底部导航（SVG 内联 + 徽章 + 红点） ===== -->
+    <nav class="yuan-tabbar">
+        <a class="yuan-tab yuan-tab-on" href="javascript:;">
+            <span class="yuan-ico-wrap"><svg class="yuan-svg-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>
+            <span>首页</span>
+        </a>
+        <a class="yuan-tab" href="javascript:;">
+            <span class="yuan-ico-wrap"><svg class="yuan-svg-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
+            <span>搜索</span>
+        </a>
+        <a class="yuan-tab" href="javascript:;">
+            <span class="yuan-ico-wrap"><svg class="yuan-svg-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg><em class="yuan-badge">8</em></span>
+            <span>消息</span>
+        </a>
+        <a class="yuan-tab" href="javascript:;">
+            <span class="yuan-ico-wrap"><svg class="yuan-svg-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><em class="yuan-dot"></em></span>
+            <span>我的</span>
+        </a>
+    </nav>
+</body>
+</html>

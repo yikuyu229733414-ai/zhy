@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>13-3 移动端底部导航（字体图标版）</title>
+    <link rel="stylesheet" href="./cdn/fontawesome/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            min-height: 100vh;
+            font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+            color: #1f2a37;
+            background:
+                radial-gradient(circle at top left, rgba(196, 66, 60, 0.12), transparent 30%),
+                linear-gradient(160deg, #fff8f4, #fdf1e8);
+            padding-bottom: 96px;
+        }
+        .yuan-wrap {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 28px 16px 40px;
+        }
+        .yuan-header {
+            text-align: center;
+            margin-bottom: 26px;
+        }
+        .yuan-header .yuan-tag {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(196, 66, 60, 0.92), rgba(240, 140, 60, 0.9));
+            color: #fff;
+            font-size: 12px;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        .yuan-header h1 {
+            font-size: clamp(22px, 4vw, 32px);
+            margin-bottom: 8px;
+        }
+        .yuan-header p {
+            color: #667085;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        .yuan-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(196, 66, 60, 0.14);
+            border-radius: 18px;
+            box-shadow: 0 14px 34px rgba(155, 90, 60, 0.12);
+            padding: 22px;
+            margin-bottom: 22px;
+        }
+        .yuan-card h2 {
+            font-size: 18px;
+            margin-bottom: 6px;
+        }
+        .yuan-card .yuan-tip {
+            color: #667085;
+            font-size: 13px;
+            margin-bottom: 16px;
+            line-height: 1.7;
+        }
+        .yuan-feed-item {
+            display: flex;
+            gap: 12px;
+            padding: 14px 0;
+            border-bottom: 1px dashed #f0e4dc;
+        }
+        .yuan-feed-item:last-child { border-bottom: none; }
+        .yuan-feed-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #c4423c, #e08a4e);
+            flex-shrink: 0;
+        }
+        .yuan-feed-text h3 {
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+        .yuan-feed-text p {
+            font-size: 12px;
+            color: #8590a6;
+            line-height: 1.6;
+        }
+        .yuan-demo-nav {
+            display: flex;
+            align-items: stretch;
+            justify-content: space-around;
+            max-width: 430px;
+            margin: 0 auto;
+            background: #fff;
+            border: 1px solid #f0e4dc;
+            border-radius: 16px;
+            padding: 8px 4px;
+            box-shadow: 0 10px 26px rgba(155, 90, 60, 0.12);
+        }
+        .yuan-demo-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 0;
+            font-size: 11px;
+            color: #8590a6;
+            text-decoration: none;
+        }
+        .yuan-demo-item i {
+            font-size: 22px;
+        }
+        .yuan-demo-active {
+            color: #c4423c;
+            font-weight: 600;
+        }
+        .yuan-demo-active i { color: #c4423c; }
+
+        .yuan-ico-wrap {
+            position: relative;
+            display: inline-flex;
+        }
+        .yuan-badge {
+            position: absolute;
+            top: -7px;
+            left: 100%;
+            transform: translateX(-50%);
+            min-width: 17px;
+            height: 17px;
+            padding: 0 4px;
+            border-radius: 999px;
+            background: #f5222d;
+            border: 2px solid #fff;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            font-style: normal;
+            line-height: 13px;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            box-sizing: content-box;
+        }
+        .yuan-dot {
+            position: absolute;
+            top: -2px;
+            left: 100%;
+            transform: translateX(-60%);
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #f5222d;
+            border: 2px solid #fff;
+            box-sizing: content-box;
+        }
+
+        .yuan-variants {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            justify-content: center;
+            padding: 18px 10px;
+            background: rgba(253, 241, 232, 0.7);
+            border-radius: 14px;
+        }
+        .yuan-variant {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            color: #667085;
+        }
+        .yuan-variant .yuan-ico-wrap i {
+            font-size: 26px;
+            color: #c4423c;
+        }
+
+        .yuan-code {
+            display: block;
+            margin-top: 14px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #2b1a16;
+            color: #ffc9b8;
+            font-family: Consolas, monospace;
+            font-size: 12.5px;
+            line-height: 1.7;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        code.inline {
+            background: rgba(196, 66, 60, 0.08);
+            border: 1px solid rgba(196, 66, 60, 0.16);
+            border-radius: 5px;
+            padding: 1px 5px;
+            font-family: Consolas, monospace;
+            font-size: 12px;
+        }
+
+        /* ===== 真机：固定自适应宽度底部导航 ===== */
+        .yuan-tabbar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            display: flex;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid #f0e4dc;
+            padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+            z-index: 999;
+            box-shadow: 0 -6px 20px rgba(155, 90, 60, 0.1);
+        }
+        .yuan-tab {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            padding: 4px 0;
+            font-size: 10px;
+            color: #8590a6;
+            text-decoration: none;
+        }
+        .yuan-tab i {
+            font-size: 21px;
+        }
+        .yuan-tab-on {
+            color: #c4423c;
+            font-weight: 600;
+        }
+        .yuan-tab-on i { color: #c4423c; }
+
+        /* ===== tu biao 素材对照版 ===== */
+        .yuan-demo-nav.tu-biao img {
+            width: 22px;
+            height: 22px;
+        }
+        .yuan-tab.tu-biao img {
+            width: 21px;
+            height: 21px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 24001010302 张浩扬 · 13-3 移动端底部导航（字体图标版） -->
+    <div class="yuan-wrap">
+        <header class="yuan-header">
+            <div class="yuan-tag">13-3 · 字体图标版</div>
+            <h1>移动端底部导航 · Font Awesome</h1>
+            <p>四个导航项 + 右上角数字徽章 / 红点。本页导航为 <code class="inline">position: fixed</code> 固定在视口底部，
+            <code class="inline">width: 100%; max-width: 430px</code> 自适应宽度居中；徽章是绝对定位在图标右上角的 <code class="inline">&lt;i&gt;</code> 兄弟元素。请缩小窗口或用手机模式查看真机效果。</p>
+        </header>
+
+        <section class="yuan-card">
+            <h2>模拟内容区</h2>
+            <p class="yuan-tip">滚动页面时，底部导航始终固定在视口底部（本卡片仅提供滚动内容）</p>
+            <div class="yuan-feed-item">
+                <div class="yuan-feed-dot"></div>
+                <div class="yuan-feed-text">
+                    <h3>字体图标徽章如何定位？</h3>
+                    <p>把徽章放在图标外层容器里，容器设 position: relative，徽章用 absolute 定位到右上角。</p>
+                </div>
+            </div>
+            <div class="yuan-feed-item">
+                <div class="yuan-feed-dot"></div>
+                <div class="yuan-feed-text">
+                    <h3>红点和数字徽章的区别</h3>
+                    <p>红点只提示有更新；数字徽章直接展示未读数量，超过上限可显示为 99+。</p>
+                </div>
+            </div>
+            <div class="yuan-feed-item">
+                <div class="yuan-feed-dot"></div>
+                <div class="yuan-feed-text">
+                    <h3>为什么固定导航要限宽？</h3>
+                    <p>手机上占满全屏；桌面浏览器里限制 max-width 并居中，视觉上更接近手机效果。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="yuan-card">
+            <h2>静态展示（同款导航）</h2>
+            <p class="yuan-tip">与页面底部固定导航相同的结构，方便平视查看；「消息」带数字徽章，「我的」带红点</p>
+            <nav class="yuan-demo-nav">
+                <a class="yuan-demo-item yuan-demo-active" href="javascript:;">
+                    <span class="yuan-ico-wrap"><i class="fa-solid fa-house"></i></span>
+                    <span>首页</span>
+                </a>
+                <a class="yuan-demo-item" href="javascript:;">
+                    <span class="yuan-ico-wrap"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    <span>搜索</span>
+                </a>
+                <a class="yuan-demo-item" href="javascript:;">
+                    <span class="yuan-ico-wrap"><i class="fa-solid fa-comment-dots"></i><em class="yuan-badge">8</em></span>
+                    <span>消息</span>
+                </a>
+                <a class="yuan-demo-item" href="javascript:;">
+                    <span class="yuan-ico-wrap"><i class="fa-solid fa-user"></i><em class="yuan-dot"></em></span>
+                    <span>我的</span>
+                </a>
+            </nav>
+        </section>
+
+        <section class="yuan-card">
+            <h2>徽章与红点样式变体</h2>
+            <p class="yuan-tip">同一种定位结构，换内容即可：单数字 / 两位数 / 99+ 上限 / 纯红点</p>
+            <div class="yuan-variants">
+                <div class="yuan-variant">
+                    <span class="yuan-ico-wrap"><i class="fa-solid fa-bell"></i><em class="yuan-badge">1</em></span>
+                    <span>单数字</span>
+                </div>
+                <div class="yuan-variant">
+                    <span class="yuan-ico-wrap"><i class="fa-solid fa-envelope"></i><em class="yuan-badge">12</em></span>
+                    <span>两位数</span>
+                </div>
+                <div class="yuan-variant">
+                    <span class="yuan-ico-wrap"><i class="fa-solid fa-comment-dots"></i><em class="yuan-badge">99+</em></span>
+                    <span>99+ 上限</span>
+                </div>
+                <div class="yuan-variant">
+                    <span class="yuan-ico-wrap"><i class="fa-solid fa-heart"></i><em class="yuan-dot"></em></span>
+                    <span>红点提示</span>
+                </div>
+            </div>
+            <code class="yuan-code">&lt;span class="yuan-ico-wrap"&gt;
+  &lt;i class="fa-solid fa-comment-dots"&gt;&lt;/i&gt;
+  &lt;em class="yuan-badge"&gt;8&lt;/em&gt;&lt;/!-- 数字徽章 --&gt;
+&lt;/span&gt;
+.yuan-ico-wrap { position: relative; }
+.yuan-badge { position: absolute; top: -7px; left: 100%;
+  transform: translateX(-50%); background: #f5222d; ... }</code>
+        </section>
+
+        <section class="yuan-card">
+            <h2>tu biao 素材对照版</h2>
+            <p class="yuan-tip">用 tu biao 目录里的 PNG 图标实现同款四项导航（zhuye / sousuo / pinglun / wode）与同样的徽章、红点</p>
+            <nav class="yuan-demo-nav tu-biao">
+                <a class="yuan-demo-item yuan-demo-active" href="javascript:;">
+                    <span class="yuan-ico-wrap"><img src="./tu biao/zhuye.png" alt="首页"></span>
+                    <span>首页</span>
+                </a>
+                <a class="yuan-demo-item" href="javascript:;">
+                    <span class="yuan-ico-wrap"><img src="./tu biao/sousuo.png" alt="搜索"></span>
+                    <span>搜索</span>
+                </a>
+                <a class="yuan-demo-item" href="javascript:;">
+                    <span class="yuan-ico-wrap"><img src="./tu biao/pinglun.png" alt="消息"><em class="yuan-badge">8</em></span>
+                    <span>消息</span>
+                </a>
+                <a class="yuan-demo-item" href="javascript:;">
+                    <span class="yuan-ico-wrap"><img src="./tu biao/wode.png" alt="我的"><em class="yuan-dot"></em></span>
+                    <span>我的</span>
+                </a>
+            </nav>
+        </section>
+    </div>
+
+    <!-- ===== 真机固定底部导航（字体图标 + 徽章 + 红点） ===== -->
+    <nav class="yuan-tabbar">
+        <a class="yuan-tab yuan-tab-on" href="javascript:;">
+            <span class="yuan-ico-wrap"><i class="fa-solid fa-house"></i></span>
+            <span>首页</span>
+        </a>
+        <a class="yuan-tab" href="javascript:;">
+            <span class="yuan-ico-wrap"><i class="fa-solid fa-magnifying-glass"></i></span>
+            <span>搜索</span>
+        </a>
+        <a class="yuan-tab" href="javascript:;">
+            <span class="yuan-ico-wrap"><i class="fa-solid fa-comment-dots"></i><em class="yuan-badge">8</em></span>
+            <span>消息</span>
+        </a>
+        <a class="yuan-tab" href="javascript:;">
+            <span class="yuan-ico-wrap"><i class="fa-solid fa-user"></i><em class="yuan-dot"></em></span>
+            <span>我的</span>
+        </a>
+    </nav>
+</body>
+</html>

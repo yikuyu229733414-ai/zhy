@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript 两种定时器</title>
+    <!-- 姓名：张浩扬  建立时间：2026-11-02 14:32:40  模型：Xiaomi MiMo-V2.6-Pro  功能：JavaScript 两种定时器演示（setTimeout / setInterval） -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        code {
+            padding: 1px 6px;
+            background: #eef2f7;
+            border-radius: 4px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            color: #c7254e;
+            word-break: break-all;
+        }
+
+        /* ========== 页面框架 ========== */
+        .yl_wrap {
+            max-width: 880px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .yl_title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+        .yl_desc {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .yl_card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+        .yl_section {
+            color: #2980b9;
+            font-size: 19px;
+            border-left: 4px solid #2980b9;
+            padding-left: 10px;
+            margin-bottom: 16px;
+        }
+        .yl_text {
+            font-size: 14px;
+            line-height: 1.9;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        /* ========== 对比表格 ========== */
+        .yl_table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .yl_table th,
+        .yl_table td {
+            border: 1px solid #e3e8ee;
+            padding: 10px 12px;
+            text-align: left;
+            line-height: 1.7;
+        }
+        .yl_table th {
+            background: #f0f5fb;
+            color: #2c3e50;
+        }
+
+        /* ========== 演示通用 ========== */
+        .yl_demo-box {
+            padding: 18px 20px;
+            background: #f8fafc;
+            border: 1px solid #e8eef5;
+            border-radius: 10px;
+        }
+        .yl_show {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+        .yl_num {
+            min-width: 86px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 40px;
+            font-weight: 700;
+            color: #2980b9;
+            line-height: 1;
+        }
+        .yl_state {
+            flex: 1;
+            min-width: 220px;
+            font-size: 14px;
+            color: #555;
+            line-height: 1.8;
+        }
+        .yl_state b { color: #2c3e50; }
+        .yl_state-ok { color: #1d8348; font-weight: 700; }
+        .yl_state-run { color: #2980b9; font-weight: 700; }
+        .yl_state-off { color: #c0392b; font-weight: 700; }
+        .yl_btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .yl_btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 6px;
+            background: #3498db;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .yl_btn:hover { background: #2980b9; }
+        .yl_btn:disabled {
+            background: #9dc3e6;
+            cursor: not-allowed;
+        }
+        .yl_btn-gray {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+        .yl_btn-gray:hover { background: #d5dbdf; color: #2c3e50; }
+        .yl_btn-red { background: #e74c3c; }
+        .yl_btn-red:hover { background: #c0392b; }
+        .yl_hint {
+            margin-top: 12px;
+            font-size: 12px;
+            color: #95a5a6;
+            line-height: 1.8;
+        }
+
+        /* ========== 小结 ========== */
+        .yl_note li {
+            position: relative;
+            padding-left: 18px;
+            font-size: 14px;
+            line-height: 2;
+            color: #444;
+        }
+        .yl_note li::before {
+            content: "";
+            position: absolute;
+            left: 2px;
+            top: 14px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="yl_wrap">
+        <h1 class="yl_title">JavaScript 两种定时器</h1>
+        <p class="yl_desc">setTimeout（延时定时器，只执行一次）与 setInterval（间隔定时器，周期重复执行），含 clearTimeout / clearInterval 取消演示。</p>
+
+        <!-- 一、对比表 -->
+        <section class="yl_card">
+            <h2 class="yl_section">一、两种定时器对比</h2>
+            <table class="yl_table">
+                <thead>
+                    <tr>
+                        <th>对比项</th>
+                        <th>setTimeout</th>
+                        <th>setInterval</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>作用</td>
+                        <td>延时一段时间后执行一次</td>
+                        <td>每隔一段时间重复执行</td>
+                    </tr>
+                    <tr>
+                        <td>语法</td>
+                        <td><code>setTimeout(回调, 毫秒)</code></td>
+                        <td><code>setInterval(回调, 毫秒)</code></td>
+                    </tr>
+                    <tr>
+                        <td>执行次数</td>
+                        <td>1 次</td>
+                        <td>无限次，直到被清除</td>
+                    </tr>
+                    <tr>
+                        <td>清除方法</td>
+                        <td><code>clearTimeout(id)</code></td>
+                        <td><code>clearInterval(id)</code></td>
+                    </tr>
+                    <tr>
+                        <td>返回值</td>
+                        <td>定时器 id（数字）</td>
+                        <td>定时器 id（数字）</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 二、setTimeout -->
+        <section class="yl_card">
+            <h2 class="yl_section">二、setTimeout：延时执行一次</h2>
+            <div class="yl_demo-box">
+                <div class="yl_show">
+                    <div class="yl_num" id="yl_toNum">3</div>
+                    <div class="yl_state" id="yl_toState">就绪：点击"启动"后 3 秒执行一次回调（倒计时由链式 setTimeout 逐秒驱动）。</div>
+                </div>
+                <div class="yl_btns">
+                    <button class="yl_btn" id="yl_toStart" type="button">启动 3 秒延时任务</button>
+                    <button class="yl_btn yl_btn-red" id="yl_toCancel" type="button">取消（clearTimeout）</button>
+                </div>
+                <p class="yl_hint">提示：点击"取消"后，尚未执行的回调将被 clearTimeout 清除，不再执行；已执行完毕的定时器 id 失效。</p>
+            </div>
+        </section>
+
+        <!-- 三、setInterval -->
+        <section class="yl_card">
+            <h2 class="yl_section">三、setInterval：周期重复执行</h2>
+            <div class="yl_demo-box">
+                <div class="yl_show">
+                    <div class="yl_num" id="yl_intNum">0</div>
+                    <div class="yl_state" id="yl_intState">就绪：点击"开始"后每 1 秒自动 +1（秒表），可暂停、清零。</div>
+                </div>
+                <div class="yl_btns">
+                    <button class="yl_btn" id="yl_intStart" type="button">开始</button>
+                    <button class="yl_btn yl_btn-gray" id="yl_intPause" type="button">暂停（clearInterval）</button>
+                    <button class="yl_btn yl_btn-gray" id="yl_intReset" type="button">清零</button>
+                </div>
+                <p class="yl_hint">提示：setInterval 会按固定间隔无限重复执行，必须用 clearInterval(id) 停止，否则离开页面后仍在运行。</p>
+            </div>
+        </section>
+
+        <!-- 四、组合应用 -->
+        <section class="yl_card">
+            <h2 class="yl_section">四、组合应用：自动停止的计数器</h2>
+            <div class="yl_demo-box">
+                <div class="yl_show">
+                    <div class="yl_num" id="yl_autoNum">0</div>
+                    <div class="yl_state" id="yl_autoState">就绪：setInterval 每秒 +1，同时 setTimeout 在 5 秒后自动 clearInterval 停止计数。</div>
+                </div>
+                <div class="yl_btns">
+                    <button class="yl_btn" id="yl_autoStart" type="button">开始</button>
+                    <button class="yl_btn yl_btn-red" id="yl_autoStop" type="button">立即停止</button>
+                </div>
+                <p class="yl_hint">提示：这是两种定时器配合的典型用法——setInterval 负责重复任务，setTimeout 负责"到点结束"。</p>
+            </div>
+        </section>
+
+        <!-- 五、小结 -->
+        <section class="yl_card">
+            <h2 class="yl_section">五、小结</h2>
+            <ul class="yl_note">
+                <li><b>setTimeout</b> 只执行一次，适合"延时后做某事"；<b>setInterval</b> 周期执行，适合"每隔一段时间做某事"。</li>
+                <li>两个函数都返回数字 id，分别用 <code>clearTimeout(id)</code>、<code>clearInterval(id)</code> 取消。</li>
+                <li>组件销毁或页面离开前应清除定时器，避免回调残留与内存泄漏。</li>
+                <li>若回调执行时间超过间隔，setInterval 可能产生积压；此时可用<b>递归 setTimeout</b> 保证"上一次执行完再计时"。</li>
+                <li>浏览器对后台标签页的定时器会节流（间隔被拉长到约 1 秒），不宜依赖定时器做精确计时。</li>
+            </ul>
+        </section>
+    </div>
+
+    <script>
+    // 姓名：张浩扬  建立时间：2026-11-02 14:32:40  模型：Xiaomi MiMo-V2.6-Pro  功能：JavaScript 两种定时器演示（setTimeout / setInterval）
+    (function () {
+        // ========== 一、setTimeout：延时执行一次（倒计时由链式 setTimeout 驱动） ==========
+        var yl_toId = null;      // 当前延时任务的定时器 id
+        var yl_toLeft = 3;       // 剩余秒数
+
+        function yl_toTick() {
+            document.getElementById('yl_toNum').textContent = yl_toLeft;
+            if (yl_toLeft > 0) {
+                document.getElementById('yl_toState').innerHTML =
+                    '<b class="yl_state-run">运行中</b>：还有 <b>' + yl_toLeft + '</b> 秒执行回调（当前定时器 id：' + yl_toId + '）';
+                yl_toLeft -= 1;
+                yl_toId = setTimeout(yl_toTick, 1000); // 链式 setTimeout，逐秒更新
+            } else {
+                document.getElementById('yl_toState').innerHTML =
+                    '<b class="yl_state-ok">时间到！</b>setTimeout 回调已执行一次，定时器自动结束。';
+                yl_toId = null;
+            }
+        }
+
+        document.getElementById('yl_toStart').addEventListener('click', function () {
+            if (yl_toId !== null) {
+                clearTimeout(yl_toId); // 重复点击时先清掉旧的
+            }
+            yl_toLeft = 3;
+            yl_toTick();
+        });
+
+        document.getElementById('yl_toCancel').addEventListener('click', function () {
+            if (yl_toId !== null) {
+                clearTimeout(yl_toId);
+                yl_toId = null;
+                document.getElementById('yl_toNum').textContent = '—';
+                document.getElementById('yl_toState').innerHTML =
+                    '<b class="yl_state-off">已取消</b>：clearTimeout 清除了尚未执行的回调。';
+            } else {
+                document.getElementById('yl_toState').innerHTML =
+                    '<b class="yl_state-off">没有可取消的任务</b>：当前没有正在等待执行的定时器。';
+            }
+        });
+
+        // ========== 二、setInterval：周期重复执行（秒表） ==========
+        var yl_intId = null;     // 秒表定时器 id
+        var yl_intCount = 0;     // 已执行次数
+
+        document.getElementById('yl_intStart').addEventListener('click', function () {
+            if (yl_intId !== null) {
+                return;
+            }
+            yl_intId = setInterval(function () {
+                yl_intCount += 1;
+                document.getElementById('yl_intNum').textContent = yl_intCount;
+                document.getElementById('yl_intState').innerHTML =
+                    '<b class="yl_state-run">运行中</b>：每 1 秒自动 +1，已执行 <b>' + yl_intCount + '</b> 次（定时器 id：' + yl_intId + '）';
+            }, 1000);
+            document.getElementById('yl_intState').innerHTML =
+                '<b class="yl_state-run">已开始</b>：setInterval 每 1000 毫秒触发一次（定时器 id：' + yl_intId + '）';
+        });
+
+        document.getElementById('yl_intPause').addEventListener('click', function () {
+            if (yl_intId !== null) {
+                clearInterval(yl_intId);
+                yl_intId = null;
+                document.getElementById('yl_intState').innerHTML =
+                    '<b class="yl_state-off">已暂停</b>：clearInterval 停止了周期执行，当前计数 <b>' + yl_intCount + '</b>，点"开始"继续。';
+            } else {
+                document.getElementById('yl_intState').innerHTML =
+                    '<b class="yl_state-off">未在运行</b>：当前没有正在执行的周期任务。';
+            }
+        });
+
+        document.getElementById('yl_intReset').addEventListener('click', function () {
+            yl_intCount = 0;
+            document.getElementById('yl_intNum').textContent = '0';
+            document.getElementById('yl_intState').innerHTML =
+                '已清零：计数回到 0（不影响定时器是否在运行）。';
+        });
+
+        // ========== 三、组合应用：setInterval 计数 + setTimeout 自动停止 ==========
+        var yl_autoIntId = null;  // 计数定时器 id
+        var yl_autoToId = null;   // 自动停止定时器 id
+        var yl_autoCount = 0;
+
+        function yl_autoStop(yl_byTimeout) {
+            if (yl_autoIntId !== null) {
+                clearInterval(yl_autoIntId);
+                yl_autoIntId = null;
+            }
+            if (yl_autoToId !== null) {
+                clearTimeout(yl_autoToId);
+                yl_autoToId = null;
+            }
+            document.getElementById('yl_autoState').innerHTML = yl_byTimeout
+                ? '<b class="yl_state-ok">自动停止</b>：setTimeout 到点执行 clearTimeout，计数定格在 <b>' + yl_autoCount + '</b>。'
+                : '<b class="yl_state-off">已手动停止</b>：两种定时器都已清除，计数定格在 <b>' + yl_autoCount + '</b>。';
+        }
+
+        document.getElementById('yl_autoStart').addEventListener('click', function () {
+            yl_autoStop(false); // 先清掉旧任务
+            yl_autoCount = 0;
+            document.getElementById('yl_autoNum').textContent = '0';
+            yl_autoIntId = setInterval(function () {
+                yl_autoCount += 1;
+                document.getElementById('yl_autoNum').textContent = yl_autoCount;
+            }, 1000);
+            yl_autoToId = setTimeout(function () {
+                yl_autoStop(true);
+            }, 5000);
+            document.getElementById('yl_autoState').innerHTML =
+                '<b class="yl_state-run">运行中</b>：setInterval 每秒 +1，5 秒后 setTimeout 将自动 clearInterval（当前计数 0）。';
+        });
+
+        document.getElementById('yl_autoStop').addEventListener('click', function () {
+            yl_autoStop(false);
+        });
+    })();
+    </script>
+</body>
+</html>

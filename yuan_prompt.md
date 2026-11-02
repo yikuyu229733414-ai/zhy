@@ -84,3 +84,18 @@
 - 提示词原文：统合一下index然后上传到github
 
 
+## 2026-11-02 14:24:54
+- 模型：Xiaomi MiMo-V2.6-Pro
+- 提示词原文：完成17-4 对远程接口进行测试支持get post等 显示返回的数据和错误提示信息实例的post接口：https://jsonplaceholder.typicode.com/posts
+
+
+## 2026-11-02 14:32:40
+- 模型：Xiaomi MiMo-V2.6-Pro
+- 提示词原文：完成17-5展示javascript的两种定时器完成17-6使用promise和async完成异步操作的演示包饺子的流程先买原后取原料料买完原料之后同时和面，活馅，两个活动都完成后开始包饺子包完饺子吃饺子。
+
+
+## 2026-11-02 14:47:25
+- 模型：Xiaomi MiMo-V2.6-Pro
+- 提示词原文：上传到git顺便给我生成可以看的网站要GitHub网站
+
+

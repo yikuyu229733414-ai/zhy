@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>远程接口测试工具</title>
+    <!-- 姓名：张浩扬  建立时间：2026-11-02 14:24:54  模型：Xiaomi MiMo-V2.6-Pro  功能：远程接口测试工具（GET/POST 等请求调试，展示返回数据与错误提示信息） -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        ul { list-style: none; }
+        code {
+            padding: 1px 6px;
+            background: #eef2f7;
+            border-radius: 4px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            color: #c7254e;
+            word-break: break-all;
+        }
+
+        /* ========== 页面框架 ========== */
+        .yl_wrap {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .yl_title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+        .yl_desc {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .yl_card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+        .yl_section {
+            color: #2980b9;
+            font-size: 19px;
+            border-left: 4px solid #2980b9;
+            padding-left: 10px;
+            margin-bottom: 16px;
+        }
+        .yl_text {
+            font-size: 14px;
+            line-height: 1.9;
+            color: #444;
+            margin-bottom: 10px;
+        }
+        .yl_hint {
+            font-size: 12px;
+            color: #95a5a6;
+            margin-top: 8px;
+        }
+
+        /* ========== 请求行 ========== */
+        .yl_req-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .yl_method {
+            width: 110px;
+            padding: 9px 10px;
+            border: 1px solid #d6dee8;
+            border-radius: 6px;
+            background: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            color: #2980b9;
+            outline: none;
+            cursor: pointer;
+        }
+        .yl_url {
+            flex: 1;
+            min-width: 260px;
+            padding: 9px 12px;
+            border: 1px solid #d6dee8;
+            border-radius: 6px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 13px;
+            color: #333;
+            outline: none;
+        }
+        .yl_method:focus,
+        .yl_url:focus { border-color: #3498db; }
+        .yl_send {
+            padding: 9px 26px;
+            border: none;
+            border-radius: 6px;
+            background: #3498db;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .yl_send:hover { background: #2980b9; }
+        .yl_send:disabled {
+            background: #9dc3e6;
+            cursor: wait;
+        }
+
+        /* 预设示例按钮 */
+        .yl_presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 14px 0;
+        }
+        .yl_preset {
+            padding: 7px 15px;
+            border: 1px solid #d6dee8;
+            border-radius: 16px;
+            background: #fff;
+            color: #444;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .yl_preset:hover {
+            border-color: #3498db;
+            color: #3498db;
+        }
+
+        /* 请求头 / 请求体 */
+        .yl_field-label {
+            display: block;
+            margin: 14px 0 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        .yl_area {
+            width: 100%;
+            padding: 11px 13px;
+            border: 1px solid #d6dee8;
+            border-radius: 8px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #333;
+            resize: vertical;
+            outline: none;
+        }
+        .yl_area:focus { border-color: #3498db; }
+        #yl_body { height: 140px; }
+        #yl_headers { height: 64px; }
+
+        /* ========== 响应结果 ========== */
+        .yl_state-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .yl_stat {
+            min-width: 120px;
+            padding: 10px 16px;
+            background: #f8fafc;
+            border: 1px solid #e8eef5;
+            border-radius: 8px;
+        }
+        .yl_stat span {
+            display: block;
+            font-size: 11px;
+            color: #95a5a6;
+            margin-bottom: 4px;
+        }
+        .yl_stat b {
+            font-size: 15px;
+            color: #2c3e50;
+            font-family: Consolas, "Courier New", monospace;
+        }
+        .yl-pill {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        .yl-pill-ok { background: #eafaf1; color: #1d8348; }
+        .yl-pill-err { background: #fdecea; color: #c0392b; }
+        .yl-pill-wait { background: #eaf3fc; color: #2980b9; }
+
+        /* 错误提示 */
+        .yl_error {
+            display: none;
+            margin-bottom: 14px;
+            padding: 12px 16px;
+            background: #fdecea;
+            border-left: 4px solid #e74c3c;
+            border-radius: 6px;
+            color: #c0392b;
+            font-size: 13px;
+            line-height: 1.8;
+            word-break: break-all;
+        }
+        .yl_error b {
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* 响应头 / 响应数据 */
+        .yl_sub-label {
+            margin: 14px 0 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        .yl_raw {
+            max-height: 340px;
+            overflow: auto;
+            background: #2b3137;
+            color: #d7e0ea;
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .yl_raw-headers {
+            max-height: 130px;
+            white-space: pre;
+        }
+        .yl_raw-empty {
+            color: #8a97a5;
+        }
+    </style>
+</head>
+<body>
+    <div class="yl_wrap">
+        <h1 class="yl_title">远程接口测试工具</h1>
+        <p class="yl_desc">使用 fetch 和原生代码实现（无第三方库 / CDN）：支持 GET / POST / PUT / PATCH / DELETE 请求调试，可编辑请求地址、请求头与请求体，实时展示状态码、耗时、响应大小、返回数据与错误提示信息。</p>
+
+        <!-- 请求设置 -->
+        <section class="yl_card">
+            <h2 class="yl_section">一、请求设置</h2>
+            <div class="yl_req-row">
+                <select class="yl_method" id="yl_method">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="PATCH">PATCH</option>
+                    <option value="DELETE">DELETE</option>
+                </select>
+                <input class="yl_url" id="yl_url" type="text" value="https://jsonplaceholder.typicode.com/posts" spellcheck="false">
+                <button class="yl_send" id="yl_send" type="button">发送请求</button>
+            </div>
+
+            <div class="yl_presets" id="yl_presets"></div>
+
+            <label class="yl_field-label" for="yl_headers">请求头（JSON 对象，可留空）</label>
+            <textarea class="yl_area" id="yl_headers" spellcheck="false">{"Content-Type": "application/json"}</textarea>
+
+            <label class="yl_field-label" for="yl_body">请求体（JSON 文本，POST / PUT / PATCH / DELETE 发送）</label>
+            <textarea class="yl_area" id="yl_body" spellcheck="false">{
+  "title": "张浩扬的接口测试",
+  "body": "使用 fetch 发送 POST 请求创建一篇文章。",
+  "userId": 1
+}</textarea>
+            <p class="yl_hint">提示：GET / HEAD 请求不发送请求体；实例接口为 jsonplaceholder 测试接口（POST 提交后返回模拟创建结果）。</p>
+        </section>
+
+        <!-- 响应结果 -->
+        <section class="yl_card">
+            <h2 class="yl_section">二、响应结果</h2>
+            <div class="yl_state-row">
+                <div class="yl_stat">
+                    <span>状态</span>
+                    <b><i class="yl-pill yl-pill-wait" id="yl_statStatus">未发送</i></b>
+                </div>
+                <div class="yl_stat">
+                    <span>耗时</span>
+                    <b id="yl_statTime">—</b>
+                </div>
+                <div class="yl_stat">
+                    <span>响应大小</span>
+                    <b id="yl_statSize">—</b>
+                </div>
+                <div class="yl_stat">
+                    <span>数据格式</span>
+                    <b id="yl_statType">—</b>
+                </div>
+            </div>
+
+            <div class="yl_error" id="yl_error">
+                <b>错误提示信息</b>
+                <span id="yl_errorText"></span>
+            </div>
+
+            <div class="yl_sub-label">响应头</div>
+            <pre class="yl_raw yl_raw-headers" id="yl_headersView">（发送请求后显示响应头）</pre>
+
+            <div class="yl_sub-label">返回数据</div>
+            <pre class="yl_raw" id="yl_bodyView">（发送请求后显示接口返回的数据）</pre>
+        </section>
+
+        <!-- 核心实现 -->
+        <section class="yl_card">
+            <h2 class="yl_section">三、核心实现：fetch + 原生代码</h2>
+            <p class="yl_text">用 <code>fetch(url, options)</code> 发送请求：方法、请求头、请求体都放在第二个参数的选项对象里；用 <code>yl_resp.ok</code> 判断状态码是否为 2xx，用 <code>yl_resp.text()</code> 读取原始返回再尝试解析 JSON；网络异常由 <code>.catch</code> 捕获并展示错误提示信息。核心代码如下：</p>
+            <pre class="yl_raw">// 1. 组装 fetch 选项：方法、请求头、请求体
+var yl_options = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title: '标题', body: '内容', userId: 1 })
+};
+
+// 2. fetch 发送请求，读取原始文本后解析
+fetch('https://jsonplaceholder.typicode.com/posts', yl_options)
+    .then(function (yl_resp) {
+        return yl_resp.text().then(function (yl_text) {
+            return { yl_ok: yl_resp.ok, yl_status: yl_resp.status, yl_text: yl_text };
+        });
+    })
+    .then(function (yl_pack) {
+        yl_render(yl_pack); // 展示状态码、耗时与返回数据
+    })
+    .catch(function (yl_err) {
+        yl_showError('网络错误：' + yl_err.message); // 错误提示信息
+    });</pre>
+        </section>
+    </div>
+
+    <script>
+    // 姓名：张浩扬  建立时间：2026-11-02 14:24:54  模型：Xiaomi MiMo-V2.6-Pro  功能：远程接口测试工具（GET/POST 等请求调试，展示返回数据与错误提示信息）
+    (function () {
+        // 预设示例（实例接口：jsonplaceholder）
+        var yl_presets = [
+            { yl_label: 'GET 文章列表', yl_method: 'GET', yl_url: 'https://jsonplaceholder.typicode.com/posts', yl_body: '' },
+            { yl_label: 'GET 单篇文章', yl_method: 'GET', yl_url: 'https://jsonplaceholder.typicode.com/posts/1', yl_body: '' },
+            { yl_label: 'POST 创建文章', yl_method: 'POST', yl_url: 'https://jsonplaceholder.typicode.com/posts', yl_body: '{\n  "title": "张浩扬的接口测试",\n  "body": "使用 fetch 发送 POST 请求创建一篇文章。",\n  "userId": 1\n}' },
+            { yl_label: 'PUT 更新文章', yl_method: 'PUT', yl_url: 'https://jsonplaceholder.typicode.com/posts/1', yl_body: '{\n  "id": 1,\n  "title": "更新后的标题",\n  "body": "使用 fetch 发送 PUT 请求更新文章。",\n  "userId": 1\n}' },
+            { yl_label: 'DELETE 删除文章', yl_method: 'DELETE', yl_url: 'https://jsonplaceholder.typicode.com/posts/1', yl_body: '' },
+            { yl_label: '404 错误演示', yl_method: 'GET', yl_url: 'https://jsonplaceholder.typicode.com/unknown-route-404', yl_body: '' },
+            { yl_label: '网络错误演示', yl_method: 'GET', yl_url: 'https://nonexistent-17-4.invalid/test', yl_body: '' }
+        ];
+
+        var yl_methodEl = document.getElementById('yl_method');
+        var yl_urlEl = document.getElementById('yl_url');
+        var yl_headersEl = document.getElementById('yl_headers');
+        var yl_bodyEl = document.getElementById('yl_body');
+        var yl_sendEl = document.getElementById('yl_send');
+
+        // 错误提示信息
+        function yl_showError(yl_msg) {
+            var yl_boxEl = document.getElementById('yl_error');
+            yl_boxEl.style.display = 'block';
+            document.getElementById('yl_errorText').textContent = yl_msg;
+        }
+        function yl_hideError() {
+            document.getElementById('yl_error').style.display = 'none';
+        }
+
+        // 状态胶囊
+        function yl_setPill(yl_text, yl_kind) {
+            var yl_pillEl = document.getElementById('yl_statStatus');
+            yl_pillEl.className = 'yl-pill yl-pill-' + yl_kind;
+            yl_pillEl.textContent = yl_text;
+        }
+
+        // 渲染响应
+        function yl_render(yl_pack) {
+            yl_setPill(yl_pack.yl_status + (yl_pack.yl_ok ? ' ✓' : ' ✗'), yl_pack.yl_ok ? 'ok' : 'err');
+            document.getElementById('yl_statTime').textContent = yl_pack.yl_ms + ' ms';
+            document.getElementById('yl_statSize').textContent = yl_pack.yl_size + ' B';
+
+            // 响应头
+            var yl_headText = '';
+            yl_pack.yl_headers.forEach(function (yl_val, yl_key) {
+                yl_headText += yl_key + ': ' + yl_val + '\n';
+            });
+            document.getElementById('yl_headersView').textContent = yl_headText || '（无响应头）';
+
+            // 返回数据：先按 JSON 解析，失败则展示原始文本
+            var yl_bodyText = yl_pack.yl_text;
+            if (yl_bodyText === '') {
+                document.getElementById('yl_statType').textContent = '空响应';
+                document.getElementById('yl_bodyView').innerHTML = '<span class="yl_raw-empty">（接口没有返回数据）</span>';
+            } else {
+                try {
+                    yl_bodyText = JSON.stringify(JSON.parse(yl_pack.yl_text), null, 2);
+                    document.getElementById('yl_statType').textContent = 'JSON';
+                } catch (yl_err) {
+                    document.getElementById('yl_statType').textContent = '文本';
+                }
+                document.getElementById('yl_bodyView').textContent = yl_bodyText;
+            }
+
+            // HTTP 错误提示
+            if (!yl_pack.yl_ok) {
+                yl_showError('HTTP ' + yl_pack.yl_status + '：服务器返回错误状态码，接口数据仍展示在下方，请检查请求地址或参数。');
+            } else {
+                yl_hideError();
+            }
+        }
+
+        // 发送请求
+        function yl_send() {
+            var yl_method = yl_methodEl.value;
+            var yl_url = yl_urlEl.value.trim();
+            if (!yl_url) {
+                yl_showError('请求地址不能为空，请输入接口地址。');
+                return;
+            }
+
+            // 解析请求头
+            var yl_headers = {};
+            var yl_headersText = yl_headersEl.value.trim();
+            if (yl_headersText) {
+                try {
+                    yl_headers = JSON.parse(yl_headersText);
+                    if (typeof yl_headers !== 'object' || yl_headers === null || Array.isArray(yl_headers)) {
+                        throw new Error('请求头必须是 JSON 对象');
+                    }
+                } catch (yl_err) {
+                    yl_showError('请求头不是合法 JSON：' + yl_err.message);
+                    return;
+                }
+            }
+
+            // 组装选项：GET / HEAD 不发送请求体
+            var yl_body = yl_bodyEl.value.trim();
+            var yl_options = { method: yl_method, headers: yl_headers };
+            if (yl_method !== 'GET' && yl_method !== 'HEAD' && yl_body) {
+                yl_options.body = yl_body;
+                if (!yl_headers['Content-Type'] && !yl_headers['content-type']) {
+                    yl_headers['Content-Type'] = 'application/json';
+                }
+            }
+
+            yl_hideError();
+            yl_setPill('请求中…', 'wait');
+            yl_sendEl.disabled = true;
+            document.getElementById('yl_statTime').textContent = '—';
+            document.getElementById('yl_statSize').textContent = '—';
+            document.getElementById('yl_statType').textContent = '—';
+            document.getElementById('yl_bodyView').textContent = '（正在等待接口返回…）';
+            document.getElementById('yl_headersView').textContent = '（正在等待接口返回…）';
+
+            var yl_t0 = performance.now();
+            fetch(yl_url, yl_options)
+                .then(function (yl_resp) {
+                    return yl_resp.text().then(function (yl_text) {
+                        return {
+                            yl_ok: yl_resp.ok,
+                            yl_status: yl_resp.status + ' ' + yl_resp.statusText,
+                            yl_headers: yl_resp.headers,
+                            yl_text: yl_text,
+                            yl_ms: Math.round(performance.now() - yl_t0),
+                            yl_size: new Blob([yl_text]).size
+                        };
+                    });
+                })
+                .then(function (yl_pack) {
+                    yl_render(yl_pack);
+                    yl_sendEl.disabled = false;
+                })
+                .catch(function (yl_err) {
+                    var yl_ms = Math.round(performance.now() - yl_t0);
+                    yl_setPill('请求失败', 'err');
+                    document.getElementById('yl_statTime').textContent = yl_ms + ' ms';
+                    document.getElementById('yl_statSize').textContent = '—';
+                    document.getElementById('yl_statType').textContent = '—';
+                    document.getElementById('yl_headersView').textContent = '（没有响应头）';
+                    document.getElementById('yl_bodyView').innerHTML = '<span class="yl_raw-empty">（没有返回数据）</span>';
+                    yl_showError('网络错误：' + yl_err.message + '。请检查请求地址、网络连接或跨域设置后重试。');
+                    yl_sendEl.disabled = false;
+                });
+        }
+
+        // 生成预设示例按钮（点击后填入并自动发送）
+        (function yl_buildPresets() {
+            var yl_boxEl = document.getElementById('yl_presets');
+            for (var yl_i = 0; yl_i < yl_presets.length; yl_i++) {
+                var yl_btnEl = document.createElement('button');
+                yl_btnEl.type = 'button';
+                yl_btnEl.className = 'yl_preset';
+                yl_btnEl.textContent = yl_presets[yl_i].yl_label;
+                (function (yl_item) {
+                    yl_btnEl.addEventListener('click', function () {
+                        yl_methodEl.value = yl_item.yl_method;
+                        yl_urlEl.value = yl_item.yl_url;
+                        yl_bodyEl.value = yl_item.yl_body;
+                        yl_send();
+                    });
+                })(yl_presets[yl_i]);
+                yl_boxEl.appendChild(yl_btnEl);
+            }
+        })();
+
+        yl_sendEl.addEventListener('click', yl_send);
+    })();
+    </script>
+</body>
+</html>

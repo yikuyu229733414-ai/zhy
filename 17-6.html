@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promise 与 async/await 异步演示 · 包饺子流程</title>
+    <!-- 姓名：张浩扬  建立时间：2026-11-02 14:32:40  模型：Xiaomi MiMo-V2.6-Pro  功能：Promise 与 async/await 异步操作演示（包饺子流程） -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        code {
+            padding: 1px 6px;
+            background: #eef2f7;
+            border-radius: 4px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            color: #c7254e;
+            word-break: break-all;
+        }
+
+        /* ========== 页面框架 ========== */
+        .yl_wrap {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .yl_title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+        .yl_desc {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .yl_card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+        .yl_section {
+            color: #2980b9;
+            font-size: 19px;
+            border-left: 4px solid #2980b9;
+            padding-left: 10px;
+            margin-bottom: 16px;
+        }
+        .yl_text {
+            font-size: 14px;
+            line-height: 1.9;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        /* ========== 流程步骤 ========== */
+        .yl_flow {
+            display: flex;
+            align-items: stretch;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .yl_flow-arrow {
+            display: flex;
+            align-items: center;
+            color: #95a5a6;
+            font-size: 18px;
+            padding: 0 2px;
+        }
+        .yl_step {
+            flex: 1;
+            min-width: 110px;
+            padding: 12px 10px;
+            background: #f8fafc;
+            border: 2px solid #e3eaf2;
+            border-radius: 10px;
+            text-align: center;
+            transition: border-color .2s ease, background .2s ease;
+        }
+        .yl_step-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+        .yl_step-time {
+            font-size: 11px;
+            color: #95a5a6;
+            margin-bottom: 7px;
+        }
+        .yl_step-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            background: #eceff3;
+            color: #7f8c8d;
+        }
+        /* 等待中 */
+        .yl_step-wait { border-color: #e3eaf2; background: #f8fafc; }
+        /* 进行中 */
+        .yl_step-run {
+            border-color: #3498db;
+            background: #eaf3fc;
+        }
+        .yl_step-run .yl_step-badge { background: #3498db; color: #fff; }
+        .yl_step-run .yl_step-badge::before {
+            content: "";
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            margin-right: 5px;
+            vertical-align: 0;
+            border: 2px solid rgba(255, 255, 255, .5);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: yl_spin .8s linear infinite;
+        }
+        /* 已完成 */
+        .yl_step-done {
+            border-color: #27ae60;
+            background: #eafaf1;
+        }
+        .yl_step-done .yl_step-badge { background: #27ae60; color: #fff; }
+        @keyframes yl_spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 并行组 */
+        .yl_parallel {
+            flex: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 10px 12px 12px;
+            border: 2px dashed #b7c9dd;
+            border-radius: 12px;
+            background: #f4f8fd;
+        }
+        .yl_parallel-tag {
+            font-size: 11px;
+            color: #2980b9;
+            font-weight: 700;
+            text-align: center;
+        }
+        .yl_parallel-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* ========== 控制按钮 ========== */
+        .yl_btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .yl_btn {
+            padding: 9px 22px;
+            border: none;
+            border-radius: 6px;
+            background: #3498db;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .yl_btn:hover { background: #2980b9; }
+        .yl_btn:disabled {
+            background: #9dc3e6;
+            cursor: not-allowed;
+        }
+        .yl_btn-green { background: #27ae60; }
+        .yl_btn-green:hover { background: #1e8449; }
+        .yl_btn-gray {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+        .yl_btn-gray:hover { background: #d5dbdf; color: #2c3e50; }
+
+        /* ========== 日志控制台 ========== */
+        .yl_log {
+            height: 260px;
+            overflow: auto;
+            background: #2b3137;
+            color: #9fe8a9;
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12.5px;
+            line-height: 1.9;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .yl_log-line-wait { color: #8a97a5; }
+        .yl_log-line-key { color: #ffd166; }
+
+        /* ========== 核心实现 ========== */
+        .yl_raw {
+            background: #2b3137;
+            color: #d7e0ea;
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin-bottom: 14px;
+        }
+        .yl_sub-label {
+            margin: 14px 0 6px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="yl_wrap">
+        <h1 class="yl_title">Promise 与 async/await 异步演示</h1>
+        <p class="yl_desc">用 Promise 链式调用与 async/await 两种写法演示"包饺子"异步流程：先买原料 → 后取原料 → 和面、拌馅同时进行（两个都完成）→ 包饺子 → 吃饺子。</p>
+
+        <!-- 一、流程与步骤状态 -->
+        <section class="yl_card">
+            <h2 class="yl_section">一、包饺子流程（点击按钮开始，观察各步状态）</h2>
+            <div class="yl_flow">
+                <div class="yl_step yl_step-wait" id="yl_stepBuy">
+                    <div class="yl_step-name">1. 买原料</div>
+                    <div class="yl_step-time">约 1.2 秒</div>
+                    <div class="yl_step-badge">等待中</div>
+                </div>
+                <div class="yl_flow-arrow">→</div>
+                <div class="yl_step yl_step-wait" id="yl_stepPick">
+                    <div class="yl_step-name">2. 取原料</div>
+                    <div class="yl_step-time">约 0.9 秒</div>
+                    <div class="yl_step-badge">等待中</div>
+                </div>
+                <div class="yl_flow-arrow">→</div>
+                <div class="yl_parallel">
+                    <div class="yl_parallel-tag">3. Promise.all 并行（两个都完成才继续）</div>
+                    <div class="yl_parallel-row">
+                        <div class="yl_step yl_step-wait" id="yl_stepDough">
+                            <div class="yl_step-name">和面</div>
+                            <div class="yl_step-time">约 1.8 秒</div>
+                            <div class="yl_step-badge">等待中</div>
+                        </div>
+                        <div class="yl_step yl_step-wait" id="yl_stepFill">
+                            <div class="yl_step-name">拌馅</div>
+                            <div class="yl_step-time">约 1.4 秒</div>
+                            <div class="yl_step-badge">等待中</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="yl_flow-arrow">→</div>
+                <div class="yl_step yl_step-wait" id="yl_stepWrap">
+                    <div class="yl_step-name">4. 包饺子</div>
+                    <div class="yl_step-time">约 1.6 秒</div>
+                    <div class="yl_step-badge">等待中</div>
+                </div>
+                <div class="yl_flow-arrow">→</div>
+                <div class="yl_step yl_step-wait" id="yl_stepEat">
+                    <div class="yl_step-name">5. 吃饺子</div>
+                    <div class="yl_step-time">约 1.0 秒</div>
+                    <div class="yl_step-badge">等待中</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 二、动手运行 -->
+        <section class="yl_card">
+            <h2 class="yl_section">二、动手运行（两种异步写法）</h2>
+            <div class="yl_btns">
+                <button class="yl_btn" id="yl_btnPromise" type="button">Promise 链式调用演示</button>
+                <button class="yl_btn yl_btn-green" id="yl_btnAsync" type="button">async/await 演示</button>
+                <button class="yl_btn yl_btn-gray" id="yl_btnReset" type="button">重置</button>
+            </div>
+            <div class="yl_log" id="yl_log">（点击上方按钮开始演示，日志带时间戳显示各步骤的开始与完成时刻）</div>
+        </section>
+
+        <!-- 三、核心实现 -->
+        <section class="yl_card">
+            <h2 class="yl_section">三、核心实现：Promise 与 async/await</h2>
+            <p class="yl_text">每个"步骤"是一个用 <code>setTimeout</code> 模拟耗时的 Promise（<code>yl_task</code>）。<b>串行步骤</b>用 then 链或 await 依次等待；<b>并行步骤</b>（和面、拌馅）用 <code>Promise.all</code> 同时发起，等两个都完成后才进入下一步。async/await 是 Promise 的语法糖，用类似同步的写法写异步流程。</p>
+
+            <div class="yl_sub-label">写法一：Promise 链式调用</div>
+            <pre class="yl_raw">yl_task('买原料', 1200, 'yl_stepBuy')
+    .then(function () {
+        return yl_task('取原料', 900, 'yl_stepPick');   // 买完再取，串行
+    })
+    .then(function () {
+        // Promise.all：和面、拌馅 同时开始，两个都完成才继续
+        return Promise.all([
+            yl_task('和面', 1800, 'yl_stepDough'),
+            yl_task('拌馅', 1400, 'yl_stepFill')
+        ]);
+    })
+    .then(function () {
+        return yl_task('包饺子', 1600, 'yl_stepWrap');
+    })
+    .then(function () {
+        return yl_task('吃饺子', 1000, 'yl_stepEat');   // 包完饺子吃饺子
+    });</pre>
+
+            <div class="yl_sub-label">写法二：async/await</div>
+            <pre class="yl_raw">async function yl_makeDumplings() {
+    await yl_task('买原料', 1200, 'yl_stepBuy');          // 先买原料
+    await yl_task('取原料', 900, 'yl_stepPick');          // 后取原料（串行）
+    await Promise.all([                                  // 和面、拌馅 同时进行
+        yl_task('和面', 1800, 'yl_stepDough'),
+        yl_task('拌馅', 1400, 'yl_stepFill')
+    ]);                                                  // 两个都完成才继续
+    await yl_task('包饺子', 1600, 'yl_stepWrap');
+    await yl_task('吃饺子', 1000, 'yl_stepEat');          // 包完饺子吃饺子
+}</pre>
+
+            <div class="yl_sub-label">步骤工厂：每个任务返回一个 Promise</div>
+            <pre class="yl_raw">function yl_task(yl_name, yl_ms, yl_stepId) {
+    return new Promise(function (yl_resolve) {
+        yl_setStep(yl_stepId, 'run');
+        yl_log('开始' + yl_name + '…');
+        setTimeout(function () {      // 用定时器模拟耗时
+            yl_setStep(yl_stepId, 'done');
+            yl_log(yl_name + '完成');
+            yl_resolve(yl_name);
+        }, yl_ms);
+    });
+}</pre>
+        </section>
+    </div>
+
+    <script>
+    // 姓名：张浩扬  建立时间：2026-11-02 14:32:40  模型：Xiaomi MiMo-V2.6-Pro  功能：Promise 与 async/await 异步操作演示（包饺子流程）
+    (function () {
+        var yl_logBoxEl = document.getElementById('yl_log');
+        var yl_startMs = 0;      // 本次演示的起始时刻
+        var yl_running = false;  // 是否正在演示中
+
+        // 日志（带时间戳）
+        function yl_log(yl_text, yl_kind) {
+            if (yl_logBoxEl.textContent.indexOf('（点击上方按钮') === 0) {
+                yl_logBoxEl.innerHTML = '';
+            }
+            var yl_ms = yl_startMs > 0 ? performance.now() - yl_startMs : 0;
+            var yl_lineEl = document.createElement('div');
+            yl_lineEl.className = yl_kind ? 'yl_log-line-' + yl_kind : '';
+            yl_lineEl.textContent = '[' + (yl_ms / 1000).toFixed(2) + 's] ' + yl_text;
+            yl_logBoxEl.appendChild(yl_lineEl);
+            yl_logBoxEl.scrollTop = yl_logBoxEl.scrollHeight;
+        }
+
+        // 步骤状态：wait / run / done
+        function yl_setStep(yl_id, yl_state) {
+            var yl_stepEl = document.getElementById(yl_id);
+            yl_stepEl.className = 'yl_step yl_step-' + yl_state;
+            var yl_badgeEl = yl_stepEl.querySelector('.yl_step-badge');
+            yl_badgeEl.textContent = yl_state === 'run' ? '进行中' : (yl_state === 'done' ? '已完成' : '等待中');
+        }
+
+        // 步骤工厂：返回 Promise，用 setTimeout 模拟耗时
+        function yl_task(yl_name, yl_ms, yl_stepId) {
+            return new Promise(function (yl_resolve) {
+                yl_setStep(yl_stepId, 'run');
+                yl_log('开始' + yl_name + '…（约 ' + (yl_ms / 1000).toFixed(1) + ' 秒）');
+                setTimeout(function () {
+                    yl_setStep(yl_stepId, 'done');
+                    yl_log(yl_name + '完成');
+                    yl_resolve(yl_name);
+                }, yl_ms);
+            });
+        }
+
+        // 重置：所有步骤回到等待中，清空日志
+        function yl_reset() {
+            yl_setStep('yl_stepBuy', 'wait');
+            yl_setStep('yl_stepPick', 'wait');
+            yl_setStep('yl_stepDough', 'wait');
+            yl_setStep('yl_stepFill', 'wait');
+            yl_setStep('yl_stepWrap', 'wait');
+            yl_setStep('yl_stepEat', 'wait');
+            yl_logBoxEl.textContent = '（点击上方按钮开始演示，日志带时间戳显示各步骤的开始与完成时刻）';
+            yl_startMs = 0;
+        }
+
+        // 按钮可用状态
+        function yl_setButtons(yl_run) {
+            yl_running = yl_run;
+            document.getElementById('yl_btnPromise').disabled = yl_run;
+            document.getElementById('yl_btnAsync').disabled = yl_run;
+        }
+
+        // 流程结束的统一收尾
+        function yl_finish(yl_mode) {
+            yl_log('流程结束：包完饺子吃饺子，开吃！（' + yl_mode + ' 共耗时 ' +
+                ((performance.now() - yl_startMs) / 1000).toFixed(2) + ' 秒）', 'key');
+            yl_setButtons(false);
+        }
+
+        // ========== 写法一：Promise 链式调用 ==========
+        document.getElementById('yl_btnPromise').addEventListener('click', function () {
+            yl_reset();
+            yl_setButtons(true);
+            yl_startMs = performance.now();
+            yl_log('—— Promise 链式调用演示开始 ——', 'key');
+
+            yl_task('买原料', 1200, 'yl_stepBuy')
+                .then(function () {
+                    return yl_task('取原料', 900, 'yl_stepPick');
+                })
+                .then(function () {
+                    yl_log('原料就绪，同时开始和面、拌馅（Promise.all 并行）', 'key');
+                    return Promise.all([
+                        yl_task('和面', 1800, 'yl_stepDough'),
+                        yl_task('拌馅', 1400, 'yl_stepFill')
+                    ]);
+                })
+                .then(function () {
+                    yl_log('和面、拌馅 都完成，开始包饺子', 'key');
+                    return yl_task('包饺子', 1600, 'yl_stepWrap');
+                })
+                .then(function () {
+                    return yl_task('吃饺子', 1000, 'yl_stepEat');
+                })
+                .then(function () {
+                    yl_finish('Promise 链式调用');
+                });
+        });
+
+        // ========== 写法二：async/await ==========
+        function yl_makeDumplings() {
+            return (async function () {
+                await yl_task('买原料', 1200, 'yl_stepBuy');
+                await yl_task('取原料', 900, 'yl_stepPick');
+                yl_log('原料就绪，同时开始和面、拌馅（await Promise.all 并行）', 'key');
+                await Promise.all([
+                    yl_task('和面', 1800, 'yl_stepDough'),
+                    yl_task('拌馅', 1400, 'yl_stepFill')
+                ]);
+                yl_log('和面、拌馅 都完成，开始包饺子', 'key');
+                await yl_task('包饺子', 1600, 'yl_stepWrap');
+                await yl_task('吃饺子', 1000, 'yl_stepEat');
+                yl_finish('async/await');
+            })();
+        }
+
+        document.getElementById('yl_btnAsync').addEventListener('click', function () {
+            yl_reset();
+            yl_setButtons(true);
+            yl_startMs = performance.now();
+            yl_log('—— async/await 演示开始 ——', 'key');
+            yl_makeDumplings();
+        });
+
+        // ========== 重置 ==========
+        document.getElementById('yl_btnReset').addEventListener('click', function () {
+            yl_reset();
+            yl_setButtons(false);
+        });
+    })();
+    </script>
+</body>
+</html>

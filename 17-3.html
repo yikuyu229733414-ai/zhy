@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品列表（DummyJSON 接口）</title>
+    <!-- 姓名：张浩扬  建立时间：2026-11-02 13:55:26  模型：Xiaomi MiMo-V2.6-Pro  功能：fetch 获取 DummyJSON 商品列表并展示 -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        ul { list-style: none; }
+        a { text-decoration: none; }
+        code {
+            padding: 1px 6px;
+            background: #eef2f7;
+            border-radius: 4px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            color: #c7254e;
+            word-break: break-all;
+        }
+
+        /* ========== 页面框架 ========== */
+        .yl_wrap {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .yl_title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+        .yl_desc {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 22px;
+        }
+        .yl_card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+        .yl_section {
+            color: #2980b9;
+            font-size: 19px;
+            border-left: 4px solid #2980b9;
+            padding-left: 10px;
+            margin-bottom: 14px;
+        }
+        .yl_text {
+            font-size: 14px;
+            line-height: 1.9;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        /* ========== 工具栏与状态 ========== */
+        .yl_toolbar {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .yl_api {
+            flex: 1;
+            min-width: 260px;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        .yl_btn {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #3498db;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .yl_btn:hover { background: #2980b9; }
+        .yl_status {
+            min-height: 20px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+        .yl_status--loading { color: #2980b9; }
+        .yl_status--ok { color: #1d8348; }
+        .yl_status--err { color: #c0392b; }
+        .yl_status--loading::before {
+            content: "";
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-right: 7px;
+            vertical-align: -2px;
+            border: 2px solid #c6dcf2;
+            border-top-color: #3498db;
+            border-radius: 50%;
+            animation: yl_spin .8s linear infinite;
+        }
+        @keyframes yl_spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ========== 商品列表 ========== */
+        .yl_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 18px;
+        }
+        .yl_item {
+            display: block;
+            background: #fff;
+            border: 1px solid #e8eef5;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+        .yl_item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 14px 28px rgba(52, 152, 219, .16);
+            border-color: #bcd8f2;
+        }
+        .yl_item-img {
+            height: 180px;
+            background: linear-gradient(135deg, #eef4fb, #dce9f7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .yl_item-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #fff;
+        }
+        .yl_item-body { padding: 12px 14px 14px; }
+        .yl_item-title {
+            height: 44px;
+            overflow: hidden;
+            font-size: 14px;
+            line-height: 22px;
+            color: #2c3e50;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+        .yl_item-meta {
+            margin: 6px 0 8px;
+            font-size: 12px;
+            color: #95a5a6;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .yl_item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .yl_item-price {
+            font-size: 17px;
+            font-weight: 700;
+            color: #e67e22;
+        }
+
+        /* 评分星星 */
+        .yl_stars {
+            position: relative;
+            display: inline-block;
+            font-size: 14px;
+            line-height: 1;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+        .yl_stars-bg { color: #dfe4ea; font-style: normal; }
+        .yl_stars-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            overflow: hidden;
+            color: #f5a623;
+            font-style: normal;
+        }
+
+        /* 库存徽标 */
+        .yl_avail {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+        .yl_avail-in { background: #eafaf1; color: #1d8348; }
+        .yl_avail-low { background: #fdf3e2; color: #b9770e; }
+        .yl_avail-out { background: #fdecea; color: #c0392b; }
+
+        /* ========== 原始 JSON / 核心代码 ========== */
+        .yl_raw {
+            max-height: 320px;
+            overflow: auto;
+            background: #2b3137;
+            color: #d7e0ea;
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            white-space: pre;
+        }
+    </style>
+</head>
+<body>
+    <div class="yl_wrap">
+        <h1 class="yl_title">商品列表（DummyJSON 接口）</h1>
+        <p class="yl_desc">使用 fetch 和原生代码实现（无第三方库 / CDN）：调用商品接口获取默认商品列表，点击商品卡片进入详情页查看单个商品。</p>
+
+        <div class="yl_toolbar">
+            <span class="yl_api">列表接口：<code>https://dummyjson.com/products?limit=8</code>（详情接口：<code>https://dummyjson.com/products/{id}</code>）</span>
+            <button class="yl_btn" id="yl_refresh" type="button">重新获取</button>
+        </div>
+        <p class="yl_status" id="yl_status">准备就绪：点击"重新获取"拉取商品列表（需要联网）。</p>
+
+        <!-- 商品列表 -->
+        <div class="yl_grid" id="yl_grid"></div>
+
+        <!-- 原始 JSON -->
+        <section class="yl_card" style="margin-top:22px;">
+            <h2 class="yl_section">原始 JSON 数据</h2>
+            <pre class="yl_raw" id="yl_rawJson">（获取数据后在此显示接口返回的原始 JSON）</pre>
+        </section>
+
+        <!-- 核心实现 -->
+        <section class="yl_card">
+            <h2 class="yl_section">核心实现：fetch + 原生代码</h2>
+            <p class="yl_text">列表页用 <code>fetch()</code> 请求商品列表接口，拿到 JSON 后用原生 DOM 操作（createElement / textContent / appendChild）渲染商品卡片；每张卡片是超链接，携带商品 id 跳转到 <code>17-3-detail.html</code>。考虑到接口网络波动，实际代码在 fetch 外层封装了自动重试（失败后延时 2 秒重试，最多 3 次）。核心代码如下：</p>
+            <pre class="yl_raw">// 1. 列表接口：默认取 8 个商品
+var yl_url = 'https://dummyjson.com/products?limit=8';
+
+// 2. fetch 发起请求，返回 Promise
+fetch(yl_url)
+    .then(function (yl_resp) {
+        if (!yl_resp.ok) {
+            throw new Error('HTTP ' + yl_resp.status);
+        }
+        return yl_resp.json(); // 把响应体解析成 JSON 对象
+    })
+    .then(function (yl_data) {
+        yl_renderList(yl_data.products); // 原生 DOM 渲染商品卡片
+    })
+    .catch(function (yl_err) {
+        yl_setStatus('err', '获取失败：' + yl_err.message);
+    });
+
+// 3. 卡片链接携带 id 跳转详情页
+//    &lt;a href="17-3-detail.html?id=1"&gt;...&lt;/a&gt;</pre>
+        </section>
+    </div>
+
+    <script>
+    // 姓名：张浩扬  建立时间：2026-11-02 13:55:26  模型：Xiaomi MiMo-V2.6-Pro  功能：fetch 获取 DummyJSON 商品列表并展示
+    (function () {
+        var yl_apiUrl = 'https://dummyjson.com/products?limit=8';
+
+        // 创建元素的小工具
+        function yl_el(yl_tag, yl_class, yl_text) {
+            var yl_node = document.createElement(yl_tag);
+            if (yl_class) { yl_node.className = yl_class; }
+            if (yl_text !== undefined) { yl_node.textContent = yl_text; }
+            return yl_node;
+        }
+
+        // 状态条
+        function yl_setStatus(yl_kind, yl_text) {
+            var yl_statusEl = document.getElementById('yl_status');
+            yl_statusEl.className = 'yl_status yl_status--' + yl_kind;
+            yl_statusEl.textContent = yl_text;
+        }
+
+        // 带自动重试的 JSON 请求（接口网络波动时最多自动重试 3 次）
+        function yl_fetchJson(yl_url, yl_retries) {
+            return fetch(yl_url)
+                .then(function (yl_resp) {
+                    if (!yl_resp.ok) {
+                        throw new Error('HTTP ' + yl_resp.status);
+                    }
+                    return yl_resp.json(); // 把响应体解析成 JSON 对象
+                })
+                .catch(function (yl_err) {
+                    if (yl_retries > 0) {
+                        yl_setStatus('loading', '网络不稳定，正在自动重试…（剩余 ' + yl_retries + ' 次）');
+                        return new Promise(function (yl_resolve) {
+                            setTimeout(yl_resolve, 2000);
+                        }).then(function () {
+                            return yl_fetchJson(yl_url, yl_retries - 1);
+                        });
+                    }
+                    throw yl_err;
+                });
+        }
+
+        // 评分星星（纯 CSS 宽度裁切）
+        function yl_starsEl(yl_rating) {
+            var yl_pct = Math.max(0, Math.min(100, yl_rating / 5 * 100));
+            var yl_boxEl = yl_el('span', 'yl_stars');
+            yl_boxEl.setAttribute('title', yl_rating + ' 分');
+            yl_boxEl.appendChild(yl_el('i', 'yl_stars-bg', '★★★★★'));
+            var yl_fillEl = yl_el('i', 'yl_stars-fill', '★★★★★');
+            yl_fillEl.style.width = yl_pct.toFixed(1) + '%';
+            yl_boxEl.appendChild(yl_fillEl);
+            return yl_boxEl;
+        }
+
+        // 库存状态
+        function yl_availClass(yl_state) {
+            if (yl_state === 'In Stock') { return 'yl_avail-in'; }
+            if (yl_state === 'Low Stock') { return 'yl_avail-low'; }
+            return 'yl_avail-out';
+        }
+        function yl_availText(yl_state) {
+            if (yl_state === 'In Stock') { return '现货'; }
+            if (yl_state === 'Low Stock') { return '库存紧张'; }
+            if (yl_state === 'Out of Stock') { return '缺货'; }
+            return yl_state || '—';
+        }
+
+        // 渲染商品卡片
+        function yl_renderList(yl_products) {
+            var yl_gridEl = document.getElementById('yl_grid');
+            yl_gridEl.innerHTML = '';
+            for (var yl_i = 0; yl_i < yl_products.length; yl_i++) {
+                var yl_p = yl_products[yl_i];
+                var yl_itemEl = yl_el('a', 'yl_item');
+                yl_itemEl.href = '17-3-detail.html?id=' + yl_p.id;
+
+                var yl_imgBoxEl = yl_el('div', 'yl_item-img');
+                var yl_imgEl = document.createElement('img');
+                yl_imgEl.alt = yl_p.title;
+                yl_imgEl.loading = 'lazy';
+                yl_imgEl.onerror = function () { this.style.display = 'none'; };
+                yl_imgEl.src = yl_p.thumbnail;
+                yl_imgBoxEl.appendChild(yl_imgEl);
+                yl_itemEl.appendChild(yl_imgBoxEl);
+
+                var yl_bodyEl = yl_el('div', 'yl_item-body');
+                yl_bodyEl.appendChild(yl_el('h3', 'yl_item-title', yl_p.title));
+                yl_bodyEl.appendChild(yl_el('p', 'yl_item-meta', yl_p.brand + ' · ' + yl_p.category));
+
+                var yl_rowEl = yl_el('div', 'yl_item-row');
+                yl_rowEl.appendChild(yl_el('span', 'yl_item-price', '$' + yl_p.price));
+                yl_rowEl.appendChild(yl_starsEl(yl_p.rating));
+                yl_bodyEl.appendChild(yl_rowEl);
+
+                yl_bodyEl.appendChild(yl_el('span', 'yl_avail ' + yl_availClass(yl_p.availabilityStatus), yl_availText(yl_p.availabilityStatus)));
+                yl_itemEl.appendChild(yl_bodyEl);
+                yl_gridEl.appendChild(yl_itemEl);
+            }
+        }
+
+        // 主流程：请求并渲染（外层 yl_fetchJson 带自动重试）
+        function yl_load() {
+            yl_setStatus('loading', '正在获取商品列表…');
+            yl_fetchJson(yl_apiUrl, 3)
+                .then(function (yl_data) {
+                    yl_renderList(yl_data.products);
+                    document.getElementById('yl_rawJson').textContent = JSON.stringify(yl_data, null, 2);
+                    yl_setStatus('ok', '✓ 列表获取成功，共 ' + yl_data.products.length + ' 个商品（接口总数 ' + yl_data.total + '），点击卡片查看详情。');
+                })
+                .catch(function (yl_err) {
+                    yl_setStatus('err', '✗ 获取失败：' + yl_err.message + '。请检查网络后点击"重新获取"。');
+                });
+        }
+
+        document.getElementById('yl_refresh').addEventListener('click', yl_load);
+
+        // 进入页面自动加载
+        yl_load();
+    })();
+    </script>
+</body>
+</html>

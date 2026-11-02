@@ -64,3 +64,23 @@
 - 提示词原文：做完这个再把这个图片也完成了命名16-4要求也是图标用tu biao 的 把他们集合到index里提交到github（附截图：点击排行组件 tit06.jpg、1.jpg、k.jpg、lin.jpg）
 
 
+## 2026-11-02 13:39:44
+- 模型：Xiaomi MiMo-V2.6-Pro
+- 提示词原文：1完成17-1.html展示json 2 完成17-2获取一个Open-Meteo接口的数据并展示
+
+
+## 2026-11-02 13:47:49
+- 模型：Xiaomi MiMo-V2.6-Pro
+- 提示词原文：17-2新增要求使用fetch和原生代码实现
+
+
+## 2026-11-02 13:55:26
+- 模型：Xiaomi MiMo-V2.6-Pro
+- 提示词原文：完成17-3和17-3-detail显示列表和列表详情，数据来源接口，使用fetch列表与列表详情：列表：https://dummyjson.com/products?limit=8，默认商品列表。详情：https://dummyjson.com/products/1，根据 ID 获取单个商品。
+
+
+## 2026-11-02 14:11:29
+- 模型：Xiaomi MiMo-V2.6-Pro
+- 提示词原文：统合一下index然后上传到github
+
+

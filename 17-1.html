@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON 数据展示</title>
+    <!-- 姓名：张浩扬  建立时间：2026-11-02 13:39:44  模型：Xiaomi MiMo-V2.6-Pro  功能：JSON 语法与解析展示 -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        ul { list-style: none; }
+        code {
+            padding: 1px 6px;
+            background: #eef2f7;
+            border-radius: 4px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 13px;
+            color: #c7254e;
+        }
+
+        /* ========== 页面框架 ========== */
+        .yl_wrap {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .yl_title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+        .yl_desc {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 26px;
+        }
+        .yl_card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+        .yl_section {
+            color: #2980b9;
+            font-size: 19px;
+            border-left: 4px solid #2980b9;
+            padding-left: 10px;
+            margin-bottom: 14px;
+        }
+        .yl_text {
+            font-size: 14px;
+            line-height: 1.9;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        /* ========== 规则列表 ========== */
+        .yl_rules li {
+            position: relative;
+            padding-left: 18px;
+            font-size: 14px;
+            line-height: 2;
+            color: #444;
+        }
+        .yl_rules li::before {
+            content: "";
+            position: absolute;
+            left: 2px;
+            top: 13px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #3498db;
+        }
+
+        /* ========== 类型表格 ========== */
+        .yl_table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .yl_table th,
+        .yl_table td {
+            border: 1px solid #e3e8ee;
+            padding: 9px 12px;
+            text-align: left;
+        }
+        .yl_table th {
+            background: #f0f5fb;
+            color: #2c3e50;
+        }
+        .yl_table td code { font-size: 12px; }
+
+        /* ========== 代码块 ========== */
+        .yl_code {
+            background: #2b3137;
+            color: #d7e0ea;
+            border-radius: 8px;
+            padding: 16px 18px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+
+        /* ========== 动手试试 ========== */
+        .yl_input {
+            width: 100%;
+            height: 210px;
+            padding: 12px 14px;
+            border: 1px solid #d6dee8;
+            border-radius: 8px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #333;
+            resize: vertical;
+            outline: none;
+        }
+        .yl_input:focus { border-color: #3498db; }
+        .yl_btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 14px 0;
+        }
+        .yl_btn {
+            padding: 8px 18px;
+            border: 1px solid #d6dee8;
+            border-radius: 6px;
+            background: #fff;
+            color: #444;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .yl_btn:hover {
+            border-color: #3498db;
+            color: #3498db;
+        }
+        .yl_btn-primary {
+            background: #3498db;
+            border-color: #3498db;
+            color: #fff;
+        }
+        .yl_btn-primary:hover {
+            background: #2980b9;
+            color: #fff;
+        }
+        .yl_result {
+            min-height: 60px;
+            padding: 12px 14px;
+            background: #f8fafc;
+            border: 1px dashed #d6dee8;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+        .yl_result-ok {
+            color: #1d8348;
+            font-weight: bold;
+        }
+        .yl_result-err {
+            color: #c0392b;
+            font-weight: bold;
+        }
+
+        /* ========== 解析结果树 ========== */
+        .yl_tree,
+        .yl_tree ul {
+            padding-left: 20px;
+        }
+        .yl_tree > li { padding-left: 0; }
+        .yl_tree li {
+            line-height: 2;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 13px;
+        }
+        .yl_t-key {
+            color: #6f42c1;
+            margin-right: 6px;
+        }
+        .yl_t-tag {
+            display: inline-block;
+            padding: 1px 8px;
+            border-radius: 9px;
+            font-size: 11px;
+            font-family: "Microsoft YaHei", sans-serif;
+            margin-right: 6px;
+        }
+        .yl_t-object {
+            background: #ede7fb;
+            color: #6f42c1;
+        }
+        .yl_t-array {
+            background: #e2f0fb;
+            color: #1f6fb2;
+        }
+        .yl_v-string {
+            color: #1e8449;
+            background: #eafaf1;
+            padding: 1px 5px;
+            border-radius: 4px;
+        }
+        .yl_v-number { color: #b9770e; }
+        .yl_v-boolean { color: #c0392b; }
+        .yl_v-null {
+            color: #95a5a6;
+            font-style: italic;
+        }
+        .yl_t-type {
+            margin-left: 8px;
+            color: #b0b8c1;
+            font-size: 11px;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        /* ========== 小结 ========== */
+        .yl_note li {
+            font-size: 14px;
+            line-height: 2;
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+    <div class="yl_wrap">
+        <h1 class="yl_title">JSON 数据展示</h1>
+        <p class="yl_desc">JavaScript Object Notation —— 轻量级数据交换格式：语法、六种数据类型、JSON.parse() 与 JSON.stringify()</p>
+
+        <!-- 一、JSON 是什么 -->
+        <section class="yl_card">
+            <h2 class="yl_section">一、JSON 是什么</h2>
+            <p class="yl_text">JSON（JavaScript Object Notation，JS 对象表示法）是一种轻量级的<b>数据交换格式</b>。它采用完全独立于编程语言的文本格式来存储和表示数据，易于人阅读和编写，也易于机器解析和生成，是目前前后端交互中最主流的数据格式。</p>
+            <ul class="yl_rules">
+                <li>数据保存在<b>名称/值对</b>（键值对）中，键必须用双引号包裹：<code>"name": "张浩扬"</code></li>
+                <li>多条数据之间用<b>逗号</b>分隔，最后一项后面<b>不能</b>有逗号。</li>
+                <li>花括号 <code>{}</code> 保存<b>对象</b>，方括号 <code>[]</code> 保存<b>数组</b>。</li>
+                <li>字符串只能用<b>双引号</b>（不能用单引号）；JSON 中没有注释、undefined、函数和日期类型。</li>
+            </ul>
+        </section>
+
+        <!-- 二、六种数据类型 -->
+        <section class="yl_card">
+            <h2 class="yl_section">二、六种数据类型</h2>
+            <table class="yl_table">
+                <thead>
+                    <tr>
+                        <th>类型</th>
+                        <th>示例</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>字符串 string</td>
+                        <td><code>"hello"</code></td>
+                        <td>双引号包裹，支持 \n \t \" 等转义字符</td>
+                    </tr>
+                    <tr>
+                        <td>数字 number</td>
+                        <td><code>42</code>、<code>3.14</code></td>
+                        <td>整数或浮点数，没有 NaN 和 Infinity</td>
+                    </tr>
+                    <tr>
+                        <td>布尔 boolean</td>
+                        <td><code>true</code>、<code>false</code></td>
+                        <td>只有小写的 true / false</td>
+                    </tr>
+                    <tr>
+                        <td>空 null</td>
+                        <td><code>null</code></td>
+                        <td>表示"没有值"，注意不是 undefined</td>
+                    </tr>
+                    <tr>
+                        <td>对象 object</td>
+                        <td><code>{ "k": "v" }</code></td>
+                        <td>键值对的无序集合，键必须加双引号</td>
+                    </tr>
+                    <tr>
+                        <td>数组 array</td>
+                        <td><code>[1, 2, 3]</code></td>
+                        <td>值的有序集合，元素类型可以不同</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 三、JSON 示例 -->
+        <section class="yl_card">
+            <h2 class="yl_section">三、JSON 示例</h2>
+            <pre class="yl_code">{
+  "name": "张浩扬",
+  "sno": "24001010302",
+  "age": 20,
+  "active": true,
+  "hobbies": ["网页设计", "摄影", "跑步"],
+  "scores": {
+    "html": 92,
+    "css": 88,
+    "javascript": 95
+  },
+  "remark": null
+}</pre>
+        </section>
+
+        <!-- 四、动手试试 -->
+        <section class="yl_card">
+            <h2 class="yl_section">四、动手试试：解析与格式化</h2>
+            <p class="yl_text">在下方编辑 JSON 文本（可以直接故意写错试试），点击按钮观察 <code>JSON.parse()</code> 与 <code>JSON.stringify()</code> 的效果：</p>
+            <textarea class="yl_input" id="yl_jsonInput" spellcheck="false">{
+  "name": "张浩扬",
+  "sno": "24001010302",
+  "age": 20,
+  "active": true,
+  "hobbies": ["网页设计", "摄影", "跑步"],
+  "scores": {
+    "html": 92,
+    "css": 88,
+    "javascript": 95
+  },
+  "remark": null
+}</textarea>
+            <div class="yl_btns">
+                <button class="yl_btn yl_btn-primary" id="yl_btnCheck" type="button">校验格式</button>
+                <button class="yl_btn" id="yl_btnFormat" type="button">格式化（缩进 2 空格）</button>
+                <button class="yl_btn" id="yl_btnMinify" type="button">压缩（转成单行）</button>
+                <button class="yl_btn" id="yl_btnTree" type="button">解析并展示结构</button>
+            </div>
+            <div class="yl_result" id="yl_result">点击上方按钮查看结果……</div>
+        </section>
+
+        <!-- 五、小结 -->
+        <section class="yl_card">
+            <h2 class="yl_section">五、小结</h2>
+            <ul class="yl_note">
+                <li><b>JSON.parse(text)</b>：把 JSON 字符串转换成 JavaScript 对象 / 数组；文本不合法时会抛出异常，实际开发中要用 try...catch 捕获。</li>
+                <li><b>JSON.stringify(value)</b>：把 JavaScript 对象 / 数组转换成 JSON 字符串；第二个参数可传筛选数组，第三个参数可传缩进空格数（如 <code>JSON.stringify(obj, null, 2)</code>）。</li>
+                <li>常见书写错误：使用单引号、键没加引号、末尾多写逗号、字符串里有未转义的换行、把 undefined / 函数当作值。</li>
+                <li>JSON 与 JavaScript 对象字面量的区别：JSON 是<b>文本格式</b>，键必须双引号、不能有注释、没有 undefined。</li>
+            </ul>
+        </section>
+    </div>
+
+    <script>
+    // 姓名：张浩扬  建立时间：2026-11-02 13:39:44  模型：Xiaomi MiMo-V2.6-Pro  功能：JSON 语法与解析展示
+    (function () {
+        var yl_jsonInputEl = document.getElementById('yl_jsonInput');
+        var yl_resultEl = document.getElementById('yl_result');
+
+        // 判断值的 JSON 类型
+        function yl_valType(yl_val) {
+            if (yl_val === null) { return 'null'; }
+            if (Array.isArray(yl_val)) { return 'array'; }
+            return typeof yl_val;
+        }
+
+        // 基本值转展示文本
+        function yl_valText(yl_val) {
+            var yl_type = yl_valType(yl_val);
+            if (yl_type === 'string') { return '"' + yl_val + '"'; }
+            return String(yl_val);
+        }
+
+        // 递归渲染值的结构
+        function yl_renderValue(yl_val, yl_label) {
+            var yl_type = yl_valType(yl_val);
+            var yl_liEl = document.createElement('li');
+            var yl_keyEl = document.createElement('span');
+            yl_keyEl.className = 'yl_t-key';
+            yl_keyEl.textContent = yl_label;
+            yl_liEl.appendChild(yl_keyEl);
+
+            if (yl_type === 'object' || yl_type === 'array') {
+                var yl_tagEl = document.createElement('span');
+                yl_tagEl.className = 'yl_t-tag yl_t-' + yl_type;
+                var yl_count = yl_type === 'array' ? yl_val.length : Object.keys(yl_val).length;
+                yl_tagEl.textContent = yl_type + '（' + yl_count + ' 项）';
+                yl_liEl.appendChild(yl_tagEl);
+
+                var yl_ulEl = document.createElement('ul');
+                var yl_keys = [];
+                if (yl_type === 'array') {
+                    for (var yl_i = 0; yl_i < yl_val.length; yl_i++) {
+                        yl_keys.push(yl_i);
+                    }
+                } else {
+                    yl_keys = Object.keys(yl_val);
+                }
+                for (var yl_j = 0; yl_j < yl_keys.length; yl_j++) {
+                    var yl_k = yl_keys[yl_j];
+                    var yl_childLabel = yl_type === 'array' ? '[' + yl_k + ']' : yl_k + ' :';
+                    yl_ulEl.appendChild(yl_renderValue(yl_val[yl_k], yl_childLabel));
+                }
+                yl_liEl.appendChild(yl_ulEl);
+            } else {
+                var yl_valEl = document.createElement('span');
+                yl_valEl.className = 'yl_v-' + yl_type;
+                yl_valEl.textContent = yl_valText(yl_val);
+                yl_liEl.appendChild(yl_valEl);
+                var yl_typeEl = document.createElement('span');
+                yl_typeEl.className = 'yl_t-type';
+                yl_typeEl.textContent = yl_type;
+                yl_liEl.appendChild(yl_typeEl);
+            }
+            return yl_liEl;
+        }
+
+        // 安全解析输入框内容
+        function yl_tryParse() {
+            try {
+                return { yl_ok: true, yl_data: JSON.parse(yl_jsonInputEl.value) };
+            } catch (yl_err) {
+                return { yl_ok: false, yl_msg: yl_err.message };
+            }
+        }
+
+        // 结果区提示
+        function yl_showTip(yl_text, yl_isErr) {
+            yl_resultEl.innerHTML = '';
+            var yl_pEl = document.createElement('p');
+            yl_pEl.className = yl_isErr ? 'yl_result-err' : 'yl_result-ok';
+            yl_pEl.textContent = yl_text;
+            yl_resultEl.appendChild(yl_pEl);
+        }
+
+        // 校验格式
+        document.getElementById('yl_btnCheck').addEventListener('click', function () {
+            var yl_res = yl_tryParse();
+            if (yl_res.yl_ok) {
+                yl_showTip('格式正确，JSON.parse() 解析成功，共 ' +
+                    Object.keys(yl_res.yl_data).length + ' 个顶层字段。', false);
+            } else {
+                yl_showTip('格式错误：' + yl_res.yl_msg, true);
+            }
+        });
+
+        // 格式化
+        document.getElementById('yl_btnFormat').addEventListener('click', function () {
+            var yl_res = yl_tryParse();
+            if (!yl_res.yl_ok) {
+                yl_showTip('无法格式化，先修正错误：' + yl_res.yl_msg, true);
+                return;
+            }
+            yl_jsonInputEl.value = JSON.stringify(yl_res.yl_data, null, 2);
+            yl_showTip('已格式化为 2 空格缩进的 JSON 文本。', false);
+        });
+
+        // 压缩
+        document.getElementById('yl_btnMinify').addEventListener('click', function () {
+            var yl_res = yl_tryParse();
+            if (!yl_res.yl_ok) {
+                yl_showTip('无法压缩，先修正错误：' + yl_res.yl_msg, true);
+                return;
+            }
+            yl_jsonInputEl.value = JSON.stringify(yl_res.yl_data);
+            yl_showTip('已压缩为单行 JSON 文本。', false);
+        });
+
+        // 解析并展示结构
+        document.getElementById('yl_btnTree').addEventListener('click', function () {
+            var yl_res = yl_tryParse();
+            if (!yl_res.yl_ok) {
+                yl_showTip('无法解析：' + yl_res.yl_msg, true);
+                return;
+            }
+            yl_resultEl.innerHTML = '';
+            var yl_ulEl = document.createElement('ul');
+            yl_ulEl.className = 'yl_tree';
+            yl_ulEl.appendChild(yl_renderValue(yl_res.yl_data, '根节点'));
+            yl_resultEl.appendChild(yl_ulEl);
+        });
+    })();
+    </script>
+</body>
+</html>

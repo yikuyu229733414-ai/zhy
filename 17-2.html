@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open-Meteo 天气数据展示</title>
+    <!-- 姓名：张浩扬  建立时间：2026-11-02 13:39:44  模型：Xiaomi MiMo-V2.6-Pro  功能：fetch 调用 Open-Meteo 天气接口并展示 JSON 数据 -->
+    <!-- 更新：2026-11-02 13:47:49  模型：Xiaomi MiMo-V2.6-Pro  新增要求落实：使用 fetch 和原生代码实现 -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        ul { list-style: none; }
+        code {
+            padding: 1px 6px;
+            background: #eef2f7;
+            border-radius: 4px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            color: #c7254e;
+            word-break: break-all;
+        }
+
+        /* ========== 页面框架 ========== */
+        .yl_wrap {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .yl_title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+        .yl_desc {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .yl_card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+        .yl_section {
+            color: #2980b9;
+            font-size: 19px;
+            border-left: 4px solid #2980b9;
+            padding-left: 10px;
+            margin-bottom: 16px;
+        }
+        .yl_text {
+            font-size: 14px;
+            line-height: 1.9;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        /* ========== 工具栏：城市 + 重新获取 ========== */
+        .yl_toolbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .yl_cities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            flex: 1;
+        }
+        .yl_city {
+            padding: 8px 20px;
+            border: 1px solid #d6dee8;
+            border-radius: 20px;
+            background: #fff;
+            color: #444;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .yl_city:hover {
+            border-color: #3498db;
+            color: #3498db;
+        }
+        .yl_city-on {
+            background: #3498db;
+            border-color: #3498db;
+            color: #fff;
+        }
+        .yl_city-on:hover { color: #fff; }
+        .yl_btn {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #3498db;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .yl_btn:hover { background: #2980b9; }
+
+        /* ========== 状态条 ========== */
+        .yl_status {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-bottom: 18px;
+            min-height: 20px;
+        }
+        .yl_status--loading { color: #2980b9; }
+        .yl_status--ok { color: #1d8348; }
+        .yl_status--err { color: #c0392b; }
+        .yl_status--loading::before {
+            content: "";
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-right: 7px;
+            vertical-align: -2px;
+            border: 2px solid #c6dcf2;
+            border-top-color: #3498db;
+            border-radius: 50%;
+            animation: yl_spin .8s linear infinite;
+        }
+        @keyframes yl_spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ========== 实况卡片 ========== */
+        .yl_now {
+            background: linear-gradient(135deg, #4b8bf5, #2b5fb8);
+            border-radius: 12px;
+            padding: 22px 26px;
+            color: #fff;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+        }
+        .yl_now-city {
+            min-width: 130px;
+        }
+        .yl_now-city b {
+            display: block;
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+        .yl_now-city span {
+            font-size: 12px;
+            opacity: .85;
+        }
+        .yl_now-main {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+            min-width: 240px;
+        }
+        .yl_now-temp {
+            font-size: 52px;
+            font-weight: 700;
+            line-height: 1;
+        }
+        .yl_now-temp em {
+            font-style: normal;
+            font-size: 22px;
+            font-weight: 400;
+            opacity: .85;
+        }
+        .yl_now-desc {
+            font-size: 17px;
+            margin-top: 6px;
+        }
+        .yl_now-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(96px, 1fr));
+            gap: 10px 18px;
+            min-width: 330px;
+        }
+        .yl_now-grid li span {
+            display: block;
+            font-size: 12px;
+            opacity: .8;
+            margin-bottom: 3px;
+        }
+        .yl_now-grid li b {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        /* ========== 天气图标（纯 CSS） ========== */
+        .yl_wx-ico {
+            position: relative;
+            display: inline-block;
+            width: 64px;
+            height: 64px;
+            flex: none;
+        }
+        .yl_wx-ico--sm {
+            transform: scale(.62);
+            transform-origin: center;
+            width: 40px;
+            height: 40px;
+            margin: -12px 0;
+        }
+        /* 晴 */
+        .yl_wx-ico--sun::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 32px;
+            height: 32px;
+            margin: -16px 0 0 -16px;
+            border-radius: 50%;
+            background: #ffd166;
+            box-shadow: 0 0 0 8px rgba(255, 209, 102, .3);
+        }
+        /* 云（多云 / 阴 / 雨 / 雪 / 雷共用） */
+        .yl_wx-ico--cloud::before,
+        .yl_wx-ico--rain::before,
+        .yl_wx-ico--snow::before,
+        .yl_wx-ico--thunder::before {
+            content: "";
+            position: absolute;
+            left: 8px;
+            top: 28px;
+            width: 48px;
+            height: 19px;
+            border-radius: 10px;
+            background: #cfdbe8;
+        }
+        .yl_wx-ico--cloud::after,
+        .yl_wx-ico--rain::after,
+        .yl_wx-ico--snow::after,
+        .yl_wx-ico--thunder::after {
+            content: "";
+            position: absolute;
+            left: 23px;
+            top: 13px;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #e2ecf5;
+        }
+        .yl_wx-ico--cloud i,
+        .yl_wx-ico--sun i,
+        .yl_wx-ico--fog i { display: none; }
+        /* 雨滴 */
+        .yl_wx-ico--rain i {
+            position: absolute;
+            top: 50px;
+            width: 4px;
+            height: 10px;
+            border-radius: 2px;
+            background: #5aa2f0;
+            transform: rotate(14deg);
+        }
+        .yl_wx-ico--rain i:nth-child(1) { left: 19px; }
+        .yl_wx-ico--rain i:nth-child(2) { left: 31px; }
+        .yl_wx-ico--rain i:nth-child(3) { left: 43px; }
+        /* 雪点 */
+        .yl_wx-ico--snow i {
+            position: absolute;
+            top: 51px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #fff;
+            border: 1px solid #9fb8d2;
+        }
+        .yl_wx-ico--snow i:nth-child(1) { left: 18px; }
+        .yl_wx-ico--snow i:nth-child(2) { left: 30px; top: 55px; }
+        .yl_wx-ico--snow i:nth-child(3) { left: 42px; }
+        /* 闪电 */
+        .yl_wx-ico--thunder i:nth-child(1) {
+            position: absolute;
+            left: 30px;
+            top: 47px;
+            width: 8px;
+            height: 17px;
+            background: #ffd166;
+            transform: skew(-16deg);
+            border-radius: 2px;
+        }
+        .yl_wx-ico--thunder i:nth-child(2),
+        .yl_wx-ico--thunder i:nth-child(3) { display: none; }
+        /* 雾 */
+        .yl_wx-ico--fog::before {
+            content: "";
+            position: absolute;
+            left: 8px;
+            top: 20px;
+            width: 48px;
+            height: 26px;
+            border-radius: 4px;
+            background: repeating-linear-gradient(to bottom, #b9c7d6 0 5px, transparent 5px 11px);
+        }
+
+        /* ========== 逐时柱状图 ========== */
+        .yl_chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 160px;
+            padding-top: 10px;
+        }
+        .yl_col {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        .yl_bar {
+            position: relative;
+            width: 100%;
+            border-radius: 3px 3px 0 0;
+            background: linear-gradient(180deg, #7fb3ff, #3b7cf6);
+        }
+        .yl_bar:hover::after {
+            content: attr(data-val);
+            position: absolute;
+            bottom: calc(100% + 5px);
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 2px 7px;
+            background: #2c3e50;
+            color: #fff;
+            font-size: 11px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .yl_x {
+            height: 18px;
+            margin-top: 5px;
+            text-align: center;
+            font-size: 10px;
+            color: #94a3b8;
+        }
+
+        /* ========== 未来预报 ========== */
+        .yl_forecast {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .yl_day {
+            flex: 1;
+            min-width: 130px;
+            background: #f8fafc;
+            border: 1px solid #e8eef5;
+            border-radius: 10px;
+            padding: 14px 10px;
+            text-align: center;
+        }
+        .yl_day-week {
+            font-size: 13px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        .yl_day-date {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+        .yl_day-wx {
+            font-size: 12px;
+            color: #555;
+            margin: 4px 0;
+        }
+        .yl_day-temp {
+            font-size: 13px;
+            color: #2c3e50;
+        }
+        .yl_day-temp em {
+            font-style: normal;
+            color: #94a3b8;
+        }
+
+        /* ========== 原始 JSON ========== */
+        .yl_url {
+            font-size: 12px;
+            color: #7f8c8d;
+            word-break: break-all;
+        }
+        .yl_raw {
+            max-height: 320px;
+            overflow: auto;
+            background: #2b3137;
+            color: #d7e0ea;
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            white-space: pre;
+        }
+    </style>
+</head>
+<body>
+    <div class="yl_wrap">
+        <h1 class="yl_title">Open-Meteo 天气数据展示</h1>
+        <p class="yl_desc">使用 fetch 和原生代码实现（无第三方库 / CDN）：fetch() 调用 Open-Meteo 免费天气接口（无需密钥），把返回的 JSON 渲染为实况卡片、逐时气温柱状图、未来 5 天预报，并附原始 JSON 与 fetch 核心代码。</p>
+
+        <!-- 城市切换 / 重新获取 -->
+        <div class="yl_toolbar">
+            <div class="yl_cities" id="yl_cities"></div>
+            <button class="yl_btn" id="yl_refresh" type="button">重新获取</button>
+        </div>
+        <p class="yl_status" id="yl_status">准备就绪：点击城市或"重新获取"拉取数据（需要联网）。</p>
+
+        <!-- 实况 -->
+        <div class="yl_now">
+            <div class="yl_now-city">
+                <b id="yl_cityName">—</b>
+                <span id="yl_nowTime">数据时间 —</span>
+            </div>
+            <div class="yl_now-main">
+                <span class="yl_wx-ico yl_wx-ico--sun" id="yl_nowIco"><i></i><i></i><i></i></span>
+                <div>
+                    <div class="yl_now-temp"><span id="yl_nowTemp">--</span><em>°C</em></div>
+                    <div class="yl_now-desc" id="yl_nowDesc">等待数据…</div>
+                </div>
+            </div>
+            <ul class="yl_now-grid">
+                <li><span>体感温度</span><b id="yl_nowFeels">--</b></li>
+                <li><span>相对湿度</span><b id="yl_nowHum">--</b></li>
+                <li><span>风速</span><b id="yl_nowWind">--</b></li>
+                <li><span>降水量</span><b id="yl_nowPrecip">--</b></li>
+                <li><span>昼夜</span><b id="yl_nowDay">--</b></li>
+                <li><span>天气代码</span><b id="yl_nowCode">--</b></li>
+            </ul>
+        </div>
+
+        <!-- 逐时气温 -->
+        <section class="yl_card">
+            <h2 class="yl_section">今日逐时气温（°C）</h2>
+            <div class="yl_chart" id="yl_chart"></div>
+        </section>
+
+        <!-- 未来 5 天 -->
+        <section class="yl_card">
+            <h2 class="yl_section">未来 5 天预报</h2>
+            <div class="yl_forecast" id="yl_forecast"></div>
+        </section>
+
+        <!-- 原始 JSON -->
+        <section class="yl_card">
+            <h2 class="yl_section">原始 JSON 数据</h2>
+            <p class="yl_text yl_url">请求地址：<code id="yl_url">（尚未请求）</code></p>
+            <pre class="yl_raw" id="yl_rawJson">（获取数据后在此显示接口返回的原始 JSON）</pre>
+        </section>
+
+        <!-- 核心实现：fetch + 原生代码 -->
+        <section class="yl_card">
+            <h2 class="yl_section">核心实现：fetch + 原生代码</h2>
+            <p class="yl_text">本页完全使用<b>原生代码</b>实现：网络请求使用浏览器内置的 <code>fetch()</code> API（返回 Promise，支持 then 链式调用），数据渲染使用原生 DOM 操作（createElement / textContent / appendChild），页面样式全部内联，未使用 jQuery、Axios 等任何第三方库或 CDN。核心请求代码如下：</p>
+            <pre class="yl_raw">// 1. 组装请求地址（原生 URLSearchParams）
+var yl_url = 'https://api.open-meteo.com/v1/forecast?' + yl_params.toString();
+
+// 2. fetch 发起请求，返回 Promise
+fetch(yl_url)
+    .then(function (yl_resp) {
+        if (!yl_resp.ok) {
+            throw new Error('HTTP ' + yl_resp.status);
+        }
+        return yl_resp.json(); // 把响应体解析成 JSON 对象
+    })
+    .then(function (yl_data) {
+        yl_renderNow(yl_data.current);     // 原生 DOM 操作渲染实况卡片
+        yl_renderChart(yl_data.hourly);    // 渲染今日逐时气温柱状图
+        yl_renderForecast(yl_data.daily);  // 渲染未来 5 天预报
+    })
+    .catch(function (yl_err) {
+        yl_setStatus('err', '获取失败：' + yl_err.message); // 捕获网络/解析错误
+    });</pre>
+        </section>
+    </div>
+
+    <script>
+    // 姓名：张浩扬  建立时间：2026-11-02 13:39:44  模型：Xiaomi MiMo-V2.6-Pro  功能：fetch 调用 Open-Meteo 天气接口并展示 JSON 数据
+    (function () {
+        // 城市列表
+        var yl_cityList = [
+            { yl_name: '北京', yl_lat: 39.90, yl_lon: 116.40 },
+            { yl_name: '上海', yl_lat: 31.23, yl_lon: 121.47 },
+            { yl_name: '杭州', yl_lat: 30.27, yl_lon: 120.15 },
+            { yl_name: '广州', yl_lat: 23.13, yl_lon: 113.26 },
+            { yl_name: '成都', yl_lat: 30.57, yl_lon: 104.07 }
+        ];
+        var yl_curCity = yl_cityList[0];
+
+        // WMO 天气代码对照
+        var yl_wxMap = {
+            0:  { yl_txt: '晴',        yl_grp: 'sun' },
+            1:  { yl_txt: '大部晴朗',  yl_grp: 'sun' },
+            2:  { yl_txt: '局部多云',  yl_grp: 'cloud' },
+            3:  { yl_txt: '阴',        yl_grp: 'cloud' },
+            45: { yl_txt: '雾',        yl_grp: 'fog' },
+            48: { yl_txt: '雾凇',      yl_grp: 'fog' },
+            51: { yl_txt: '毛毛雨',    yl_grp: 'rain' },
+            53: { yl_txt: '毛毛雨',    yl_grp: 'rain' },
+            55: { yl_txt: '毛毛雨',    yl_grp: 'rain' },
+            56: { yl_txt: '冻毛雨',    yl_grp: 'rain' },
+            57: { yl_txt: '冻毛雨',    yl_grp: 'rain' },
+            61: { yl_txt: '小雨',      yl_grp: 'rain' },
+            63: { yl_txt: '中雨',      yl_grp: 'rain' },
+            65: { yl_txt: '大雨',      yl_grp: 'rain' },
+            66: { yl_txt: '冻雨',      yl_grp: 'rain' },
+            67: { yl_txt: '冻雨',      yl_grp: 'rain' },
+            71: { yl_txt: '小雪',      yl_grp: 'snow' },
+            73: { yl_txt: '中雪',      yl_grp: 'snow' },
+            75: { yl_txt: '大雪',      yl_grp: 'snow' },
+            77: { yl_txt: '雪粒',      yl_grp: 'snow' },
+            80: { yl_txt: '阵雨',      yl_grp: 'rain' },
+            81: { yl_txt: '阵雨',      yl_grp: 'rain' },
+            82: { yl_txt: '强阵雨',    yl_grp: 'rain' },
+            85: { yl_txt: '阵雪',      yl_grp: 'snow' },
+            86: { yl_txt: '阵雪',      yl_grp: 'snow' },
+            95: { yl_txt: '雷阵雨',    yl_grp: 'thunder' },
+            96: { yl_txt: '雷暴冰雹',  yl_grp: 'thunder' },
+            99: { yl_txt: '雷暴冰雹',  yl_grp: 'thunder' }
+        };
+        function yl_wxInfo(yl_code) {
+            return yl_wxMap[yl_code] || { yl_txt: '未知（代码 ' + yl_code + '）', yl_grp: 'cloud' };
+        }
+
+        // 组装请求地址
+        function yl_buildUrl(yl_city) {
+            var yl_params = new URLSearchParams({
+                latitude: yl_city.yl_lat,
+                longitude: yl_city.yl_lon,
+                current: 'temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m',
+                hourly: 'temperature_2m,weather_code',
+                daily: 'weather_code,temperature_2m_max,temperature_2m_min',
+                timezone: 'Asia/Shanghai',
+                forecast_days: 5
+            });
+            return 'https://api.open-meteo.com/v1/forecast?' + yl_params.toString();
+        }
+
+        // 状态条
+        function yl_setStatus(yl_kind, yl_text) {
+            var yl_statusEl = document.getElementById('yl_status');
+            yl_statusEl.className = 'yl_status yl_status--' + yl_kind;
+            yl_statusEl.textContent = yl_text;
+        }
+
+        // 天气小图标
+        function yl_icoHtml(yl_grp, yl_isSm) {
+            return '<span class="yl_wx-ico yl_wx-ico--' + yl_grp + (yl_isSm ? ' yl_wx-ico--sm' : '') +
+                '"><i></i><i></i><i></i></span>';
+        }
+
+        // 渲染实况
+        function yl_renderNow(yl_cur) {
+            var yl_wx = yl_wxInfo(yl_cur.weather_code);
+            document.getElementById('yl_cityName').textContent = yl_curCity.yl_name;
+            document.getElementById('yl_nowTime').textContent = '数据时间 ' + yl_cur.time.replace('T', ' ');
+            document.getElementById('yl_nowIco').className = 'yl_wx-ico yl_wx-ico--' + yl_wx.yl_grp;
+            document.getElementById('yl_nowTemp').textContent = yl_cur.temperature_2m;
+            document.getElementById('yl_nowDesc').textContent = yl_wx.yl_txt;
+            document.getElementById('yl_nowFeels').textContent = yl_cur.apparent_temperature + ' °C';
+            document.getElementById('yl_nowHum').textContent = yl_cur.relative_humidity_2m + ' %';
+            document.getElementById('yl_nowWind').textContent = yl_cur.wind_speed_10m + ' km/h';
+            document.getElementById('yl_nowPrecip').textContent = yl_cur.precipitation + ' mm';
+            document.getElementById('yl_nowDay').textContent = yl_cur.is_day === 1 ? '白天' : '夜间';
+            document.getElementById('yl_nowCode').textContent = yl_cur.weather_code;
+        }
+
+        // 渲染今日逐时柱状图
+        function yl_renderChart(yl_hourly) {
+            var yl_chartEl = document.getElementById('yl_chart');
+            yl_chartEl.innerHTML = '';
+            var yl_temps = yl_hourly.temperature_2m.slice(0, 24);
+            var yl_times = yl_hourly.time.slice(0, 24);
+            var yl_min = Math.min.apply(null, yl_temps);
+            var yl_max = Math.max.apply(null, yl_temps);
+            var yl_span = (yl_max - yl_min) || 1;
+            for (var yl_i = 0; yl_i < yl_temps.length; yl_i++) {
+                var yl_colEl = document.createElement('div');
+                yl_colEl.className = 'yl_col';
+                var yl_barEl = document.createElement('div');
+                yl_barEl.className = 'yl_bar';
+                yl_barEl.style.height = (((yl_temps[yl_i] - yl_min + 1) / (yl_span + 2)) * 100).toFixed(1) + '%';
+                yl_barEl.setAttribute('data-val', yl_temps[yl_i] + ' °C');
+                var yl_xEl = document.createElement('div');
+                yl_xEl.className = 'yl_x';
+                yl_xEl.textContent = yl_i % 2 === 0 ? yl_times[yl_i].slice(11, 16) : '';
+                yl_colEl.appendChild(yl_barEl);
+                yl_colEl.appendChild(yl_xEl);
+                yl_chartEl.appendChild(yl_colEl);
+            }
+        }
+
+        // 渲染未来 5 天
+        function yl_renderForecast(yl_daily) {
+            var yl_boxEl = document.getElementById('yl_forecast');
+            yl_boxEl.innerHTML = '';
+            var yl_week = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+            for (var yl_i = 0; yl_i < yl_daily.time.length; yl_i++) {
+                var yl_dateStr = yl_daily.time[yl_i];
+                var yl_d = new Date(yl_dateStr + 'T00:00:00');
+                var yl_wx = yl_wxInfo(yl_daily.weather_code[yl_i]);
+                var yl_dayEl = document.createElement('div');
+                yl_dayEl.className = 'yl_day';
+                yl_dayEl.innerHTML =
+                    '<div class="yl_day-week">' + (yl_i === 0 ? '今天' : yl_week[yl_d.getDay()]) + '</div>' +
+                    '<div class="yl_day-date">' + yl_dateStr.slice(5) + '</div>' +
+                    yl_icoHtml(yl_wx.yl_grp, true) +
+                    '<div class="yl_day-wx">' + yl_wx.yl_txt + '</div>' +
+                    '<div class="yl_day-temp">' + yl_daily.temperature_2m_max[yl_i] + '° <em>/ ' +
+                    yl_daily.temperature_2m_min[yl_i] + '°</em></div>';
+                yl_boxEl.appendChild(yl_dayEl);
+            }
+        }
+
+        // 主流程：请求并渲染
+        function yl_load() {
+            var yl_url = yl_buildUrl(yl_curCity);
+            document.getElementById('yl_url').textContent = yl_url;
+            yl_setStatus('loading', '正在获取 ' + yl_curCity.yl_name + ' 的天气数据…');
+            fetch(yl_url)
+                .then(function (yl_resp) {
+                    if (!yl_resp.ok) {
+                        throw new Error('HTTP ' + yl_resp.status);
+                    }
+                    return yl_resp.json();
+                })
+                .then(function (yl_data) {
+                    if (!yl_data.current) {
+                        throw new Error('接口返回缺少 current 数据');
+                    }
+                    yl_renderNow(yl_data.current);
+                    yl_renderChart(yl_data.hourly);
+                    yl_renderForecast(yl_data.daily);
+                    document.getElementById('yl_rawJson').textContent = JSON.stringify(yl_data, null, 2);
+                    yl_setStatus('ok', '✓ ' + yl_curCity.yl_name + ' 数据获取成功，更新时间：' + yl_data.current.time.replace('T', ' '));
+                })
+                .catch(function (yl_err) {
+                    yl_setStatus('err', '✗ 获取失败：' + yl_err.message + '。请检查网络后点击"重新获取"。');
+                });
+        }
+
+        // 生成城市按钮
+        (function yl_buildCities() {
+            var yl_boxEl = document.getElementById('yl_cities');
+            for (var yl_i = 0; yl_i < yl_cityList.length; yl_i++) {
+                var yl_btnEl = document.createElement('button');
+                yl_btnEl.type = 'button';
+                yl_btnEl.className = 'yl_city' + (yl_cityList[yl_i] === yl_curCity ? ' yl_city-on' : '');
+                yl_btnEl.textContent = yl_cityList[yl_i].yl_name;
+                yl_btnEl.setAttribute('data-yl-idx', yl_i);
+                yl_boxEl.appendChild(yl_btnEl);
+            }
+            yl_boxEl.addEventListener('click', function (yl_ev) {
+                var yl_idx = yl_ev.target.getAttribute('data-yl-idx');
+                if (yl_idx === null) { return; }
+                yl_curCity = yl_cityList[Number(yl_idx)];
+                var yl_btns = yl_boxEl.querySelectorAll('.yl_city');
+                for (var yl_j = 0; yl_j < yl_btns.length; yl_j++) {
+                    yl_btns[yl_j].className = 'yl_city' + (yl_j === Number(yl_idx) ? ' yl_city-on' : '');
+                }
+                yl_load();
+            });
+        })();
+
+        document.getElementById('yl_refresh').addEventListener('click', yl_load);
+
+        // 进入页面自动加载
+        yl_load();
+    })();
+    </script>
+</body>
+</html>

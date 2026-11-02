@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品详情（DummyJSON 接口）</title>
+    <!-- 姓名：张浩扬  建立时间：2026-11-02 13:55:26  模型：Xiaomi MiMo-V2.6-Pro  功能：fetch 按 id 获取 DummyJSON 单个商品并展示详情 -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        ul { list-style: none; }
+        a { text-decoration: none; }
+        code {
+            padding: 1px 6px;
+            background: #eef2f7;
+            border-radius: 4px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            color: #c7254e;
+            word-break: break-all;
+        }
+
+        /* ========== 页面框架 ========== */
+        .yl_wrap {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .yl_title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+        .yl_desc {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 22px;
+        }
+        .yl_card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+        .yl_section {
+            color: #2980b9;
+            font-size: 19px;
+            border-left: 4px solid #2980b9;
+            padding-left: 10px;
+            margin-bottom: 14px;
+        }
+        .yl_text {
+            font-size: 14px;
+            line-height: 1.9;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        /* ========== 工具栏与状态 ========== */
+        .yl_toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .yl_btn {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #3498db;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .yl_btn:hover { background: #2980b9; }
+        .yl_btn-back {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+        .yl_btn-back:hover { background: #d5dbdf; color: #2c3e50; }
+        .yl_btn:disabled {
+            background: #cfd9e2;
+            cursor: not-allowed;
+        }
+        .yl_api {
+            flex: 1;
+            min-width: 240px;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        .yl_status {
+            min-height: 20px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+        .yl_status--loading { color: #2980b9; }
+        .yl_status--ok { color: #1d8348; }
+        .yl_status--err { color: #c0392b; }
+        .yl_status--loading::before {
+            content: "";
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-right: 7px;
+            vertical-align: -2px;
+            border: 2px solid #c6dcf2;
+            border-top-color: #3498db;
+            border-radius: 50%;
+            animation: yl_spin .8s linear infinite;
+        }
+        @keyframes yl_spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ========== 详情主卡片 ========== */
+        .yl_detail {
+            display: flex;
+            gap: 26px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+        .yl_gallery {
+            width: 380px;
+            max-width: 100%;
+            flex: none;
+        }
+        .yl_main-img {
+            height: 340px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #eef4fb, #dce9f7);
+            border: 1px solid #e3ebf3;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .yl_main-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #fff;
+        }
+        .yl_thumbs {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .yl_thumb {
+            width: 64px;
+            height: 64px;
+            padding: 0;
+            border: 2px solid #e3ebf3;
+            border-radius: 8px;
+            background: #fff;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .yl_thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .yl_thumb-on { border-color: #3498db; }
+
+        .yl_info { flex: 1; min-width: 300px; }
+        .yl_info-title {
+            font-size: 22px;
+            line-height: 1.5;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .yl_chips { margin-bottom: 14px; }
+        .yl_chip {
+            display: inline-block;
+            margin: 0 8px 8px 0;
+            padding: 3px 12px;
+            border-radius: 14px;
+            font-size: 12px;
+            background: #eaf3fc;
+            color: #2980b9;
+        }
+        .yl_price-box {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 12px 16px;
+            background: #fdf6ee;
+            border-radius: 8px;
+            margin-bottom: 14px;
+        }
+        .yl_price-now {
+            font-size: 28px;
+            font-weight: 700;
+            color: #e67e22;
+        }
+        .yl_price-old {
+            font-size: 14px;
+            color: #95a5a6;
+            text-decoration: line-through;
+        }
+        .yl_price-off {
+            padding: 2px 10px;
+            border-radius: 12px;
+            background: #e74c3c;
+            color: #fff;
+            font-size: 12px;
+        }
+        .yl_rating-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+        .yl_stars {
+            position: relative;
+            display: inline-block;
+            font-size: 16px;
+            line-height: 1;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+        .yl_stars-bg { color: #dfe4ea; font-style: normal; }
+        .yl_stars-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            overflow: hidden;
+            color: #f5a623;
+            font-style: normal;
+        }
+        .yl_avail {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-bottom: 14px;
+        }
+        .yl_avail-in { background: #eafaf1; color: #1d8348; }
+        .yl_avail-low { background: #fdf3e2; color: #b9770e; }
+        .yl_avail-out { background: #fdecea; color: #c0392b; }
+        .yl_info-desc {
+            font-size: 14px;
+            line-height: 1.95;
+            color: #555;
+        }
+
+        /* ========== 参数表 ========== */
+        .yl_specs {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+        }
+        .yl_spec {
+            padding: 12px 14px;
+            background: #f8fafc;
+            border: 1px solid #e8eef5;
+            border-radius: 8px;
+        }
+        .yl_spec span {
+            display: block;
+            font-size: 12px;
+            color: #95a5a6;
+            margin-bottom: 5px;
+        }
+        .yl_spec b {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        /* ========== 评论 ========== */
+        .yl_review {
+            padding: 14px 16px;
+            border: 1px solid #e8eef5;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .yl_review-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+        .yl_review-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .yl_review-date {
+            font-size: 12px;
+            color: #95a5a6;
+        }
+        .yl_review-text {
+            font-size: 13px;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        /* ========== 原始 JSON ========== */
+        .yl_raw {
+            max-height: 320px;
+            overflow: auto;
+            background: #2b3137;
+            color: #d7e0ea;
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            white-space: pre;
+        }
+    </style>
+</head>
+<body>
+    <div class="yl_wrap">
+        <h1 class="yl_title">商品详情（DummyJSON 接口）</h1>
+        <p class="yl_desc">使用 fetch 和原生代码实现（无第三方库 / CDN）：从地址栏读取商品 id，按 ID 获取单个商品并展示图集、价格、参数与评论。</p>
+
+        <div class="yl_toolbar">
+            <a class="yl_btn yl_btn-back" href="17-3.html">← 返回列表</a>
+            <button class="yl_btn" id="yl_prev" type="button">上一个商品</button>
+            <button class="yl_btn" id="yl_next" type="button">下一个商品</button>
+            <button class="yl_btn" id="yl_refresh" type="button">重新获取</button>
+            <span class="yl_api">详情接口：<code id="yl_url">https://dummyjson.com/products/1</code></span>
+        </div>
+        <p class="yl_status" id="yl_status">准备就绪：正在按 ID 获取商品（需要联网）。</p>
+
+        <!-- 详情主卡片 -->
+        <div class="yl_card">
+            <div class="yl_detail">
+                <div class="yl_gallery">
+                    <div class="yl_main-img"><img id="yl_mainImg" alt="商品主图"></div>
+                    <div class="yl_thumbs" id="yl_thumbs"></div>
+                </div>
+                <div class="yl_info">
+                    <h2 class="yl_info-title" id="yl_pTitle">—</h2>
+                    <div class="yl_chips" id="yl_pChips"></div>
+                    <div class="yl_price-box">
+                        <span class="yl_price-now" id="yl_pPrice">—</span>
+                        <span class="yl_price-old" id="yl_pOld">—</span>
+                        <span class="yl_price-off" id="yl_pOff">—</span>
+                    </div>
+                    <div class="yl_rating-row">
+                        <span class="yl_stars" id="yl_pStars"></span>
+                        <span id="yl_pRating">—</span>
+                    </div>
+                    <div>
+                        <span class="yl_avail yl_avail-in" id="yl_pAvail">—</span>
+                        <span class="yl_rating-row" style="display:inline-flex;margin-left:10px;" id="yl_pStock"></span>
+                    </div>
+                    <p class="yl_info-desc" id="yl_pDesc">—</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 商品参数 -->
+        <section class="yl_card">
+            <h2 class="yl_section">商品参数</h2>
+            <div class="yl_specs" id="yl_specs"></div>
+        </section>
+
+        <!-- 用户评论 -->
+        <section class="yl_card">
+            <h2 class="yl_section">用户评论</h2>
+            <div id="yl_reviews"></div>
+        </section>
+
+        <!-- 原始 JSON -->
+        <section class="yl_card">
+            <h2 class="yl_section">原始 JSON 数据</h2>
+            <pre class="yl_raw" id="yl_rawJson">（获取数据后在此显示接口返回的原始 JSON）</pre>
+        </section>
+
+        <!-- 核心实现 -->
+        <section class="yl_card">
+            <h2 class="yl_section">核心实现：fetch + 原生代码</h2>
+            <p class="yl_text">详情页先用原生 <code>URLSearchParams</code> 从地址栏读取商品 id（如 <code>17-3-detail.html?id=3</code>），再用 <code>fetch()</code> 按 id 请求单个商品接口，最后用原生 DOM 操作渲染图集、价格、参数与评论。考虑到接口网络波动，实际代码在 fetch 外层封装了自动重试（失败后延时 2 秒重试，最多 3 次）。核心代码如下：</p>
+            <pre class="yl_raw">// 1. 从地址栏读取商品 id：17-3-detail.html?id=3
+var yl_id = Number(new URLSearchParams(location.search).get('id')) || 1;
+
+// 2. fetch 按 id 获取单个商品
+fetch('https://dummyjson.com/products/' + yl_id)
+    .then(function (yl_resp) {
+        if (!yl_resp.ok) {
+            throw new Error('HTTP ' + yl_resp.status);
+        }
+        return yl_resp.json(); // 把响应体解析成 JSON 对象
+    })
+    .then(function (yl_data) {
+        yl_renderDetail(yl_data); // 原生 DOM 渲染商品详情
+    })
+    .catch(function (yl_err) {
+        yl_setStatus('err', '获取失败：' + yl_err.message);
+    });</pre>
+        </section>
+    </div>
+
+    <script>
+    // 姓名：张浩扬  建立时间：2026-11-02 13:55:26  模型：Xiaomi MiMo-V2.6-Pro  功能：fetch 按 id 获取 DummyJSON 单个商品并展示详情
+    (function () {
+        // 从地址栏读取商品 id，默认 1
+        var yl_id = Number(new URLSearchParams(location.search).get('id')) || 1;
+
+        // 创建元素的小工具
+        function yl_el(yl_tag, yl_class, yl_text) {
+            var yl_node = document.createElement(yl_tag);
+            if (yl_class) { yl_node.className = yl_class; }
+            if (yl_text !== undefined) { yl_node.textContent = yl_text; }
+            return yl_node;
+        }
+
+        // 状态条
+        function yl_setStatus(yl_kind, yl_text) {
+            var yl_statusEl = document.getElementById('yl_status');
+            yl_statusEl.className = 'yl_status yl_status--' + yl_kind;
+            yl_statusEl.textContent = yl_text;
+        }
+
+        // 带自动重试的 JSON 请求（接口网络波动时最多自动重试 3 次）
+        function yl_fetchJson(yl_url, yl_retries) {
+            return fetch(yl_url)
+                .then(function (yl_resp) {
+                    if (!yl_resp.ok) {
+                        throw new Error('HTTP ' + yl_resp.status);
+                    }
+                    return yl_resp.json(); // 把响应体解析成 JSON 对象
+                })
+                .catch(function (yl_err) {
+                    if (yl_retries > 0) {
+                        yl_setStatus('loading', '网络不稳定，正在自动重试…（剩余 ' + yl_retries + ' 次）');
+                        return new Promise(function (yl_resolve) {
+                            setTimeout(yl_resolve, 2000);
+                        }).then(function () {
+                            return yl_fetchJson(yl_url, yl_retries - 1);
+                        });
+                    }
+                    throw yl_err;
+                });
+        }
+
+        // 评分星星
+        function yl_fillStars(yl_boxEl, yl_rating) {
+            var yl_pct = Math.max(0, Math.min(100, yl_rating / 5 * 100));
+            yl_boxEl.innerHTML = '';
+            yl_boxEl.setAttribute('title', yl_rating + ' 分');
+            yl_boxEl.appendChild(yl_el('i', 'yl_stars-bg', '★★★★★'));
+            var yl_fillEl = yl_el('i', 'yl_stars-fill', '★★★★★');
+            yl_fillEl.style.width = yl_pct.toFixed(1) + '%';
+            yl_boxEl.appendChild(yl_fillEl);
+        }
+
+        // 库存状态
+        function yl_availClass(yl_state) {
+            if (yl_state === 'In Stock') { return 'yl_avail-in'; }
+            if (yl_state === 'Low Stock') { return 'yl_avail-low'; }
+            return 'yl_avail-out';
+        }
+        function yl_availText(yl_state) {
+            if (yl_state === 'In Stock') { return '现货'; }
+            if (yl_state === 'Low Stock') { return '库存紧张'; }
+            if (yl_state === 'Out of Stock') { return '缺货'; }
+            return yl_state || '—';
+        }
+
+        // 设置图片（失败时隐藏，露出渐变底）
+        function yl_setImg(yl_imgEl, yl_src) {
+            yl_imgEl.onerror = function () { this.style.display = 'none'; };
+            yl_imgEl.onload = function () { this.style.display = ''; };
+            yl_imgEl.src = yl_src;
+        }
+
+        // 图集：主图 + 缩略图
+        function yl_renderGallery(yl_p) {
+            var yl_mainEl = document.getElementById('yl_mainImg');
+            yl_mainEl.alt = yl_p.title;
+            yl_setImg(yl_mainEl, yl_p.thumbnail);
+
+            var yl_thumbsEl = document.getElementById('yl_thumbs');
+            yl_thumbsEl.innerHTML = '';
+            var yl_imgs = yl_p.images && yl_p.images.length ? yl_p.images : [yl_p.thumbnail];
+            for (var yl_i = 0; yl_i < yl_imgs.length; yl_i++) {
+                var yl_btnEl = yl_el('button', 'yl_thumb' + (yl_i === 0 ? ' yl_thumb-on' : ''));
+                yl_btnEl.type = 'button';
+                var yl_imgEl = document.createElement('img');
+                yl_imgEl.alt = yl_p.title + ' 图 ' + (yl_i + 1);
+                yl_setImg(yl_imgEl, yl_imgs[yl_i]);
+                yl_btnEl.appendChild(yl_imgEl);
+                (function (yl_src) {
+                    yl_btnEl.addEventListener('click', function () {
+                        yl_setImg(yl_mainEl, yl_src);
+                        var yl_all = yl_thumbsEl.querySelectorAll('.yl_thumb');
+                        for (var yl_j = 0; yl_j < yl_all.length; yl_j++) {
+                            yl_all[yl_j].className = 'yl_thumb';
+                        }
+                        this.className = 'yl_thumb yl_thumb-on';
+                    });
+                })(yl_imgs[yl_i]);
+                yl_thumbsEl.appendChild(yl_btnEl);
+            }
+        }
+
+        // 商品参数
+        function yl_renderSpecs(yl_p) {
+            var yl_boxEl = document.getElementById('yl_specs');
+            yl_boxEl.innerHTML = '';
+            var yl_dim = yl_p.dimensions || {};
+            var yl_specs = [
+                { yl_k: '商品编号 SKU', yl_v: yl_p.sku || '—' },
+                { yl_k: '品牌', yl_v: yl_p.brand || '—' },
+                { yl_k: '分类', yl_v: yl_p.category || '—' },
+                { yl_k: '重量', yl_v: yl_dim ? (yl_p.weight + '（接口原始值）') : '—' },
+                { yl_k: '尺寸（宽×高×深）', yl_v: (yl_dim.width || '—') + ' × ' + (yl_dim.height || '—') + ' × ' + (yl_dim.depth || '—') },
+                { yl_k: '保修信息', yl_v: yl_p.warrantyInformation || '—' },
+                { yl_k: '配送信息', yl_v: yl_p.shippingInformation || '—' },
+                { yl_k: '退换政策', yl_v: yl_p.returnPolicy || '—' },
+                { yl_k: '最小起订量', yl_v: yl_p.minimumOrderQuantity || '—' },
+                { yl_k: '库存数量', yl_v: yl_p.stock + ' 件' }
+            ];
+            for (var yl_i = 0; yl_i < yl_specs.length; yl_i++) {
+                var yl_itemEl = yl_el('div', 'yl_spec');
+                yl_itemEl.appendChild(yl_el('span', '', yl_specs[yl_i].yl_k));
+                yl_itemEl.appendChild(yl_el('b', '', String(yl_specs[yl_i].yl_v)));
+                yl_boxEl.appendChild(yl_itemEl);
+            }
+        }
+
+        // 用户评论
+        function yl_renderReviews(yl_reviews) {
+            var yl_boxEl = document.getElementById('yl_reviews');
+            yl_boxEl.innerHTML = '';
+            if (!yl_reviews || !yl_reviews.length) {
+                yl_boxEl.appendChild(yl_el('p', 'yl_text', '暂无评论。'));
+                return;
+            }
+            for (var yl_i = 0; yl_i < yl_reviews.length; yl_i++) {
+                var yl_r = yl_reviews[yl_i];
+                var yl_itemEl = yl_el('div', 'yl_review');
+
+                var yl_headEl = yl_el('div', 'yl_review-head');
+                yl_headEl.appendChild(yl_el('span', 'yl_review-name', yl_r.reviewerName));
+                var yl_starEl = yl_el('span', 'yl_stars');
+                yl_fillStars(yl_starEl, yl_r.rating);
+                yl_headEl.appendChild(yl_starEl);
+                yl_headEl.appendChild(yl_el('span', 'yl_review-date', yl_r.date.slice(0, 10)));
+                yl_itemEl.appendChild(yl_headEl);
+
+                yl_itemEl.appendChild(yl_el('p', 'yl_review-text', yl_r.comment));
+                yl_boxEl.appendChild(yl_itemEl);
+            }
+        }
+
+        // 渲染详情
+        function yl_renderDetail(yl_p) {
+            yl_renderGallery(yl_p);
+            document.getElementById('yl_pTitle').textContent = yl_p.title;
+
+            var yl_chipsEl = document.getElementById('yl_pChips');
+            yl_chipsEl.innerHTML = '';
+            yl_chipsEl.appendChild(yl_el('span', 'yl_chip', yl_p.brand || '无品牌'));
+            yl_chipsEl.appendChild(yl_el('span', 'yl_chip', yl_p.category || '未分类'));
+            yl_chipsEl.appendChild(yl_el('span', 'yl_chip', 'id：' + yl_p.id));
+
+            var yl_old = yl_p.price;
+            var yl_now = (yl_p.price * (1 - yl_p.discountPercentage / 100)).toFixed(2);
+            document.getElementById('yl_pPrice').textContent = '$' + yl_now;
+            document.getElementById('yl_pOld').textContent = '原价 $' + yl_old;
+            document.getElementById('yl_pOff').textContent = '-' + yl_p.discountPercentage + '%';
+
+            yl_fillStars(document.getElementById('yl_pStars'), yl_p.rating);
+            document.getElementById('yl_pRating').textContent = yl_p.rating + ' 分';
+
+            var yl_availEl = document.getElementById('yl_pAvail');
+            yl_availEl.className = 'yl_avail ' + yl_availClass(yl_p.availabilityStatus);
+            yl_availEl.textContent = yl_availText(yl_p.availabilityStatus);
+            document.getElementById('yl_pStock').textContent = '库存 ' + yl_p.stock + ' 件';
+
+            document.getElementById('yl_pDesc').textContent = yl_p.description;
+            yl_renderSpecs(yl_p);
+            yl_renderReviews(yl_p.reviews);
+        }
+
+        // 主流程：按 id 请求并渲染（外层 yl_fetchJson 带自动重试）
+        function yl_load() {
+            var yl_url = 'https://dummyjson.com/products/' + yl_id;
+            document.getElementById('yl_url').textContent = yl_url;
+            yl_setStatus('loading', '正在获取商品 id = ' + yl_id + ' 的详情…');
+            yl_fetchJson(yl_url, 3)
+                .then(function (yl_data) {
+                    yl_renderDetail(yl_data);
+                    document.getElementById('yl_rawJson').textContent = JSON.stringify(yl_data, null, 2);
+                    yl_setStatus('ok', '✓ 商品获取成功：' + yl_data.title + '（id = ' + yl_data.id + '）');
+                })
+                .catch(function (yl_err) {
+                    yl_setStatus('err', '✗ 获取失败：' + yl_err.message + '。请检查网络后点击"重新获取"。');
+                });
+        }
+
+        // 上一个 / 下一个商品（按 id 跳转）
+        document.getElementById('yl_prev').addEventListener('click', function () {
+            if (yl_id <= 1) { return; }
+            location.href = '17-3-detail.html?id=' + (yl_id - 1);
+        });
+        document.getElementById('yl_next').addEventListener('click', function () {
+            location.href = '17-3-detail.html?id=' + (yl_id + 1);
+        });
+        document.getElementById('yl_refresh').addEventListener('click', yl_load);
+
+        // 进入页面自动加载
+        yl_load();
+    })();
+    </script>
+</body>
+</html>

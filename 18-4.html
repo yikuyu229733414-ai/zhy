@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECharts 图表 · 折线图与饼状图</title>
+    <!-- 姓名：张浩扬  建立时间：2026-11-05 14:05:24  模型：Xiaomi MiMo-V2.6-Pro  功能：ECharts 数据可视化（折线图 + 饼状图，ECharts 库本地化于 cdn/echarts/） -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        code {
+            padding: 1px 6px;
+            background: #eef2f7;
+            border-radius: 4px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            color: #c7254e;
+            word-break: break-all;
+        }
+
+        /* ========== 页面框架 ========== */
+        .yl_wrap {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .yl_title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+        .yl_desc {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .yl_card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+        .yl_section {
+            color: #2980b9;
+            font-size: 19px;
+            border-left: 4px solid #2980b9;
+            padding-left: 10px;
+            margin-bottom: 16px;
+        }
+        .yl_text {
+            font-size: 14px;
+            line-height: 1.9;
+            color: #444;
+            margin-bottom: 10px;
+        }
+        .yl_note {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #95a5a6;
+            line-height: 1.8;
+        }
+
+        /* ========== 图表容器 ========== */
+        .yl_chart-box {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #e8eef5;
+            border-radius: 8px;
+            background: #fff;
+        }
+        .yl_row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .yl_col {
+            flex: 1;
+            min-width: 340px;
+        }
+        .yl_tip-box {
+            display: none;
+            padding: 12px 16px;
+            background: #fdecea;
+            border-left: 4px solid #e74c3c;
+            color: #c0392b;
+            font-size: 13px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        /* ========== 控制按钮 ========== */
+        .yl_btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 14px 0 4px;
+        }
+        .yl_btn {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #3498db;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .yl_btn:hover { background: #2980b9; }
+        .yl_btn-gray {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+        .yl_btn-gray:hover { background: #d5dbdf; color: #2c3e50; }
+
+        /* ========== 核心代码 ========== */
+        .yl_raw {
+            background: #2b3137;
+            color: #d7e0ea;
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="yl_wrap">
+        <h1 class="yl_title">ECharts 数据可视化 · 折线图与饼状图</h1>
+        <p class="yl_desc">使用 Apache ECharts（已下载到本地 <code>./cdn/echarts/echarts.min.js</code>，不依赖远程 CDN）绘制折线图与饼状图，支持图例切换、数据提示框、缩放与图片导出。</p>
+
+        <!-- 一、折线图 -->
+        <section class="yl_card">
+            <h2 class="yl_section">一、折线图：近 7 天网站访问量趋势</h2>
+            <div class="yl_tip-box" id="yl_tip">ECharts 脚本未加载：请确认 ./cdn/echarts/echarts.min.js 文件存在后刷新页面。</div>
+            <div class="yl_chart-box" id="yl_lineChart"></div>
+            <div class="yl_btns">
+                <button class="yl_btn" id="yl_btnSmooth" type="button">切换平滑 / 折线</button>
+                <button class="yl_btn yl_btn-gray" id="yl_btnRefresh" type="button">重新加载数据</button>
+            </div>
+            <p class="yl_note">提示：点击图例可显示 / 隐藏系列；鼠标悬停查看每日明细；右上角工具箱可保存为图片、切换数据视图。</p>
+        </section>
+
+        <!-- 二、饼状图 -->
+        <section class="yl_card">
+            <h2 class="yl_section">二、饼状图：课程练习页面类型分布</h2>
+            <div class="yl_chart-box" id="yl_pieChart"></div>
+            <div class="yl_btns">
+                <button class="yl_btn" id="yl_btnRing" type="button">切换环形 / 饼形</button>
+            </div>
+            <p class="yl_note">提示：鼠标悬停扇区查看数量与占比；再次点击可还原为环形图（环形图中心留白，更便于阅读标签）。</p>
+        </section>
+
+        <!-- 三、核心实现 -->
+        <section class="yl_card">
+            <h2 class="yl_section">三、核心实现：ECharts 使用要点</h2>
+            <p class="yl_text">ECharts 库已按课程要求<b>下载到本地 <code>cdn/echarts/</code> 目录</b>（约 1MB 的 echarts.min.js，来自 Apache ECharts 官方发行版），页面通过相对路径 <code>&lt;script src="./cdn/echarts/echarts.min.js"&gt;</code> 引用，完全离线可用。核心步骤：先 <code>echarts.init(dom)</code> 初始化实例，再用 <code>setOption(option)</code> 传入配置（标题、提示框、图例、坐标轴、系列），窗口缩放时调用 <code>resize()</code> 自适应。</p>
+            <pre class="yl_raw">&lt;!-- 1. 引用本地 ECharts（不使用远程 CDN） --&gt;
+&lt;script src="./cdn/echarts/echarts.min.js"&gt;&lt;/script&gt;
+
+// 2. 初始化实例并设置配置项
+var yl_lineChart = echarts.init(document.getElementById('yl_lineChart'));
+var yl_lineOption = {
+    title:   { text: '近 7 天网站访问量趋势' },
+    tooltip: { trigger: 'axis' },                 // 坐标轴提示框
+    legend:  { data: ['PV 浏览量', 'UV 访客数'] },
+    xAxis:   { type: 'category', data: ['周一', …, '周日'] },
+    yAxis:   { type: 'value' },
+    series: [
+        { name: 'PV 浏览量', type: 'line', smooth: true, data: [120, 200, …] },
+        { name: 'UV 访客数', type: 'line', smooth: true, data: [60, 100, …] }
+    ]
+};
+yl_lineChart.setOption(yl_lineOption);
+
+// 3. 窗口缩放自适应
+window.addEventListener('resize', function () {
+    yl_lineChart.resize();
+    yl_pieChart.resize();
+});</pre>
+        </section>
+    </div>
+
+    <script src="./cdn/echarts/echarts.min.js"></script>
+    <script>
+    // 姓名：张浩扬  建立时间：2026-11-05 14:05:24  模型：Xiaomi MiMo-V2.6-Pro  功能：ECharts 数据可视化（折线图 + 饼状图）
+    (function () {
+        // 未加载成功时给出提示，不继续执行
+        if (typeof echarts === 'undefined') {
+            document.getElementById('yl_tip').style.display = 'block';
+            return;
+        }
+
+        // ========== 一、折线图 ==========
+        var yl_lineChart = echarts.init(document.getElementById('yl_lineChart'));
+        var yl_pvData = [120, 200, 150, 320, 260, 410, 380];
+        var yl_uvData = [60, 100, 80, 170, 140, 220, 200];
+        var yl_smooth = true;
+
+        function yl_lineOption() {
+            return {
+                title: {
+                    text: '近 7 天网站访问量趋势',
+                    left: 'center',
+                    textStyle: { fontSize: 16, color: '#2c3e50' }
+                },
+                tooltip: { trigger: 'axis' },
+                legend: {
+                    data: ['PV 浏览量', 'UV 访客数'],
+                    bottom: 0
+                },
+                grid: { left: 56, right: 30, top: 50, bottom: 56 },
+                toolbox: {
+                    feature: { saveAsImage: {}, dataView: {} },
+                    right: 16
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '次数'
+                },
+                series: [
+                    {
+                        name: 'PV 浏览量',
+                        type: 'line',
+                        smooth: yl_smooth,
+                        data: yl_pvData,
+                        areaStyle: { opacity: .12 },
+                        itemStyle: { color: '#3b82f6' },
+                        lineStyle: { width: 2.5 }
+                    },
+                    {
+                        name: 'UV 访客数',
+                        type: 'line',
+                        smooth: yl_smooth,
+                        data: yl_uvData,
+                        areaStyle: { opacity: .12 },
+                        itemStyle: { color: '#10b981' },
+                        lineStyle: { width: 2.5 }
+                    }
+                ]
+            };
+        }
+        yl_lineChart.setOption(yl_lineOption());
+
+        // ========== 二、饼状图 ==========
+        var yl_pieChart = echarts.init(document.getElementById('yl_pieChart'));
+        var yl_isRing = true;
+        var yl_pieData = [
+            { value: 6,  name: 'HTML 基础' },
+            { value: 10, name: 'CSS 布局' },
+            { value: 6,  name: 'JavaScript 编程' },
+            { value: 12, name: '接口与异步' },
+            { value: 4,  name: '图形绘制（Canvas/SVG）' }
+        ];
+
+        function yl_pieOption() {
+            return {
+                title: {
+                    text: '课程练习页面类型分布',
+                    left: 'center',
+                    textStyle: { fontSize: 16, color: '#2c3e50' }
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}：{c} 个（{d}%）'
+                },
+                legend: {
+                    bottom: 0,
+                    itemWidth: 14,
+                    itemHeight: 10
+                },
+                toolbox: {
+                    feature: { saveAsImage: {}, dataView: {} },
+                    right: 16
+                },
+                series: [
+                    {
+                        type: 'pie',
+                        radius: yl_isRing ? ['40%', '64%'] : '62%',
+                        center: ['50%', '47%'],
+                        data: yl_pieData,
+                        label: {
+                            formatter: '{b}\n{d}%',
+                            fontSize: 12
+                        },
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 12,
+                                shadowColor: 'rgba(0, 0, 0, .2)'
+                            }
+                        },
+                        itemStyle: {
+                            borderRadius: yl_isRing ? 6 : 0,
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        }
+                    }
+                ]
+            };
+        }
+        yl_pieChart.setOption(yl_pieOption());
+
+        // ========== 控制按钮 ==========
+        // 折线图：平滑切换
+        document.getElementById('yl_btnSmooth').addEventListener('click', function () {
+            yl_smooth = !yl_smooth;
+            yl_lineChart.setOption(yl_lineOption());
+        });
+
+        // 折线图：模拟重新加载数据
+        document.getElementById('yl_btnRefresh').addEventListener('click', function () {
+            for (var yl_i = 0; yl_i < yl_pvData.length; yl_i++) {
+                yl_pvData[yl_i] = Math.round(100 + Math.random() * 380);
+                yl_uvData[yl_i] = Math.round(50 + Math.random() * 200);
+            }
+            yl_lineChart.setOption(yl_lineOption());
+        });
+
+        // 饼状图：环形 / 饼形切换
+        document.getElementById('yl_btnRing').addEventListener('click', function () {
+            yl_isRing = !yl_isRing;
+            yl_pieChart.setOption(yl_pieOption());
+        });
+
+        // ========== 自适应 ==========
+        window.addEventListener('resize', function () {
+            yl_lineChart.resize();
+            yl_pieChart.resize();
+        });
+    })();
+    </script>
+</body>
+</html>

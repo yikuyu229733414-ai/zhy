@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas 动画 · 我的名字</title>
+    <!-- 姓名：张浩扬  建立时间：2026-11-05 13:36:39  模型：Xiaomi MiMo-V2.6-Pro  功能：Canvas 动画展示（粒子汇聚文字"张浩扬"与波浪文字特效） -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #0f1626;
+            color: #e8eef7;
+        }
+        code {
+            padding: 1px 6px;
+            background: rgba(255, 255, 255, .1);
+            border-radius: 4px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            color: #8fd3ff;
+            word-break: break-all;
+        }
+
+        /* ========== 页面框架（深色星空风格） ========== */
+        .yl_wrap {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 36px 20px;
+        }
+        .yl_title {
+            text-align: center;
+            font-size: 26px;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+        .yl_desc {
+            text-align: center;
+            font-size: 14px;
+            color: #93a4bb;
+            margin-bottom: 22px;
+        }
+        .yl_card {
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 12px;
+            padding: 18px 22px;
+            margin-bottom: 20px;
+        }
+        .yl_section {
+            color: #8fd3ff;
+            font-size: 18px;
+            border-left: 4px solid #4a90e2;
+            padding-left: 10px;
+            margin-bottom: 14px;
+        }
+        .yl_text {
+            font-size: 14px;
+            line-height: 1.9;
+            color: #b8c4d6;
+            margin-bottom: 10px;
+        }
+
+        /* ========== 画布与按钮 ========== */
+        .yl_stage {
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, .12);
+            border-radius: 10px;
+            overflow: hidden;
+            background: #101a2e;
+        }
+        #yl_canvas {
+            display: block;
+            width: 100%;
+            height: 380px;
+        }
+        .yl_btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .yl_btn {
+            padding: 8px 20px;
+            border: 1px solid rgba(255, 255, 255, .22);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, .08);
+            color: #e8eef7;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .yl_btn:hover {
+            background: #4a90e2;
+            border-color: #4a90e2;
+        }
+        .yl_btn-on {
+            background: #4a90e2;
+            border-color: #4a90e2;
+        }
+        .yl_tip {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #7c8aa3;
+        }
+
+        /* ========== 核心代码 ========== */
+        .yl_raw {
+            background: #16233a;
+            color: #cfe3ff;
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="yl_wrap">
+        <h1 class="yl_title">Canvas 动画 · 我的名字</h1>
+        <p class="yl_desc">HTML5 Canvas 绘制的动画效果，画面中的文字是"张浩扬"——粒子汇聚文字与波浪渐变文字两种特效（原生 JS，requestAnimationFrame 驱动）。</p>
+
+        <!-- 画布 -->
+        <div class="yl_card">
+            <h2 class="yl_section">一、动画演示（可点击按钮切换效果）</h2>
+            <div class="yl_stage">
+                <canvas id="yl_canvas"></canvas>
+            </div>
+            <div class="yl_btns">
+                <button class="yl_btn yl_btn-on" id="yl_btnParticle" type="button">粒子文字</button>
+                <button class="yl_btn" id="yl_btnWave" type="button">波浪文字</button>
+                <button class="yl_btn" id="yl_btnBoom" type="button">炸散重组</button>
+                <button class="yl_btn" id="yl_btnColor" type="button">切换配色</button>
+            </div>
+            <p class="yl_tip">提示：粒子文字模式下，把鼠标移到文字上会把粒子推开，松开后自动归位；"炸散重组"让粒子四散后重新汇聚成"张浩扬"。</p>
+        </div>
+
+        <!-- 核心实现 -->
+        <div class="yl_card">
+            <h2 class="yl_section">二、核心实现：Canvas 绘制要点</h2>
+            <p class="yl_text"><code>canvas.getContext('2d')</code> 获取绘图上下文；粒子文字先用离屏画布把文字"张浩扬"画出来，再用 <code>getImageData()</code> 按像素采样得到每个粒子的目标坐标，最后用 <code>requestAnimationFrame()</code> 循环重绘；波浪文字用 <code>fillText()</code> 逐字绘制并按正弦函数偏移纵坐标。</p>
+            <pre class="yl_raw">// 1. 离屏采样：把文字画到隐藏画布，读取像素得到粒子目标点
+yl_octx.font = 'bold 130px "Microsoft YaHei"';
+yl_octx.fillText('张浩扬', yl_w / 2, yl_h / 2);
+var yl_pixels = yl_octx.getImageData(0, 0, yl_w, yl_h).data;
+// 透明度大于 128 的像素点，每隔 5px 取一个作为粒子目标
+
+// 2. 每帧动画：粒子向目标点缓动 + 轻微抖动
+yl_particles.forEach(function (yl_p) {
+    yl_p.x += (yl_p.tx - yl_p.x) * 0.08;   // 缓动靠拢
+    yl_p.y += (yl_p.ty - yl_p.y) * 0.08;
+    yl_ctx.fillRect(yl_p.x, yl_p.y, yl_p.size, yl_p.size);
+});
+yl_rafId = requestAnimationFrame(yl_draw);</pre>
+        </div>
+    </div>
+
+    <script>
+    // 姓名：张浩扬  建立时间：2026-11-05 13:36:39  模型：Xiaomi MiMo-V2.6-Pro  功能：Canvas 动画展示（粒子汇聚文字"张浩扬"与波浪文字特效）
+    (function () {
+        var yl_canvasEl = document.getElementById('yl_canvas');
+        var yl_ctx = yl_canvasEl.getContext('2d');
+        var yl_dpr = window.devicePixelRatio || 1;
+        var yl_w = 0;
+        var yl_h = 0;
+
+        var yl_mode = 'particle';      // particle / wave
+        var yl_themeIdx = 0;
+        var yl_themes = [
+            ['#4a90e2', '#8fd3ff', '#2c5f9e'],
+            ['#e67e22', '#f8c471', '#a04b0a'],
+            ['#27ae60', '#a9dfbf', '#1d7a46'],
+            ['#e74c3c', '#f5b7b1', '#a93226']
+        ];
+        var yl_particles = [];        // 粒子数组
+        var yl_stars = [];            // 背景星星
+        var yl_mouse = { x: -999, y: -999 };
+        var yl_rafId = 0;
+        var yl_tick = 0;
+
+        // 适配高清屏
+        function yl_resize() {
+            var yl_rect = yl_canvasEl.getBoundingClientRect();
+            yl_w = yl_rect.width;
+            yl_h = yl_rect.height;
+            yl_canvasEl.width = yl_w * yl_dpr;
+            yl_canvasEl.height = yl_h * yl_dpr;
+            yl_ctx.setTransform(yl_dpr, 0, 0, yl_dpr, 0, 0);
+            yl_buildStars();
+            yl_buildParticles();
+        }
+
+        // 背景星星
+        function yl_buildStars() {
+            yl_stars = [];
+            for (var yl_i = 0; yl_i < 70; yl_i++) {
+                yl_stars.push({
+                    x: Math.random() * yl_w,
+                    y: Math.random() * yl_h,
+                    r: Math.random() * 1.6 + 0.4,
+                    s: Math.random() * 0.25 + 0.05,
+                    a: Math.random()
+                });
+            }
+        }
+
+        // 离屏采样文字像素 → 粒子目标点
+        function yl_buildParticles() {
+            var yl_off = document.createElement('canvas');
+            yl_off.width = yl_w;
+            yl_off.height = yl_h;
+            var yl_octx = yl_off.getContext('2d');
+            yl_octx.fillStyle = '#fff';
+            yl_octx.font = 'bold 130px "Microsoft YaHei", sans-serif';
+            yl_octx.textAlign = 'center';
+            yl_octx.textBaseline = 'middle';
+            yl_octx.fillText('张浩扬', yl_w / 2, yl_h / 2 - 16);
+
+            var yl_pixels = yl_octx.getImageData(0, 0, yl_w, yl_h).data;
+            yl_particles = [];
+            var yl_step = 5;
+            for (var yl_y = 0; yl_y < yl_h; yl_y += yl_step) {
+                for (var yl_x = 0; yl_x < yl_w; yl_x += yl_step) {
+                    if (yl_pixels[(yl_y * yl_w + yl_x) * 4 + 3] > 128) {
+                        yl_particles.push({
+                            x: Math.random() * yl_w,
+                            y: Math.random() * yl_h,
+                            tx: yl_x,
+                            ty: yl_y,
+                            size: Math.random() * 2.2 + 1.4,
+                            seed: Math.random() * Math.PI * 2
+                        });
+                    }
+                }
+            }
+        }
+
+        // 绘制背景星星
+        function yl_drawStars() {
+            for (var yl_i = 0; yl_i < yl_stars.length; yl_i++) {
+                var yl_st = yl_stars[yl_i];
+                yl_st.a += 0.02;
+                yl_st.y += yl_st.s;
+                if (yl_st.y > yl_h) { yl_st.y = -2; }
+                yl_ctx.globalAlpha = 0.35 + Math.abs(Math.sin(yl_st.a)) * 0.55;
+                yl_ctx.fillStyle = '#cfe3ff';
+                yl_ctx.beginPath();
+                yl_ctx.arc(yl_st.x, yl_st.y, yl_st.r, 0, Math.PI * 2);
+                yl_ctx.fill();
+            }
+            yl_ctx.globalAlpha = 1;
+        }
+
+        // 粒子文字模式
+        function yl_drawParticle() {
+            var yl_colors = yl_themes[yl_themeIdx];
+            for (var yl_i = 0; yl_i < yl_particles.length; yl_i++) {
+                var yl_p = yl_particles[yl_i];
+                // 鼠标斥力
+                var yl_dx = yl_mouse.x - yl_p.x;
+                var yl_dy = yl_mouse.y - yl_p.y;
+                var yl_dist = Math.sqrt(yl_dx * yl_dx + yl_dy * yl_dy);
+                if (yl_dist < 70) {
+                    yl_p.x -= yl_dx / yl_dist * 3.2;
+                    yl_p.y -= yl_dy / yl_dist * 3.2;
+                }
+                // 缓动归位 + 轻微抖动
+                yl_p.x += (yl_p.tx - yl_p.x) * 0.08;
+                yl_p.y += (yl_p.ty - yl_p.y) * 0.08;
+                var yl_jx = Math.sin(yl_tick * 0.05 + yl_p.seed) * 0.8;
+                var yl_jy = Math.cos(yl_tick * 0.04 + yl_p.seed) * 0.8;
+
+                yl_ctx.fillStyle = yl_i % 7 === 0 ? yl_colors[1] : yl_colors[0];
+                yl_ctx.fillRect(yl_p.x + yl_jx, yl_p.y + yl_jy, yl_p.size, yl_p.size);
+            }
+            // 底部副标题
+            yl_ctx.fillStyle = yl_colors[1];
+            yl_ctx.globalAlpha = 0.85;
+            yl_ctx.font = '16px "Microsoft YaHei", sans-serif';
+            yl_ctx.textAlign = 'center';
+            yl_ctx.fillText('24001010302 · 《高级网页设计》课堂实践', yl_w / 2, yl_h / 2 + 110);
+            yl_ctx.globalAlpha = 1;
+        }
+
+        // 波浪文字模式
+        function yl_drawWave() {
+            var yl_colors = yl_themes[yl_themeIdx];
+            var yl_text = '张浩扬';
+            var yl_chars = yl_text.split('');
+            var yl_charW = 150;
+            var yl_startX = yl_w / 2 - (yl_chars.length * yl_charW) / 2 + yl_charW / 2;
+            for (var yl_i = 0; yl_i < yl_chars.length; yl_i++) {
+                var yl_offY = Math.sin(yl_tick * 0.06 + yl_i * 0.7) * 26;
+                var yl_grad = yl_ctx.createLinearGradient(0, yl_h / 2 - 110 + yl_offY, 0, yl_h / 2 + 40 + yl_offY);
+                yl_grad.addColorStop(0, yl_colors[1]);
+                yl_grad.addColorStop(1, yl_colors[0]);
+                yl_ctx.fillStyle = yl_grad;
+                yl_ctx.font = 'bold 128px "Microsoft YaHei", sans-serif';
+                yl_ctx.textAlign = 'center';
+                yl_ctx.textBaseline = 'middle';
+                yl_ctx.shadowColor = yl_colors[0];
+                yl_ctx.shadowBlur = 26;
+                yl_ctx.fillText(yl_chars[yl_i], yl_startX + yl_i * yl_charW, yl_h / 2 - 16 + yl_offY);
+                yl_ctx.shadowBlur = 0;
+                // 倒影
+                yl_ctx.globalAlpha = 0.18;
+                yl_ctx.fillText(yl_chars[yl_i], yl_startX + yl_i * yl_charW, yl_h / 2 + 120 - yl_offY * 0.6);
+                yl_ctx.globalAlpha = 1;
+            }
+            yl_ctx.fillStyle = yl_colors[1];
+            yl_ctx.globalAlpha = 0.85;
+            yl_ctx.font = '16px "Microsoft YaHei", sans-serif';
+            yl_ctx.fillText('波浪文字特效 · 副标题跟随波动', yl_w / 2, yl_h - 30);
+            yl_ctx.globalAlpha = 1;
+        }
+
+        // 主绘制循环
+        function yl_draw() {
+            yl_tick += 1;
+            yl_ctx.clearRect(0, 0, yl_w, yl_h);
+            yl_ctx.fillStyle = '#101a2e';
+            yl_ctx.fillRect(0, 0, yl_w, yl_h);
+            yl_drawStars();
+            if (yl_mode === 'particle') {
+                yl_drawParticle();
+            } else {
+                yl_drawWave();
+            }
+            yl_rafId = requestAnimationFrame(yl_draw);
+        }
+
+        // 鼠标位置
+        yl_canvasEl.addEventListener('mousemove', function (yl_ev) {
+            var yl_rect = yl_canvasEl.getBoundingClientRect();
+            yl_mouse.x = yl_ev.clientX - yl_rect.left;
+            yl_mouse.y = yl_ev.clientY - yl_rect.top;
+        });
+        yl_canvasEl.addEventListener('mouseleave', function () {
+            yl_mouse.x = -999;
+            yl_mouse.y = -999;
+        });
+
+        // 按钮：切换效果
+        function yl_setMode(yl_next) {
+            yl_mode = yl_next;
+            document.getElementById('yl_btnParticle').className = yl_next === 'particle' ? 'yl_btn yl_btn-on' : 'yl_btn';
+            document.getElementById('yl_btnWave').className = yl_next === 'wave' ? 'yl_btn yl_btn-on' : 'yl_btn';
+        }
+        document.getElementById('yl_btnParticle').addEventListener('click', function () {
+            yl_setMode('particle');
+        });
+        document.getElementById('yl_btnWave').addEventListener('click', function () {
+            yl_setMode('wave');
+        });
+
+        // 按钮：炸散重组
+        document.getElementById('yl_btnBoom').addEventListener('click', function () {
+            yl_setMode('particle');
+            for (var yl_i = 0; yl_i < yl_particles.length; yl_i++) {
+                var yl_ang = Math.random() * Math.PI * 2;
+                var yl_spd = Math.random() * 16 + 6;
+                yl_particles[yl_i].x += Math.cos(yl_ang) * yl_spd;
+                yl_particles[yl_i].y += Math.sin(yl_ang) * yl_spd;
+            }
+        });
+
+        // 按钮：切换配色
+        document.getElementById('yl_btnColor').addEventListener('click', function () {
+            yl_themeIdx = (yl_themeIdx + 1) % yl_themes.length;
+        });
+
+        // 启动
+        yl_resize();
+        yl_draw();
+        window.addEventListener('resize', yl_resize);
+    })();
+    </script>
+</body>
+</html>

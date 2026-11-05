@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas · 知乎全站系统架构图</title>
+    <!-- 姓名：张浩扬  建立时间：2026-11-05 13:36:39  模型：Xiaomi MiMo-V2.6-Pro  功能：基于 Canvas 绘制知乎全站系统架构图（七层分层结构、模块悬停说明） -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        code {
+            padding: 1px 6px;
+            background: #eef2f7;
+            border-radius: 4px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            color: #c7254e;
+            word-break: break-all;
+        }
+
+        /* ========== 页面框架 ========== */
+        .yl_wrap {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .yl_title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+        .yl_desc {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .yl_card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+        .yl_section {
+            color: #2980b9;
+            font-size: 19px;
+            border-left: 4px solid #2980b9;
+            padding-left: 10px;
+            margin-bottom: 16px;
+        }
+        .yl_text {
+            font-size: 14px;
+            line-height: 1.9;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        /* ========== 架构图画布 ========== */
+        .yl_stage {
+            border: 1px solid #e8eef5;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+        }
+        #yl_canvas {
+            display: block;
+            width: 100%;
+        }
+        .yl_info {
+            margin-top: 12px;
+            padding: 11px 16px;
+            background: #f8fafc;
+            border: 1px solid #e8eef5;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #555;
+            min-height: 42px;
+            line-height: 1.8;
+        }
+        .yl_info b { color: #2c3e50; }
+        .yl_btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .yl_btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 6px;
+            background: #3498db;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .yl_btn:hover { background: #2980b9; }
+        .yl_btn-gray {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+        .yl_btn-gray:hover { background: #d5dbdf; color: #2c3e50; }
+
+        /* ========== 核心代码 ========== */
+        .yl_raw {
+            background: #2b3137;
+            color: #d7e0ea;
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="yl_wrap">
+        <h1 class="yl_title">Canvas · 知乎全站系统架构图</h1>
+        <p class="yl_desc">使用 HTML5 Canvas 绘制的知乎全站系统分层架构图：从用户浏览器到 GitHub Pages 托管共七层，鼠标悬停任意模块可查看说明。</p>
+
+        <!-- 架构图 -->
+        <section class="yl_card">
+            <h2 class="yl_section">一、系统架构图（鼠标悬停模块查看说明）</h2>
+            <div class="yl_stage">
+                <canvas id="yl_canvas"></canvas>
+            </div>
+            <div class="yl_info" id="yl_info">将鼠标悬停在任意模块上查看说明；箭头表示调用与数据流向。</div>
+            <div class="yl_btns">
+                <button class="yl_btn yl_btn-gray" id="yl_btnArrows" type="button">隐藏数据流箭头</button>
+                <button class="yl_btn" id="yl_btnRedraw" type="button">重绘架构图</button>
+            </div>
+        </section>
+
+        <!-- 核心实现 -->
+        <section class="yl_card">
+            <h2 class="yl_section">二、核心实现：Canvas 绘图要点</h2>
+            <p class="yl_text">用 <code>canvas.getContext('2d')</code> 获取绘图上下文，把七层结构写成数据数组，循环绘制圆角矩形（<code>arcTo</code>）、文字（<code>fillText</code>）与箭头（<code>moveTo/lineTo</code>）；鼠标坐标经缩放换算后做命中检测，实现悬停高亮与说明展示。</p>
+            <pre class="yl_raw">// 1. 分层数据驱动绘图：每层 = 标题 + 颜色 + 若干模块
+var yl_layers = [
+    { yl_title: '表现层 · 页面与组件', yl_items: [{ yl_name: 'zhihu-elements 知乎元素', yl_desc: '…' }, …] },
+    …
+];
+
+// 2. 圆角矩形模块
+function yl_roundRect(yl_ctx, yl_x, yl_y, yl_w, yl_h, yl_r) {
+    yl_ctx.moveTo(yl_x + yl_r, yl_y);
+    yl_ctx.arcTo(yl_x + yl_w, yl_y, yl_x + yl_w, yl_y + yl_h, yl_r);
+    yl_ctx.arcTo(yl_x + yl_w, yl_y + yl_h, yl_x, yl_y + yl_h, yl_r);
+    yl_ctx.arcTo(yl_x, yl_y + yl_h, yl_x, yl_y, yl_r);
+    yl_ctx.arcTo(yl_x, yl_y, yl_x + yl_w, yl_y, yl_r);
+}
+
+// 3. 命中检测：鼠标逻辑坐标落在模块矩形内 → 高亮 + 显示说明
+if (yl_mx >= yl_box.x && yl_mx <= yl_box.x + yl_box.w &&
+    yl_my >= yl_box.y && yl_my <= yl_box.y + yl_box.h) {
+    yl_infoEl.innerHTML = '&lt;b&gt;' + yl_box.yl_name + '&lt;/b&gt;：' + yl_box.yl_desc;
+}</pre>
+        </section>
+    </div>
+
+    <script>
+    // 姓名：张浩扬  建立时间：2026-11-05 13:36:39  模型：Xiaomi MiMo-V2.6-Pro  功能：基于 Canvas 绘制知乎全站系统架构图（七层分层结构、模块悬停说明）
+    (function () {
+        var yl_canvasEl = document.getElementById('yl_canvas');
+        var yl_ctx = yl_canvasEl.getContext('2d');
+        var yl_infoEl = document.getElementById('yl_info');
+        var yl_dpr = window.devicePixelRatio || 1;
+        var yl_LW = 920;            // 逻辑画布宽
+        var yl_LH = 900;            // 逻辑画布高
+        var yl_showArrows = true;
+        var yl_hoverIdx = -1;
+        var yl_boxes = [];          // 命中检测用的模块矩形
+
+        // 七层架构数据
+        var yl_layers = [
+            {
+                yl_title: '用户与浏览器',
+                yl_color: '#eaf3fc', yl_border: '#5b9bd5',
+                yl_items: [
+                    { yl_name: '用户（张浩扬）', yl_desc: '课程练习的使用者，通过浏览器访问页面。' },
+                    { yl_name: '浏览器', yl_desc: 'Chrome / Edge：解析 HTML/CSS，运行原生 JavaScript。' },
+                    { yl_name: '访问方式', yl_desc: '本地 file:// 直接打开，或访问 GitHub Pages 在线地址。' }
+                ]
+            },
+            {
+                yl_title: '表现层 · 页面与组件',
+                yl_color: '#eafaf1', yl_border: '#27ae60',
+                yl_items: [
+                    { yl_name: 'index.html 导航', yl_desc: '全站入口：收录全部练习页面的链接卡片。' },
+                    { yl_name: 'zhihu-elements 知乎元素', yl_desc: '知乎模仿：顶部导航、帖子卡片、底部导航、功能入口。' },
+                    { yl_name: '练习页面 2-x ~ 18-x', yl_desc: 'HTML / CSS / JavaScript 各章节练习页，内联样式。' },
+                    { yl_name: '交互组件', yl_desc: '点击排行、商品列表/详情、接口测试工具、定时器与异步演示。' },
+                    { yl_name: 'Canvas 图形', yl_desc: '18-1 名字动画、18-2 本架构图，均用 Canvas 绘制。' }
+                ]
+            },
+            {
+                yl_title: '业务逻辑层 · 原生 JavaScript',
+                yl_color: '#fdf3e2', yl_border: '#e67e22',
+                yl_items: [
+                    { yl_name: 'DOM 渲染', yl_desc: 'createElement / textContent / appendChild 动态生成界面。' },
+                    { yl_name: '事件交互', yl_desc: 'addEventListener 处理点击、输入、悬停等事件。' },
+                    { yl_name: '定时器', yl_desc: 'setTimeout 延时执行、setInterval 周期执行（17-5）。' },
+                    { yl_name: '异步流程', yl_desc: 'Promise 链式、async/await、Promise.all 并行（17-6）。' },
+                    { yl_name: 'JSON 处理', yl_desc: 'JSON.parse 与 JSON.stringify（17-1）。' }
+                ]
+            },
+            {
+                yl_title: '数据访问层 · fetch',
+                yl_color: '#f0e6fb', yl_border: '#8e44ad',
+                yl_items: [
+                    { yl_name: 'GET 查询', yl_desc: 'fetch 获取列表与详情数据。' },
+                    { yl_name: 'POST 新增', yl_desc: '提交请求体创建数据（17-4 接口测试）。' },
+                    { yl_name: 'PUT / PATCH 更新', yl_desc: '全量或局部更新数据。' },
+                    { yl_name: 'DELETE 删除', yl_desc: '按 id 删除资源。' },
+                    { yl_name: '错误处理', yl_desc: '状态码判断、catch 捕获、自动重试与错误提示。' }
+                ]
+            },
+            {
+                yl_title: '数据服务层 · 远程接口',
+                yl_color: '#fdecea', yl_border: '#e74c3c',
+                yl_items: [
+                    { yl_name: 'DummyJSON 商品', yl_desc: 'products 商品列表 / 详情（17-3、17-3-detail）。' },
+                    { yl_name: 'Open-Meteo 天气', yl_desc: '实况、逐时气温与 5 天预报数据（17-2）。' },
+                    { yl_name: 'jsonplaceholder', yl_desc: '文章 GET/POST/PUT/DELETE 测试接口（17-4）。' }
+                ]
+            },
+            {
+                yl_title: '静态资源层',
+                yl_color: '#e8f6f3', yl_border: '#16a085',
+                yl_items: [
+                    { yl_name: 'img/ 炫狗素材', yl_desc: '知乎帖子配图、幻灯片图片与视频。' },
+                    { yl_name: 'tu biao/ 图标', yl_desc: '20 个 PNG 图标：导航、操作栏与工具条。' },
+                    { yl_name: 'cdn/ 图标字体', yl_desc: 'Font Awesome 与 Lucide 本地图标资源。' }
+                ]
+            },
+            {
+                yl_title: '托管与版本管理',
+                yl_color: '#eceff3', yl_border: '#7f8c8d',
+                yl_items: [
+                    { yl_name: 'GitHub Pages', yl_desc: '纯静态托管（.nojekyll），生成可访问的网页链接。' },
+                    { yl_name: 'GitHub 仓库 main', yl_desc: 'git 版本管理，push 上传课程项目。' }
+                ]
+            }
+        ];
+
+        // 圆角矩形路径
+        function yl_roundRect(yl_x, yl_y, yl_w, yl_h, yl_r) {
+            yl_ctx.beginPath();
+            yl_ctx.moveTo(yl_x + yl_r, yl_y);
+            yl_ctx.arcTo(yl_x + yl_w, yl_y, yl_x + yl_w, yl_y + yl_h, yl_r);
+            yl_ctx.arcTo(yl_x + yl_w, yl_y + yl_h, yl_x, yl_y + yl_h, yl_r);
+            yl_ctx.arcTo(yl_x, yl_y + yl_h, yl_x, yl_y, yl_r);
+            yl_ctx.arcTo(yl_x, yl_y, yl_x + yl_w, yl_y, yl_r);
+            yl_ctx.closePath();
+        }
+
+        // 垂直箭头（yl_dir: 1 向下 / -1 向上）
+        function yl_drawArrow(yl_x, yl_y1, yl_y2, yl_dir) {
+            yl_ctx.strokeStyle = '#9bb4cc';
+            yl_ctx.fillStyle = '#9bb4cc';
+            yl_ctx.lineWidth = 2;
+            yl_ctx.beginPath();
+            yl_ctx.moveTo(yl_x, yl_y1);
+            yl_ctx.lineTo(yl_x, yl_y2 - 8 * yl_dir);
+            yl_ctx.stroke();
+            yl_ctx.beginPath();
+            yl_ctx.moveTo(yl_x - 5, yl_y2 - 10 * yl_dir);
+            yl_ctx.lineTo(yl_x + 5, yl_y2 - 10 * yl_dir);
+            yl_ctx.lineTo(yl_x, yl_y2);
+            yl_ctx.closePath();
+            yl_ctx.fill();
+        }
+
+        // 绘制整图
+        function yl_drawAll() {
+            yl_boxes = [];
+            yl_ctx.clearRect(0, 0, yl_LW, yl_LH);
+            yl_ctx.fillStyle = '#ffffff';
+            yl_ctx.fillRect(0, 0, yl_LW, yl_LH);
+
+            // 图标题
+            yl_ctx.fillStyle = '#2c3e50';
+            yl_ctx.font = 'bold 20px "Microsoft YaHei", sans-serif';
+            yl_ctx.textAlign = 'center';
+            yl_ctx.textBaseline = 'middle';
+            yl_ctx.fillText('知乎全站系统架构图（基于 Canvas 绘制）', yl_LW / 2, 30);
+
+            var yl_bandX = 26;
+            var yl_bandW = yl_LW - 52;
+            var yl_bandH = 92;
+            var yl_gap = 24;
+            var yl_y = 62;
+
+            for (var yl_i = 0; yl_i < yl_layers.length; yl_i++) {
+                var yl_layer = yl_layers[yl_i];
+
+                // 层带背景
+                yl_roundRect(yl_bandX, yl_y, yl_bandW, yl_bandH, 10);
+                yl_ctx.fillStyle = yl_layer.yl_color;
+                yl_ctx.fill();
+                yl_ctx.strokeStyle = yl_layer.yl_border;
+                yl_ctx.lineWidth = 1.5;
+                yl_ctx.stroke();
+
+                // 层标题
+                yl_ctx.fillStyle = yl_layer.yl_border;
+                yl_ctx.fillRect(yl_bandX + 14, yl_y + 12, 6, 16);
+                yl_ctx.fillStyle = '#2c3e50';
+                yl_ctx.font = 'bold 14px "Microsoft YaHei", sans-serif';
+                yl_ctx.textAlign = 'left';
+                yl_ctx.fillText(yl_layer.yl_title, yl_bandX + 28, yl_y + 21);
+
+                // 模块盒子
+                var yl_items = yl_layer.yl_items;
+                var yl_pad = 16;
+                var yl_itemGap = 10;
+                var yl_itemW = (yl_bandW - yl_pad * 2 - yl_itemGap * (yl_items.length - 1)) / yl_items.length;
+                var yl_itemH = 42;
+                var yl_itemY = yl_y + 38;
+                for (var yl_j = 0; yl_j < yl_items.length; yl_j++) {
+                    var yl_itemX = yl_bandX + yl_pad + yl_j * (yl_itemW + yl_itemGap);
+                    var yl_idx = yl_boxes.length;
+                    yl_boxes.push({
+                        x: yl_itemX, y: yl_itemY, w: yl_itemW, h: yl_itemH,
+                        yl_name: yl_items[yl_j].yl_name,
+                        yl_desc: yl_items[yl_j].yl_desc
+                    });
+
+                    // 悬停高亮
+                    var yl_on = yl_idx === yl_hoverIdx;
+                    yl_roundRect(yl_itemX, yl_itemY, yl_itemW, yl_itemH, 7);
+                    yl_ctx.fillStyle = yl_on ? yl_layer.yl_border : '#ffffff';
+                    yl_ctx.fill();
+                    yl_ctx.strokeStyle = yl_on ? yl_layer.yl_border : '#cfd8e3';
+                    yl_ctx.lineWidth = yl_on ? 2.5 : 1;
+                    yl_ctx.stroke();
+
+                    yl_ctx.fillStyle = yl_on ? '#ffffff' : '#34495e';
+                    yl_ctx.font = 'bold 13px "Microsoft YaHei", sans-serif';
+                    yl_ctx.textAlign = 'center';
+                    yl_ctx.fillText(yl_items[yl_j].yl_name, yl_itemX + yl_itemW / 2, yl_itemY + yl_itemH / 2);
+                }
+
+                // 层间箭头：左侧向下（请求/调用），右侧向上（数据返回）
+                if (yl_showArrows && yl_i < yl_layers.length - 1) {
+                    var yl_gapY1 = yl_y + yl_bandH;
+                    var yl_gapY2 = yl_gapY1 + yl_gap;
+                    yl_drawArrow(170, yl_gapY1 + 3, yl_gapY2 - 3, 1);
+                    yl_drawArrow(300, yl_gapY1 + 3, yl_gapY2 - 3, 1);
+                    yl_drawArrow(620, yl_gapY2 - 3, yl_gapY1 + 3, -1);
+                    yl_drawArrow(750, yl_gapY2 - 3, yl_gapY1 + 3, -1);
+                }
+
+                yl_y += yl_bandH + yl_gap;
+            }
+
+            // 图例
+            var yl_legendY = yl_y + 4;
+            yl_ctx.fillStyle = '#7f8c8d';
+            yl_ctx.font = '13px "Microsoft YaHei", sans-serif';
+            yl_ctx.textAlign = 'center';
+            yl_ctx.fillText('左侧向下箭头：请求 / 调用方向      右侧向上箭头：数据返回 / 渲染方向', yl_LW / 2, yl_legendY);
+        }
+
+        // 尺寸适配：逻辑坐标 920×900 等比缩放到容器宽
+        function yl_resize() {
+            var yl_dispW = yl_canvasEl.parentNode.clientWidth;
+            var yl_dispH = yl_dispW * yl_LH / yl_LW;
+            yl_canvasEl.style.width = yl_dispW + 'px';
+            yl_canvasEl.style.height = yl_dispH + 'px';
+            yl_canvasEl.width = yl_dispW * yl_dpr;
+            yl_canvasEl.height = yl_dispH * yl_dpr;
+            yl_ctx.setTransform(yl_dispW * yl_dpr / yl_LW, 0, 0, yl_dispW * yl_dpr / yl_LW, 0, 0);
+            yl_drawAll();
+        }
+
+        // 悬停命中检测
+        yl_canvasEl.addEventListener('mousemove', function (yl_ev) {
+            var yl_rect = yl_canvasEl.getBoundingClientRect();
+            var yl_mx = (yl_ev.clientX - yl_rect.left) / yl_rect.width * yl_LW;
+            var yl_my = (yl_ev.clientY - yl_rect.top) / yl_rect.height * yl_LH;
+            var yl_found = -1;
+            for (var yl_k = 0; yl_k < yl_boxes.length; yl_k++) {
+                var yl_b = yl_boxes[yl_k];
+                if (yl_mx >= yl_b.x && yl_mx <= yl_b.x + yl_b.w &&
+                    yl_my >= yl_b.y && yl_my <= yl_b.y + yl_b.h) {
+                    yl_found = yl_k;
+                    break;
+                }
+            }
+            if (yl_found !== yl_hoverIdx) {
+                yl_hoverIdx = yl_found;
+                if (yl_found >= 0) {
+                    yl_infoEl.innerHTML = '<b>' + yl_boxes[yl_found].yl_name + '</b>：' + yl_boxes[yl_found].yl_desc;
+                } else {
+                    yl_infoEl.textContent = '将鼠标悬停在任意模块上查看说明；箭头表示调用与数据流向。';
+                }
+                yl_drawAll();
+            }
+        });
+        yl_canvasEl.addEventListener('mouseleave', function () {
+            if (yl_hoverIdx !== -1) {
+                yl_hoverIdx = -1;
+                yl_infoEl.textContent = '将鼠标悬停在任意模块上查看说明；箭头表示调用与数据流向。';
+                yl_drawAll();
+            }
+        });
+
+        // 按钮：数据流箭头开关
+        document.getElementById('yl_btnArrows').addEventListener('click', function () {
+            yl_showArrows = !yl_showArrows;
+            this.textContent = yl_showArrows ? '隐藏数据流箭头' : '显示数据流箭头';
+            yl_drawAll();
+        });
+        // 按钮：重绘
+        document.getElementById('yl_btnRedraw').addEventListener('click', yl_drawAll);
+
+        // 启动
+        yl_resize();
+        window.addEventListener('resize', yl_resize);
+    })();
+    </script>
+</body>
+</html>

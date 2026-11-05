@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mermaid · 智能客服系统流程图与 ER 图</title>
+    <!-- 姓名：张浩扬  建立时间：2026-11-05 14:21:09  模型：Xiaomi MiMo-V2.6-Pro  功能：基于 Mermaid 的智能客服系统流程图与 ER 图（Mermaid 库本地化于 cdn/mermaid/） -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        code {
+            padding: 1px 6px;
+            background: #eef2f7;
+            border-radius: 4px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            color: #c7254e;
+            word-break: break-all;
+        }
+
+        /* ========== 页面框架 ========== */
+        .yl_wrap {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .yl_title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+        .yl_desc {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .yl_card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+        .yl_section {
+            color: #2980b9;
+            font-size: 19px;
+            border-left: 4px solid #2980b9;
+            padding-left: 10px;
+            margin-bottom: 16px;
+        }
+        .yl_text {
+            font-size: 14px;
+            line-height: 1.9;
+            color: #444;
+            margin-bottom: 10px;
+        }
+        .yl_note {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #95a5a6;
+            line-height: 1.8;
+        }
+
+        /* ========== 图区 ========== */
+        .yl_stage {
+            min-height: 220px;
+            border: 1px solid #e8eef5;
+            border-radius: 8px;
+            background: #fff;
+            padding: 16px;
+            overflow: auto;
+            text-align: center;
+        }
+        .yl_stage svg {
+            max-width: 100%;
+            height: auto;
+        }
+        .yl_err-box {
+            display: none;
+            padding: 12px 16px;
+            background: #fdecea;
+            border-left: 4px solid #e74c3c;
+            color: #c0392b;
+            font-size: 13px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            word-break: break-all;
+        }
+        .yl_btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 14px 0 4px;
+        }
+        .yl_btn {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #3498db;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .yl_btn:hover { background: #2980b9; }
+        .yl_btn-gray {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+        .yl_btn-gray:hover { background: #d5dbdf; color: #2c3e50; }
+
+        /* ========== 核心代码 ========== */
+        .yl_raw {
+            background: #2b3137;
+            color: #d7e0ea;
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="yl_wrap">
+        <h1 class="yl_title">Mermaid · 智能客服系统流程图与 ER 图</h1>
+        <p class="yl_desc">使用 Mermaid（已下载到本地 <code>./cdn/mermaid/mermaid.min.js</code>，不依赖远程 CDN）把文字描述的图表语法自动渲染为 SVG 矢量图：图 1 为业务流程图，图 2 为数据库 ER 图。</p>
+
+        <!-- 错误提示 -->
+        <div class="yl_err-box" id="yl_err"></div>
+
+        <!-- 一、流程图 -->
+        <section class="yl_card">
+            <h2 class="yl_section">一、智能客服系统业务流程图（图 1）</h2>
+            <div class="yl_stage" id="yl_flowBox">（正在渲染流程图…）</div>
+            <div class="yl_btns">
+                <button class="yl_btn" id="yl_btnDir" type="button">切换布局方向（当前：TD 自上而下）</button>
+                <button class="yl_btn yl_btn-gray" id="yl_btnTheme" type="button">切换主题（当前：default）</button>
+            </div>
+            <p class="yl_note">提示：流程覆盖"渠道接入 → 语义理解 → 意图分流 → 知识检索 → RAG 生成 → 答案校验 → 满意度回访"，虚线为用户反馈驱动的知识库更新与模型微调闭环；节点形状：圆角矩形=处理、菱形=判断。</p>
+        </section>
+
+        <!-- 二、ER 图 -->
+        <section class="yl_card">
+            <h2 class="yl_section">二、智能客服系统 ER 图（图 2）</h2>
+            <div class="yl_stage" id="yl_erBox">（正在渲染 ER 图…）</div>
+            <div class="yl_btns">
+                <button class="yl_btn yl_btn-gray" id="yl_btnErTheme" type="button">切换 ER 图主题（当前：default）</button>
+            </div>
+            <p class="yl_note">提示：ER 图描述用户、会话、消息、坐席、工单、知识库、知识条目、反馈、评价 9 个实体及其关系；||--o{ 表示"一对多"，}o--o{ 表示"多对多"，PK / FK 标注主外键。</p>
+        </section>
+
+        <!-- 三、核心实现 -->
+        <section class="yl_card">
+            <h2 class="yl_section">三、核心实现：Mermaid 使用要点</h2>
+            <p class="yl_text">Mermaid 库已按要求<b>下载到本地 <code>cdn/mermaid/</code> 目录</b>（mermaid.min.js 约 3.5MB，官方发行版 UMD 构建），页面以相对路径引用、离线可用。用法：先 <code>mermaid.initialize()</code> 配置主题，再调用 <code>mermaid.render(唯一id, 图表语法)</code> 得到 SVG 字符串插入容器；图表本身只需书写 <b>mermaid 文本语法</b>（flowchart / erDiagram），无需手写图形坐标。</p>
+            <pre class="yl_raw">// 1. 初始化（关闭自动渲染，改为手动控制）
+mermaid.initialize({ startOnLoad: false, theme: 'default' });
+
+// 2. 流程图语法（节选）
+flowchart TD
+    A["用户发起咨询"] --&gt; B{"意图识别"}
+    B --&gt;|"业务咨询"| F["检索知识库"]
+    F --&gt; I["混合检索：向量+关键词+图谱"]
+    I --&gt; K["大模型 RAG 生成"]
+    K --&gt; M["答案返回用户"]
+    M -.-&gt;|"反馈数据"| R["知识库更新与模型微调"]
+
+// 3. ER 图语法（节选）
+erDiagram
+    USER ||--o{ SESSION : "发起"
+    SESSION ||--o{ MESSAGE : "包含"
+    KNOWLEDGE_BASE ||--o{ KNOWLEDGE_ITEM : "收录"
+    USER {
+        string user_id PK
+        string nickname
+    }
+
+// 4. 渲染为 SVG 并插入页面
+var yl_res = await mermaid.render('yl_svg_' + yl_n, yl_flowCode);
+document.getElementById('yl_flowBox').innerHTML = yl_res.svg;</pre>
+        </section>
+    </div>
+
+    <script src="./cdn/mermaid/mermaid.min.js"></script>
+    <script>
+    // 姓名：张浩扬  建立时间：2026-11-05 14:21:09  模型：Xiaomi MiMo-V2.6-Pro  功能：基于 Mermaid 的智能客服系统流程图与 ER 图
+    (function () {
+        var yl_errEl = document.getElementById('yl_err');
+
+        // 未加载成功时给出提示
+        if (typeof mermaid === 'undefined') {
+            yl_errEl.style.display = 'block';
+            yl_errEl.textContent = 'Mermaid 脚本未加载：请确认 ./cdn/mermaid/mermaid.min.js 文件存在后刷新页面。';
+            document.getElementById('yl_flowBox').textContent = '（流程图未渲染）';
+            document.getElementById('yl_erBox').textContent = '（ER 图未渲染）';
+            return;
+        }
+
+        var yl_uid = 0;               // 渲染用的唯一 id 计数
+        var yl_flowDir = 'TD';        // TD 自上而下 / LR 自左向右
+        var yl_theme = 'default';     // 流程图主题
+        var yl_erTheme = 'default';   // ER 图主题
+
+        // ========== 图表语法（mermaid 文本 DSL） ==========
+        function yl_flowCode() {
+            return [
+                'flowchart ' + yl_flowDir,
+                '    A["用户发起咨询"] --> B{"渠道类型"}',
+                '    B -->|"文本"| C["NLU 语义理解"]',
+                '    B -->|"语音"| D["ASR 语音识别"]',
+                '    D --> C',
+                '    C --> E{"意图识别"}',
+                '    E -->|"业务咨询"| F["检索知识库"]',
+                '    E -->|"闲聊寒暄"| G["闲聊应答"]',
+                '    E -->|"无法识别"| H["澄清追问"]',
+                '    F --> I["混合检索：向量+关键词+图谱"]',
+                '    I --> J["重排序与过滤"]',
+                '    J --> K["大模型 RAG 生成"]',
+                '    K --> L{"答案校验与溯源"}',
+                '    L -->|"通过"| M["答案返回用户"]',
+                '    L -->|"不通过"| H',
+                '    H --> C',
+                '    M --> N["记录会话日志"]',
+                '    N --> O{"用户满意？"}',
+                '    O -->|"是"| P["结束会话"]',
+                '    O -->|"否"| Q["转人工客服"]',
+                '    Q --> P',
+                '    N -.->|"反馈数据"| R["知识库更新与模型微调"]',
+                '    R -.->|"增量更新"| I'
+            ].join('\n');
+        }
+
+        var yl_erCode = [
+            'erDiagram',
+            '    USER ||--o{ SESSION : "发起"',
+            '    SESSION ||--o{ MESSAGE : "包含"',
+            '    SESSION }o--|| AGENT : "转接"',
+            '    SESSION }o--o{ KNOWLEDGE_ITEM : "引用"',
+            '    MESSAGE }o--o{ KNOWLEDGE_ITEM : "溯源"',
+            '    KNOWLEDGE_BASE ||--o{ KNOWLEDGE_ITEM : "收录"',
+            '    KNOWLEDGE_ITEM ||--o{ FEEDBACK : "产生"',
+            '    USER ||--o{ TICKET : "提交"',
+            '    TICKET }o--|| AGENT : "处理"',
+            '    SESSION ||--o{ EVALUATION : "评价"',
+            '    USER {',
+            '        string user_id PK',
+            '        string nickname',
+            '        string channel',
+            '        datetime created_at',
+            '    }',
+            '    SESSION {',
+            '        string session_id PK',
+            '        string user_id FK',
+            '        string status',
+            '        datetime start_time',
+            '    }',
+            '    MESSAGE {',
+            '        string message_id PK',
+            '        string session_id FK',
+            '        string role',
+            '        text content',
+            '    }',
+            '    AGENT {',
+            '        string agent_id PK',
+            '        string name',
+            '        string skill_group',
+            '    }',
+            '    TICKET {',
+            '        string ticket_id PK',
+            '        string user_id FK',
+            '        string status',
+            '    }',
+            '    KNOWLEDGE_BASE {',
+            '        string kb_id PK',
+            '        string name',
+            '        string kb_type',
+            '    }',
+            '    KNOWLEDGE_ITEM {',
+            '        string item_id PK',
+            '        string kb_id FK',
+            '        string question',
+            '        text answer',
+            '    }',
+            '    FEEDBACK {',
+            '        string feedback_id PK',
+            '        string item_id FK',
+            '        text content',
+            '    }',
+            '    EVALUATION {',
+            '        string eval_id PK',
+            '        string session_id FK',
+            '        int score',
+            '    }'
+        ].join('\n');
+
+        // ========== 渲染封装 ==========
+        function yl_showError(yl_msg) {
+            yl_errEl.style.display = 'block';
+            yl_errEl.textContent = '渲染出错：' + yl_msg;
+        }
+
+        function yl_renderFlow() {
+            yl_uid += 1;
+            mermaid.initialize({ startOnLoad: false, theme: yl_theme });
+            mermaid.render('yl_flow_svg_' + yl_uid, yl_flowCode())
+                .then(function (yl_res) {
+                    document.getElementById('yl_flowBox').innerHTML = yl_res.svg;
+                    yl_errEl.style.display = 'none';
+                })
+                .catch(function (yl_err) {
+                    document.getElementById('yl_flowBox').textContent = '（流程图渲染失败）';
+                    yl_showError(yl_err.message || String(yl_err));
+                });
+        }
+
+        function yl_renderEr() {
+            yl_uid += 1;
+            mermaid.initialize({ startOnLoad: false, theme: yl_erTheme });
+            mermaid.render('yl_er_svg_' + yl_uid, yl_erCode)
+                .then(function (yl_res) {
+                    document.getElementById('yl_erBox').innerHTML = yl_res.svg;
+                    yl_errEl.style.display = 'none';
+                })
+                .catch(function (yl_err) {
+                    document.getElementById('yl_erBox').textContent = '（ER 图渲染失败）';
+                    yl_showError(yl_err.message || String(yl_err));
+                });
+        }
+
+        // ========== 控制按钮 ==========
+        document.getElementById('yl_btnDir').addEventListener('click', function () {
+            yl_flowDir = yl_flowDir === 'TD' ? 'LR' : 'TD';
+            this.textContent = yl_flowDir === 'TD'
+                ? '切换布局方向（当前：TD 自上而下）'
+                : '切换布局方向（当前：LR 自左向右）';
+            yl_renderFlow();
+        });
+
+        document.getElementById('yl_btnTheme').addEventListener('click', function () {
+            yl_theme = yl_theme === 'default' ? 'forest' : 'default';
+            this.textContent = '切换主题（当前：' + yl_theme + '）';
+            yl_renderFlow();
+        });
+
+        document.getElementById('yl_btnErTheme').addEventListener('click', function () {
+            yl_erTheme = yl_erTheme === 'default' ? 'neutral' : 'default';
+            this.textContent = '切换 ER 图主题（当前：' + yl_erTheme + '）';
+            yl_renderEr();
+        });
+
+        // ========== 首次渲染 ==========
+        yl_renderFlow();
+        yl_renderEr();
+    })();
+    </script>
+</body>
+</html>

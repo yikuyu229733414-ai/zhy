@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基于知识库的智能客服系统（科研方向）</title>
+    <!-- 姓名：张浩扬  建立时间：2026-11-05 13:55:28  模型：Xiaomi MiMo-V2.6-Pro  功能：基于知识库的智能客服系统架构图（SVG 科研图示：系统总体架构、RAG 问答流程、研究方向标注） -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f7f8fa;
+            color: #2b2b2b;
+        }
+        code {
+            padding: 1px 6px;
+            background: #eef2f7;
+            border-radius: 4px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            color: #a12c3e;
+            word-break: break-all;
+        }
+
+        /* ========== 页面框架（科研风格） ========== */
+        .yl_wrap {
+            max-width: 1060px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .yl_title {
+            text-align: center;
+            font-family: SimSun, "宋体", serif;
+            font-size: 25px;
+            color: #1f3350;
+            margin-bottom: 10px;
+        }
+        .yl_abstract {
+            max-width: 880px;
+            margin: 0 auto 26px;
+            padding: 14px 20px;
+            background: #fff;
+            border-left: 4px solid #3b5f8a;
+            font-size: 13.5px;
+            line-height: 2;
+            color: #444;
+            text-align: justify;
+        }
+        .yl_abstract b {
+            color: #1f3350;
+            font-family: SimSun, "宋体", serif;
+        }
+        .yl_card {
+            background: #fff;
+            border: 1px solid #e4e8ee;
+            border-radius: 4px;
+            padding: 22px 26px;
+            margin-bottom: 22px;
+        }
+        .yl_section {
+            font-family: SimSun, "宋体", serif;
+            color: #1f3350;
+            font-size: 19px;
+            border-left: 4px solid #3b5f8a;
+            padding-left: 10px;
+            margin-bottom: 16px;
+        }
+        .yl_text {
+            font-size: 14px;
+            line-height: 2;
+            color: #444;
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        /* ========== SVG 图区 ========== */
+        .yl_stage {
+            border: 1px solid #dfe4ea;
+            background: #fff;
+            padding: 6px;
+        }
+        .yl_stage svg {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        .yl_fig-cap {
+            margin: 12px 0 6px;
+            text-align: center;
+            font-family: SimSun, "宋体", serif;
+            font-weight: bold;
+            font-size: 15px;
+            color: #1f3350;
+        }
+        .yl_fig-legend {
+            text-align: center;
+            font-size: 12px;
+            color: #7a828c;
+            margin-bottom: 12px;
+            line-height: 1.9;
+        }
+        .yl_info {
+            margin-top: 10px;
+            padding: 10px 16px;
+            background: #f7f9fc;
+            border: 1px solid #e4e8ee;
+            font-size: 13px;
+            color: #555;
+            min-height: 40px;
+            line-height: 1.8;
+        }
+        .yl_info b { color: #1f3350; }
+        .yl_btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .yl_btn {
+            padding: 8px 18px;
+            border: 1px solid #3b5f8a;
+            border-radius: 3px;
+            background: #fff;
+            color: #3b5f8a;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .yl_btn:hover {
+            background: #3b5f8a;
+            color: #fff;
+        }
+
+        /* ========== 研究方向列表 ========== */
+        .yl_research {
+            counter-reset: yl_rc;
+        }
+        .yl_research li {
+            position: relative;
+            padding: 12px 16px 12px 58px;
+            border-bottom: 1px dashed #e0e4ea;
+            font-size: 14px;
+            line-height: 1.95;
+            color: #444;
+        }
+        .yl_research li:last-child { border-bottom: none; }
+        .yl_research li::before {
+            counter-increment: yl_rc;
+            content: counter(yl_rc);
+            position: absolute;
+            left: 12px;
+            top: 16px;
+            width: 28px;
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+            border-radius: 50%;
+            background: #b03a2e;
+            color: #fff;
+            font-family: Georgia, serif;
+            font-size: 15px;
+        }
+        .yl_research b {
+            color: #1f3350;
+        }
+
+        /* ========== 核心代码 ========== */
+        .yl_raw {
+            background: #2b3137;
+            color: #d7e0ea;
+            border-radius: 6px;
+            padding: 14px 16px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="yl_wrap">
+        <h1 class="yl_title">基于知识库的智能客服系统架构（科研方向）</h1>
+        <p class="yl_abstract"><b>摘要：</b>面向大规模并发咨询场景，设计并实现以知识库为核心、以大语言模型为推理引擎的智能客服系统。系统采用分层架构，自下而上涵盖数据支撑、学习优化、知识与推理、对话管理、智能交互与用户接入六层；围绕知识图谱构建、检索增强生成（RAG）、对话状态建模、幻觉抑制与可解释性、多模态交互、持续学习与评估六个研究方向开展工作。图 1 为系统总体架构，图 2 为基于知识库的检索增强问答流程，两图均以 SVG 矢量格式绘制。</p>
+
+        <!-- 一、系统总体架构 -->
+        <section class="yl_card">
+            <h2 class="yl_section">一、系统总体架构（图 1）</h2>
+            <div class="yl_stage">
+                <svg id="yl_svg1" viewBox="0 0 1040 580" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <marker id="yl_arr" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+                            <path d="M0,0 L10,4 L0,8 z" fill="#55606c"></path>
+                        </marker>
+                    </defs>
+
+                    <!-- 第 1 层：用户与接入层 -->
+                    <g class="yl-layer">
+                        <rect x="30" y="20" width="730" height="72" rx="6" fill="#eef3f9" stroke="#3b5f8a"></rect>
+                        <rect x="30" y="20" width="118" height="72" rx="6" fill="#3b5f8a"></rect>
+                        <text x="89" y="61" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">用户与接入层</text>
+                        <g class="yl-node" data-desc="客户以文本或语音方式发起咨询，是系统服务的起点。">
+                            <rect x="158" y="34" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="228" y="61" text-anchor="middle" font-size="13" fill="#2b2b2b">用户咨询</text>
+                        </g>
+                        <g class="yl-node" data-desc="Web / App / 小程序 / 企业微信等多渠道统一接入。">
+                            <rect x="309" y="34" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="379" y="61" text-anchor="middle" font-size="13" fill="#2b2b2b">多渠道接入</text>
+                        </g>
+                        <g class="yl-node" data-desc="电话热线与语音坐席接入，支持语音客服场景。">
+                            <rect x="460" y="34" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="530" y="61" text-anchor="middle" font-size="13" fill="#2b2b2b">语音热线</text>
+                        </g>
+                    </g>
+                    <!-- 层间箭头 1 -->
+                    <line x1="250" y1="94" x2="250" y2="110" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr)"></line>
+                    <line x1="450" y1="94" x2="450" y2="110" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr)"></line>
+                    <line x1="650" y1="110" x2="650" y2="94" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr)"></line>
+
+                    <!-- 第 2 层：智能交互层 -->
+                    <g class="yl-layer">
+                        <rect x="30" y="112" width="730" height="72" rx="6" fill="#eef6f1" stroke="#4f7c63"></rect>
+                        <rect x="30" y="112" width="118" height="72" rx="6" fill="#4f7c63"></rect>
+                        <text x="89" y="153" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">智能交互层</text>
+                        <g class="yl-node" data-desc="语音识别（ASR）：将用户语音转写为文本。">
+                            <rect x="158" y="126" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="228" y="153" text-anchor="middle" font-size="13" fill="#2b2b2b">语音识别 ASR</text>
+                        </g>
+                        <g class="yl-node" data-desc="自然语言理解（NLU）：意图识别、实体抽取、情感分析。">
+                            <rect x="309" y="126" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="379" y="153" text-anchor="middle" font-size="13" fill="#2b2b2b">语义理解 NLU</text>
+                        </g>
+                        <g class="yl-node" data-desc="语音合成（TTS）：将系统回复合成为语音播报。">
+                            <rect x="460" y="126" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="530" y="153" text-anchor="middle" font-size="13" fill="#2b2b2b">语音合成 TTS</text>
+                        </g>
+                        <g class="yl-node" data-desc="多模态理解：支持图片、截图、表单等多模态输入，对应研究方向⑤。">
+                            <rect x="611" y="126" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="681" y="153" text-anchor="middle" font-size="13" fill="#2b2b2b">多模态理解</text>
+                            <g class="yl-badge-g"><circle cx="744" cy="126" r="11" fill="#b03a2e"></circle><text x="744" y="130" text-anchor="middle" fill="#fff" font-size="11">5</text></g>
+                        </g>
+                    </g>
+                    <!-- 层间箭头 2 -->
+                    <line x1="250" y1="186" x2="250" y2="202" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr)"></line>
+                    <line x1="450" y1="186" x2="450" y2="202" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr)"></line>
+                    <line x1="650" y1="202" x2="650" y2="186" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr)"></line>
+
+                    <!-- 第 3 层：对话管理层 -->
+                    <g class="yl-layer">
+                        <rect x="30" y="204" width="730" height="72" rx="6" fill="#faf3e8" stroke="#8a6d3b"></rect>
+                        <rect x="30" y="204" width="118" height="72" rx="6" fill="#8a6d3b"></rect>
+                        <text x="89" y="245" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">对话管理层</text>
+                        <g class="yl-node" data-desc="对话状态跟踪（DST）：维护多轮对话槽位与上下文状态，对应研究方向③。">
+                            <rect x="158" y="218" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="228" y="245" text-anchor="middle" font-size="13" fill="#2b2b2b">状态跟踪 DST</text>
+                            <g class="yl-badge-g"><circle cx="291" cy="218" r="11" fill="#b03a2e"></circle><text x="291" y="222" text-anchor="middle" fill="#fff" font-size="11">3</text></g>
+                        </g>
+                        <g class="yl-node" data-desc="对话策略决策：选择回答、澄清、转人工等动作。">
+                            <rect x="309" y="218" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="379" y="245" text-anchor="middle" font-size="13" fill="#2b2b2b">策略决策</text>
+                        </g>
+                        <g class="yl-node" data-desc="上下文管理：管理会话历史、指代消解与多轮记忆。">
+                            <rect x="460" y="218" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="530" y="245" text-anchor="middle" font-size="13" fill="#2b2b2b">上下文管理</text>
+                        </g>
+                        <g class="yl-node" data-desc="回复生成：组织自然语言回复并支持话术模板。">
+                            <rect x="611" y="218" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="681" y="245" text-anchor="middle" font-size="13" fill="#2b2b2b">回复生成</text>
+                        </g>
+                    </g>
+                    <!-- 层间箭头 3 -->
+                    <line x1="250" y1="278" x2="250" y2="294" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr)"></line>
+                    <line x1="450" y1="278" x2="450" y2="294" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr)"></line>
+                    <line x1="650" y1="294" x2="650" y2="278" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr)"></line>
+
+                    <!-- 第 4 层：知识与推理层 -->
+                    <g class="yl-layer">
+                        <rect x="30" y="296" width="730" height="72" rx="6" fill="#f2eef8" stroke="#6b5b95"></rect>
+                        <rect x="30" y="296" width="118" height="72" rx="6" fill="#6b5b95"></rect>
+                        <text x="89" y="337" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">知识与推理层</text>
+                        <g class="yl-node" data-desc="知识库：FAQ 问答对、文档库、领域知识图谱，对应研究方向①。">
+                            <rect x="158" y="310" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="228" y="337" text-anchor="middle" font-size="13" fill="#2b2b2b">知识库</text>
+                            <g class="yl-badge-g"><circle cx="291" cy="310" r="11" fill="#b03a2e"></circle><text x="291" y="314" text-anchor="middle" fill="#fff" font-size="11">1</text></g>
+                        </g>
+                        <g class="yl-node" data-desc="向量数据库：存储文本 Embedding 向量，支持语义相似检索。">
+                            <rect x="309" y="310" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="379" y="337" text-anchor="middle" font-size="13" fill="#2b2b2b">向量数据库</text>
+                        </g>
+                        <g class="yl-node" data-desc="混合检索与重排序：向量召回 + 关键词检索 + 知识图谱查询，对应研究方向②。">
+                            <rect x="460" y="310" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="530" y="337" text-anchor="middle" font-size="13" fill="#2b2b2b">混合检索</text>
+                            <g class="yl-badge-g"><circle cx="593" cy="310" r="11" fill="#b03a2e"></circle><text x="593" y="314" text-anchor="middle" fill="#fff" font-size="11">2</text></g>
+                        </g>
+                        <g class="yl-node" data-desc="大语言模型 RAG：检索增强生成与知识溯源，抑制幻觉，对应研究方向④。">
+                            <rect x="611" y="310" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="681" y="337" text-anchor="middle" font-size="13" fill="#2b2b2b">大模型 RAG</text>
+                            <g class="yl-badge-g"><circle cx="744" cy="310" r="11" fill="#b03a2e"></circle><text x="744" y="314" text-anchor="middle" fill="#fff" font-size="11">4</text></g>
+                        </g>
+                    </g>
+                    <!-- 层间箭头 4 -->
+                    <line x1="250" y1="370" x2="250" y2="386" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr)"></line>
+                    <line x1="450" y1="370" x2="450" y2="386" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr)"></line>
+                    <line x1="650" y1="386" x2="650" y2="370" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr)"></line>
+
+                    <!-- 第 5 层：学习与优化层 -->
+                    <g class="yl-layer">
+                        <rect x="30" y="388" width="730" height="72" rx="6" fill="#faf0ee" stroke="#a05a4c"></rect>
+                        <rect x="30" y="388" width="118" height="72" rx="6" fill="#a05a4c"></rect>
+                        <text x="89" y="429" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">学习与优化层</text>
+                        <g class="yl-node" data-desc="模型微调训练：基于领域语料微调意图识别与生成模型。">
+                            <rect x="158" y="402" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="228" y="429" text-anchor="middle" font-size="13" fill="#2b2b2b">模型微调</text>
+                        </g>
+                        <g class="yl-node" data-desc="向量化（Embedding）：文本向量化表示与索引更新。">
+                            <rect x="309" y="402" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="379" y="429" text-anchor="middle" font-size="13" fill="#2b2b2b">向量化</text>
+                        </g>
+                        <g class="yl-node" data-desc="反馈学习：利用用户反馈与人工校正进行强化学习优化。">
+                            <rect x="460" y="402" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="530" y="429" text-anchor="middle" font-size="13" fill="#2b2b2b">反馈学习</text>
+                        </g>
+                        <g class="yl-node" data-desc="效果评估：准确率、响应时延、解决率、满意度等多指标评估，对应研究方向⑥。">
+                            <rect x="611" y="402" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="681" y="429" text-anchor="middle" font-size="13" fill="#2b2b2b">效果评估</text>
+                            <g class="yl-badge-g"><circle cx="744" cy="402" r="11" fill="#b03a2e"></circle><text x="744" y="406" text-anchor="middle" fill="#fff" font-size="11">6</text></g>
+                        </g>
+                    </g>
+                    <!-- 层间箭头 5 -->
+                    <line x1="250" y1="462" x2="250" y2="478" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr)"></line>
+                    <line x1="450" y1="462" x2="450" y2="478" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr)"></line>
+                    <line x1="650" y1="478" x2="650" y2="462" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr)"></line>
+
+                    <!-- 第 6 层：数据与支撑层 -->
+                    <g class="yl-layer">
+                        <rect x="30" y="480" width="730" height="72" rx="6" fill="#f0f2f4" stroke="#6a737d"></rect>
+                        <rect x="30" y="480" width="118" height="72" rx="6" fill="#6a737d"></rect>
+                        <text x="89" y="521" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">数据与支撑层</text>
+                        <g class="yl-node" data-desc="业务系统 / 工单：订单、物流、售后等业务数据与人工工单。">
+                            <rect x="158" y="494" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="228" y="521" text-anchor="middle" font-size="13" fill="#2b2b2b">业务系统</text>
+                        </g>
+                        <g class="yl-node" data-desc="用户画像：用户标签、历史行为与偏好建模。">
+                            <rect x="309" y="494" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="379" y="521" text-anchor="middle" font-size="13" fill="#2b2b2b">用户画像</text>
+                        </g>
+                        <g class="yl-node" data-desc="日志与审计：全链路会话日志记录、追踪与审计。">
+                            <rect x="460" y="494" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="530" y="521" text-anchor="middle" font-size="13" fill="#2b2b2b">日志审计</text>
+                        </g>
+                        <g class="yl-node" data-desc="安全与合规：数据脱敏、隐私保护与内容安全审核。">
+                            <rect x="611" y="494" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"></rect>
+                            <text x="681" y="521" text-anchor="middle" font-size="13" fill="#2b2b2b">安全合规</text>
+                        </g>
+                    </g>
+
+                    <!-- 右侧研究方向标注列 -->
+                    <g class="yl-layer">
+                        <rect x="790" y="20" width="220" height="532" rx="6" fill="#fffdf9" stroke="#b03a2e" stroke-dasharray="6 4"></rect>
+                        <text x="900" y="50" text-anchor="middle" font-size="15" font-weight="bold" fill="#b03a2e">研究方向</text>
+                        <g class="yl-badge-g">
+                            <circle cx="818" cy="88" r="11" fill="#b03a2e"></circle><text x="818" y="92" text-anchor="middle" fill="#fff" font-size="11">1</text>
+                            <text x="838" y="93" font-size="13" fill="#2b2b2b">知识图谱构建</text>
+                            <circle cx="818" cy="128" r="11" fill="#b03a2e"></circle><text x="818" y="132" text-anchor="middle" fill="#fff" font-size="11">2</text>
+                            <text x="838" y="133" font-size="13" fill="#2b2b2b">检索增强生成 RAG</text>
+                            <circle cx="818" cy="168" r="11" fill="#b03a2e"></circle><text x="818" y="172" text-anchor="middle" fill="#fff" font-size="11">3</text>
+                            <text x="838" y="173" font-size="13" fill="#2b2b2b">对话状态建模</text>
+                            <circle cx="818" cy="208" r="11" fill="#b03a2e"></circle><text x="818" y="212" text-anchor="middle" fill="#fff" font-size="11">4</text>
+                            <text x="838" y="213" font-size="13" fill="#2b2b2b">幻觉抑制与可解释</text>
+                            <circle cx="818" cy="248" r="11" fill="#b03a2e"></circle><text x="818" y="252" text-anchor="middle" fill="#fff" font-size="11">5</text>
+                            <text x="838" y="253" font-size="13" fill="#2b2b2b">多模态智能交互</text>
+                            <circle cx="818" cy="288" r="11" fill="#b03a2e"></circle><text x="818" y="292" text-anchor="middle" fill="#fff" font-size="11">6</text>
+                            <text x="838" y="293" font-size="13" fill="#2b2b2b">持续学习与评估</text>
+                        </g>
+                        <text x="900" y="345" text-anchor="middle" font-size="12" fill="#7a828c">标注含义：</text>
+                        <text x="900" y="368" text-anchor="middle" font-size="12" fill="#7a828c">数字圆标对应系统中</text>
+                        <text x="900" y="389" text-anchor="middle" font-size="12" fill="#7a828c">重点研究的模块，</text>
+                        <text x="900" y="410" text-anchor="middle" font-size="12" fill="#7a828c">详见下方研究方向。</text>
+                    </g>
+
+                    <!-- 底部图例 -->
+                    <g class="yl-node" data-desc="图例：实线箭头表示层间调用与数据流向（向下为请求，向上为返回/反馈）。">
+                        <line x1="30" y1="568" x2="66" y2="568" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr)"></line>
+                        <text x="74" y="572" font-size="12" fill="#7a828c">调用与数据流向</text>
+                        <circle cx="220" cy="568" r="9" fill="#b03a2e"></circle>
+                        <text x="220" y="572" text-anchor="middle" fill="#fff" font-size="10">n</text>
+                        <text x="236" y="572" font-size="12" fill="#7a828c">研究方向标注</text>
+                    </g>
+                </svg>
+            </div>
+            <p class="yl_fig-cap">图 1　基于知识库的智能客服系统总体架构</p>
+            <p class="yl_fig-legend">注：实线箭头表示层间调用与数据流向（向下为请求方向，向上为返回/反馈方向）；红色数字圆标为研究方向标注，与右栏及下文一一对应。</p>
+            <div class="yl_info" id="yl_info1">将鼠标悬停在图中任意模块上查看功能说明。</div>
+            <div class="yl_btns">
+                <button class="yl_btn" id="yl_btnBadge" type="button">隐藏研究方向标注</button>
+            </div>
+        </section>
+
+        <!-- 二、研究方向 -->
+        <section class="yl_card">
+            <h2 class="yl_section">二、核心研究方向（对应图 1 标注 ①–⑥）</h2>
+            <ol class="yl_research">
+                <li><b>知识表示与知识图谱构建：</b>面向客服领域的实体识别、关系抽取与知识图谱补全方法研究，支持结构化知识的存储、更新与一致性维护。</li>
+                <li><b>检索增强生成（RAG）：</b>稠密向量检索与关键词检索的混合召回策略、重排序模型设计，以及检索结果注入大模型提示的生成增强机制。</li>
+                <li><b>意图识别与对话状态跟踪：</b>基于预训练语言模型的意图分类、实体抽取与多轮对话状态（DST）建模，提升复杂咨询下的语义理解准确率。</li>
+                <li><b>大模型幻觉抑制与可解释性：</b>知识溯源（引用定位）、置信度校准与答案一致性约束，降低无依据生成并提供可解释的回答依据。</li>
+                <li><b>多模态智能客服：</b>融合文本、语音、图像（如订单截图识别）的多模态交互方法，扩展智能客服的输入形态与服务能力。</li>
+                <li><b>持续学习与效果评估：</b>用户反馈驱动的增量学习与模型迭代机制，以及涵盖准确率、响应时延、问题解决率、用户满意度的多指标评估体系。</li>
+            </ol>
+        </section>
+
+        <!-- 三、RAG 问答流程 -->
+        <section class="yl_card">
+            <h2 class="yl_section">三、基于知识库的检索增强问答流程（图 2）</h2>
+            <div class="yl_stage">
+                <svg id="yl_svg2" viewBox="0 0 1040 560" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <marker id="yl_arr2" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+                            <path d="M0,0 L10,4 L0,8 z" fill="#55606c"></path>
+                        </marker>
+                    </defs>
+
+                    <!-- 主流程（自上而下） -->
+                    <g class="yl-node" data-desc="用户提问：接收文本或语音形式的咨询问题。">
+                        <rect x="280" y="20" width="480" height="48" rx="8" fill="#eef3f9" stroke="#3b5f8a"></rect>
+                        <text x="520" y="49" text-anchor="middle" font-size="14" font-weight="bold" fill="#1f3350">用户提问</text>
+                    </g>
+                    <line x1="520" y1="68" x2="520" y2="82" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr2)"></line>
+
+                    <g class="yl-node" data-desc="查询理解：意图识别、实体抽取、指代消解与查询改写。">
+                        <rect x="280" y="84" width="480" height="48" rx="8" fill="#fff" stroke="#4a5568"></rect>
+                        <text x="520" y="113" text-anchor="middle" font-size="14" fill="#2b2b2b">查询理解（意图识别 / 实体抽取 / 指代消解）</text>
+                    </g>
+                    <line x1="520" y1="132" x2="520" y2="146" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr2)"></line>
+
+                    <g class="yl-node" data-desc="混合检索：向量召回 + 关键词检索 + 知识图谱查询三路融合。">
+                        <rect x="280" y="148" width="480" height="48" rx="8" fill="#fff" stroke="#4a5568"></rect>
+                        <text x="520" y="177" text-anchor="middle" font-size="14" fill="#2b2b2b">混合检索（向量召回 + 关键词 + 知识图谱）</text>
+                    </g>
+                    <line x1="520" y1="196" x2="520" y2="210" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr2)"></line>
+
+                    <g class="yl-node" data-desc="重排序与过滤：对召回候选计算相关性得分，过滤低质量内容。">
+                        <rect x="280" y="212" width="480" height="48" rx="8" fill="#fff" stroke="#4a5568"></rect>
+                        <text x="520" y="241" text-anchor="middle" font-size="14" fill="#2b2b2b">重排序与过滤</text>
+                    </g>
+                    <line x1="520" y1="260" x2="520" y2="274" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr2)"></line>
+
+                    <g class="yl-node" data-desc="大模型生成（RAG）：将检索到的知识片段注入提示模板，生成有依据的回答。">
+                        <rect x="280" y="276" width="480" height="48" rx="8" fill="#f2eef8" stroke="#6b5b95"></rect>
+                        <text x="520" y="305" text-anchor="middle" font-size="14" fill="#2b2b2b">大模型生成（RAG 提示增强）</text>
+                    </g>
+                    <line x1="520" y1="324" x2="520" y2="338" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr2)"></line>
+
+                    <g class="yl-node" data-desc="答案校验与溯源：核对答案与知识来源的一致性，输出引用依据。">
+                        <rect x="280" y="340" width="480" height="48" rx="8" fill="#fff" stroke="#4a5568"></rect>
+                        <text x="520" y="369" text-anchor="middle" font-size="14" fill="#2b2b2b">答案校验与知识溯源</text>
+                    </g>
+                    <line x1="520" y1="388" x2="520" y2="402" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr2)"></line>
+
+                    <g class="yl-node" data-desc="答案返回用户：输出最终回复，并记录本次会话日志。">
+                        <rect x="280" y="404" width="480" height="48" rx="8" fill="#eef3f9" stroke="#3b5f8a"></rect>
+                        <text x="520" y="433" text-anchor="middle" font-size="14" font-weight="bold" fill="#1f3350">答案返回用户</text>
+                    </g>
+
+                    <!-- 右侧：知识库 -->
+                    <g class="yl-node" data-desc="知识库：FAQ 问答对、文档库、领域知识图谱、向量数据库。">
+                        <rect x="800" y="148" width="210" height="176" rx="8" fill="#fffdf9" stroke="#b03a2e" stroke-dasharray="6 4"></rect>
+                        <text x="905" y="196" text-anchor="middle" font-size="15" font-weight="bold" fill="#b03a2e">知识库</text>
+                        <text x="905" y="224" text-anchor="middle" font-size="12.5" fill="#2b2b2b">FAQ 问答对</text>
+                        <text x="905" y="247" text-anchor="middle" font-size="12.5" fill="#2b2b2b">文档库</text>
+                        <text x="905" y="270" text-anchor="middle" font-size="12.5" fill="#2b2b2b">领域知识图谱</text>
+                        <text x="905" y="293" text-anchor="middle" font-size="12.5" fill="#2b2b2b">向量数据库</text>
+                    </g>
+                    <!-- 知识库 ↔ 混合检索 -->
+                    <line x1="800" y1="172" x2="764" y2="172" stroke="#b03a2e" stroke-width="1.6" marker-end="url(#yl_arr2)"></line>
+                    <line x1="766" y1="196" x2="802" y2="196" stroke="#b03a2e" stroke-width="1.6" marker-end="url(#yl_arr2)"></line>
+                    <text x="782" y="146" text-anchor="middle" font-size="11.5" fill="#b03a2e">检索 / 注入</text>
+
+                    <!-- 左侧：反馈更新回路（虚线） -->
+                    <g class="yl-node" data-desc="用户反馈与人工校正：满意度评价、纠错标注与转人工记录。">
+                        <rect x="30" y="404" width="210" height="48" rx="8" fill="#faf0ee" stroke="#a05a4c"></rect>
+                        <text x="135" y="433" text-anchor="middle" font-size="13.5" fill="#2b2b2b">用户反馈与人工校正</text>
+                    </g>
+                    <line x1="240" y1="428" x2="276" y2="428" stroke="#a05a4c" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#yl_arr2)"></line>
+
+                    <g class="yl-node" data-desc="知识库更新与模型微调：基于反馈进行知识增量更新与模型迭代。">
+                        <rect x="30" y="488" width="480" height="48" rx="8" fill="#faf0ee" stroke="#a05a4c"></rect>
+                        <text x="270" y="517" text-anchor="middle" font-size="13.5" fill="#2b2b2b">知识库更新与模型微调（持续学习）</text>
+                    </g>
+                    <line x1="135" y1="452" x2="135" y2="484" stroke="#a05a4c" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#yl_arr2)"></line>
+                    <line x1="510" y1="512" x2="820" y2="328" stroke="#a05a4c" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#yl_arr2)"></line>
+                    <text x="640" y="470" text-anchor="middle" font-size="11.5" fill="#a05a4c">增量更新</text>
+
+                    <!-- 图内图例 -->
+                    <g class="yl-node" data-desc="图例：实线为问答主流程，虚线为反馈与持续学习回路。">
+                        <line x1="30" y1="548" x2="66" y2="548" stroke="#55606c" stroke-width="1.6" marker-end="url(#yl_arr2)"></line>
+                        <text x="74" y="552" font-size="12" fill="#7a828c">问答主流程</text>
+                        <line x1="180" y1="548" x2="216" y2="548" stroke="#a05a4c" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#yl_arr2)"></line>
+                        <text x="224" y="552" font-size="12" fill="#7a828c">反馈与持续学习</text>
+                    </g>
+                </svg>
+            </div>
+            <p class="yl_fig-cap">图 2　基于知识库的检索增强问答（RAG）流程</p>
+            <p class="yl_fig-legend">注：实线为“提问—检索—生成—溯源—回答”主流程；虚线为用户反馈驱动的知识库更新与模型微调闭环。</p>
+            <div class="yl_info" id="yl_info2">将鼠标悬停在图中任意节点上查看流程说明。</div>
+        </section>
+
+        <!-- 四、核心实现 -->
+        <section class="yl_card">
+            <h2 class="yl_section">四、核心实现：SVG 绘图要点</h2>
+            <p class="yl_text">两幅图均采用<b>内联 SVG 矢量格式</b>绘制：<code>&lt;svg viewBox&gt;</code> 定义坐标系并随窗口等比缩放；<code>&lt;rect&gt;、&lt;circle&gt;、&lt;line&gt;、&lt;text&gt;</code> 绘制模块、标注与文字；<code>&lt;defs&gt; + &lt;marker&gt;</code> 定义箭头并由 <code>marker-end</code> 引用；用 <code>&lt;g&gt;</code> 对模块分组并附加 <code>data-desc</code> 属性，配合少量脚本实现悬停说明与标注开关。</p>
+            <pre class="yl_raw">&lt;svg id="yl_svg1" viewBox="0 0 1040 580"&gt;
+  &lt;defs&gt;
+    &lt;marker id="yl_arr" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"&gt;
+      &lt;path d="M0,0 L10,4 L0,8 z" fill="#55606c"/&gt;   &lt;!-- 箭头形状 --&gt;
+    &lt;/marker&gt;
+  &lt;/defs&gt;
+
+  &lt;g class="yl-node" data-desc="知识库：FAQ、文档库、领域知识图谱"&gt;
+    &lt;rect x="158" y="310" width="141" height="44" rx="6" fill="#fff" stroke="#4a5568"/&gt;
+    &lt;text x="228" y="337" text-anchor="middle"&gt;知识库&lt;/text&gt;
+    &lt;circle cx="291" cy="310" r="11" fill="#b03a2e"/&gt; &lt;!-- 研究方向标注 --&gt;
+    &lt;text x="291" y="314" text-anchor="middle" fill="#fff" font-size="11"&gt;1&lt;/text&gt;
+  &lt;/g&gt;
+
+  &lt;line x1="250" y1="278" x2="250" y2="294" marker-end="url(#yl_arr)"/&gt;  &lt;!-- 带箭头连线 --&gt;
+&lt;/svg&gt;</pre>
+        </section>
+    </div>
+
+    <script>
+    // 姓名：张浩扬  建立时间：2026-11-05 13:55:28  模型：Xiaomi MiMo-V2.6-Pro  功能：基于知识库的智能客服系统架构图（SVG 科研图示：系统总体架构、RAG 问答流程、研究方向标注）
+    (function () {
+        // 为 SVG 内带 data-desc 的分组绑定悬停说明
+        function yl_bind(yl_svgId, yl_infoId) {
+            var yl_svgEl = document.getElementById(yl_svgId);
+            var yl_infoEl = document.getElementById(yl_infoId);
+            var yl_default = yl_infoEl.textContent;
+            var yl_nodes = yl_svgEl.querySelectorAll('[data-desc]');
+            for (var yl_i = 0; yl_i < yl_nodes.length; yl_i++) {
+                yl_nodes[yl_i].addEventListener('mouseenter', function () {
+                    yl_infoEl.innerHTML = '<b>模块说明：</b>' + this.getAttribute('data-desc');
+                });
+                yl_nodes[yl_i].addEventListener('mouseleave', function () {
+                    yl_infoEl.textContent = yl_default;
+                });
+            }
+        }
+        yl_bind('yl_svg1', 'yl_info1');
+        yl_bind('yl_svg2', 'yl_info2');
+
+        // 研究方向标注开关（图 1 中的红色数字圆标）
+        var yl_btnBadgeEl = document.getElementById('yl_btnBadge');
+        var yl_badges = document.querySelectorAll('#yl_svg1 .yl-badge-g');
+        var yl_badgeOn = true;
+        yl_btnBadgeEl.addEventListener('click', function () {
+            yl_badgeOn = !yl_badgeOn;
+            for (var yl_j = 0; yl_j < yl_badges.length; yl_j++) {
+                yl_badges[yl_j].style.display = yl_badgeOn ? '' : 'none';
+            }
+            yl_btnBadgeEl.textContent = yl_badgeOn ? '隐藏研究方向标注' : '显示研究方向标注';
+        });
+    })();
+    </script>
+</body>
+</html>

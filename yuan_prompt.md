@@ -34,6 +34,10 @@
 - 模型：DeepSeek-V4-Pro 正式版
 - 提示词原文：设置项目规则使用原生的htnl，css和javascript实现图标使用tu biao 目录下的图标不适用第三方酷和cdn
 
+## 2026-11-12 13:59:09
+- 模型：DeepSeek-V4-Pro 正式版
+- 提示词原文：在zhy 24001010302文件夹完成chat.html，调用llm接口完成聊天功能，发送的提示词和接收的数据都在控制台输出。接口：SiliconFlow，base_url=https://api.siliconflow.cn/v1，model=deepseek-ai/DeepSeek-V4-Flash
+
 
 ## 2026-10-26 13:36:26
 - 模型：opencode/mimo-v2.6-flash-free
@@ -129,3 +133,37 @@
 - 提示词原文：整合一下上传到github
 
 
+## 2026-11-09 13:45:34
+- 模型：Xiaomi MiMo-V2.6-Pro
+- 提示词原文：在zhy 24001010302文件夹里创建AGENTS.md写下如下规则（项目结构与技术栈/命名与注释/记录文件/前端约定，详见 zhy 24001010302/AGENTS.md）
+
+
+## 2026-11-09 13:59:31
+- 模型：Xiaomi MiMo-V2.6-Pro
+- 提示词原文：初始化 zhy 24001010302 项目：git init + .gitignore（排除 node_modules、.env）+ 首次提交；创建前端首页 index.html（姓名/学号/项目名称/项目类别、页面链接导航、canvas 背景动画）；按 AGENTS.md 创建前后端目录骨架并安装依赖；readme.md；run.bat 启动后端；database.html 数据库连接测试页（知乎风格，成功/错误提示）。详见 zhy 24001010302/yuanlei_prompt.md
+
+## 2026-11-12 14:39:57
+- 模型：DeepSeek-V4-Pro 正式版
+- 提示词原文：在zhy 24001010302完成知识库上传页面和基于知识库的客服页面（RAG），基于本地PDF/TXT上传解析构建专属客服问答系统，包括知识库文件上传模块，发送给LLM和从LLM获得的信息在控制台输出。
+
+
+
+## 2026-11-16 13:58:30
+- 模型：Xiaomi MiMo-V2.6-Pro
+- 提示词原文：完成商业评论的上传和llm惊醒评价功能上传到的是一个一个excel文件,里面有若干评论，格式自拟，上传商业评论后llm会对每一个评论进行判断：好评，中评，差评 ，将结果返回，前段以饼状图的形式显示，并显示有价值的评论在根目录下生成三个excel模拟数据，每个20条评论。可以下载excel模板，返回是json,格式确定好 做的时候再改改上次做是参考是d盘的wps里的LLM应用设计-实验指导书和LLM应用设计-项目报告
+
+
+## 2026-11-16 14:30:49
+- 模型：Xiaomi MiMo-V2.6-Pro
+- 提示词原文：识别语音用qwen-asr识图用deepseek v4.1flash这是我的deepseek和qwen的url相关截图新建一个网页可以做到语音和图片识别
+
+
+---
+
+## 2026-11-16 14:35:19 | 模型：Xiaomi MiMo-V2.6-Pro
+识别语音用qwen-asr识图用deepseek v4.1flash这是我的deepseek和qwen的url相关截图新建一个网页可以做到语音和图片识别
+
+---
+
+## 2026-11-16 | 模型：Xiaomi MiMo-V2.6-Pro
+整合发到GitHub并给我一个github网页网址

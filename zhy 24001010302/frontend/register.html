@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 · 知乎模仿</title>
+    <!-- 姓名：张浩扬 | 学号：24001010302 | 建立时间：2026-11-19 13:36:32 | 大模型：Xiaomi MiMo-V2.6-Pro | 功能：注册页面（表单校验 + 图形验证码 + 密码加密存储 + 平滑动画） -->
+    <link rel="stylesheet" href="./css/yuan_login.css">
+</head>
+<body>
+    <!-- 动态渐变背景 + 漂浮光斑（纯 CSS 动画） -->
+    <div class="yuan_bg">
+        <div class="yuan_blob yuan_blob-1"></div>
+        <div class="yuan_blob yuan_blob-2"></div>
+        <div class="yuan_blob yuan_blob-3"></div>
+    </div>
+
+    <!-- 顶部导航条 -->
+    <header class="yuan_topbar">
+        <div class="yuan_topbar-inner">
+            <a class="yuan_logo" href="./index.html">知乎<span class="yuan_logo-sub">模仿</span></a>
+            <nav class="yuan_topnav">
+                <a href="./index.html">首页</a>
+                <a href="./login.html">登录</a>
+                <a class="yuan_topnav-on" href="./register.html">注册</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="yuan_wrap">
+        <div class="yuan_layout">
+        <!-- 左侧品牌面板（平面色块） -->
+        <aside class="yuan_brand">
+            <span class="yuan_brand-tag">知乎模仿 · 三级项目</span>
+            <h2 class="yuan_brand-title">注册账号<br>加入知乎模仿</h2>
+            <p class="yuan_brand-sub">注册信息经前后端双端校验，密码加密后入库，安全可靠。</p>
+            <ul class="yuan_brand-list">
+                <li><span class="yuan_brand-num">1</span>用户名 3~20 位，实时校验</li>
+                <li><span class="yuan_brand-num">2</span>密码强度提示，两次输入一致</li>
+                <li><span class="yuan_brand-num">3</span>图形验证码防止机器注册</li>
+                <li><span class="yuan_brand-num">4</span>密码加密存储，不保存明文</li>
+            </ul>
+        </aside>
+
+        <!-- 注册卡片（入场动画） -->
+        <section id="yuan_registerCard" class="yuan_card">
+            <h1 class="yuan_card-title">创建账号</h1>
+            <p class="yuan_card-sub">注册后即可登录体验知乎模仿站点</p>
+
+            <!-- 注册表单 -->
+            <form id="yuan_registerForm" class="yuan_form" novalidate>
+                <div class="yuan_field">
+                    <label class="yuan_label" for="yuan_username">用户名</label>
+                    <input id="yuan_username" class="yuan_input" type="text" placeholder="3~20 位字母、数字、中文或下划线" maxlength="20">
+                </div>
+                <div class="yuan_field">
+                    <label class="yuan_label" for="yuan_nickname">昵称（选填）</label>
+                    <input id="yuan_nickname" class="yuan_input" type="text" placeholder="不填则与用户名相同" maxlength="20">
+                </div>
+                <div class="yuan_field">
+                    <label class="yuan_label" for="yuan_password">密码</label>
+                    <input id="yuan_password" class="yuan_input" type="password" placeholder="6~20 位密码" maxlength="20">
+                    <!-- 密码强度提示 -->
+                    <div id="yuan_strength" class="yuan_strength" style="display:none;">
+                        <div class="yuan_strength-bar"><i></i><i></i><i></i></div>
+                        <div id="yuan_strengthText" class="yuan_strength-text"></div>
+                    </div>
+                </div>
+                <div class="yuan_field">
+                    <label class="yuan_label" for="yuan_password2">确认密码</label>
+                    <input id="yuan_password2" class="yuan_input" type="password" placeholder="再次输入密码" maxlength="20">
+                </div>
+                <div class="yuan_field">
+                    <label class="yuan_label" for="yuan_captchaCode">图形验证码</label>
+                    <div class="yuan_captcha-row">
+                        <input id="yuan_captchaCode" class="yuan_input yuan_input-captcha" type="text" placeholder="输入图中字符" maxlength="4">
+                        <div id="yuan_captchaBox" class="yuan_captcha-box" title="点击刷新验证码">
+                            <img id="yuan_captchaImg" class="yuan_captcha-img" alt="图形验证码">
+                        </div>
+                    </div>
+                </div>
+                <div class="yuan_row-between">
+                    <label class="yuan_checkbox">
+                        <input id="yuan_agree" type="checkbox" checked>
+                        <span>我已阅读并同意注册协议</span>
+                    </label>
+                    <a class="yuan_link" href="./login.html">已有账号？去登录</a>
+                </div>
+                <div id="yuan_msg" class="yuan_msg"></div>
+                <button id="yuan_submitBtn" class="yuan_btn-main" type="submit">注 册</button>
+            </form>
+
+            <!-- 注册成功面板 -->
+            <div id="yuan_donePanel" class="yuan_logged" style="display:none;">
+                <div class="yuan_logged-check">✓</div>
+                <p class="yuan_logged-text">注册成功：<b id="yuan_doneName"></b></p>
+                <p class="yuan_logged-tip">密码已加密存储（sha256 加盐），数据库不保存明文</p>
+                <a class="yuan_btn-main yuan_btn-inline" href="./login.html">去登录</a>
+            </div>
+        </section>
+        </div>
+    </main>
+
+    <footer class="yuan_footer">学号：24001010302 · 姓名：张浩扬 · 登录与注册（密码加密存储 + 图形验证码）</footer>
+
+    <script src="./js/yuan_register.js"></script>
+</body>
+</html>

@@ -1,0 +1,370 @@
+/* 姓名：张浩扬 | 学号：24001010302 | 建立时间：2026-11-19 14:29:19 | 大模型：Xiaomi MiMo-V2.6-Pro */
+/* 后台管理页面样式：左右布局（左侧菜单栏 + 右侧内容区），扁平风格，类名统一 yuan_ 前缀 */
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+    color: #1f2a37;
+    background: #f3f6fa;
+}
+
+/* ============ 整体左右布局 ============ */
+.yuan_admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ============ 左侧边栏 ============ */
+.yuan_sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    background: #17233d;
+    color: #c7d2e4;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+.yuan_sidebar-logo {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+    padding: 22px 20px 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.yuan_sidebar-logoSub {
+    display: block;
+    font-size: 12px;
+    font-weight: 400;
+    color: #8ea2c0;
+    margin-top: 4px;
+}
+.yuan_menu {
+    flex: 1;
+    padding: 14px 0;
+}
+.yuan_menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 22px;
+    font-size: 14px;
+    color: #c7d2e4;
+    text-decoration: none;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+.yuan_menu-item:hover { background: rgba(255, 255, 255, 0.06); color: #ffffff; }
+.yuan_menu-item.yuan_menu-on {
+    background: #0084ff;
+    color: #ffffff;
+    border-left-color: #7cc4ff;
+}
+.yuan_menu-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: currentColor;
+    opacity: 0.75;
+}
+.yuan_sidebar-foot {
+    padding: 16px 20px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.yuan_admin-user {
+    margin: 0 0 10px;
+    font-size: 12px;
+    color: #8ea2c0;
+}
+.yuan_admin-user b { color: #ffffff; }
+
+/* ============ 右侧内容区 ============ */
+.yuan_main {
+    flex: 1;
+    min-width: 0;
+    padding: 24px 28px 40px;
+}
+.yuan_main-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.yuan_view-title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+}
+.yuan_back-link {
+    font-size: 13px;
+    color: #0084ff;
+    text-decoration: none;
+}
+.yuan_back-link:hover { text-decoration: underline; }
+
+/* ============ 仪表盘：统计卡片 ============ */
+.yuan_stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 20px;
+}
+.yuan_stat-card {
+    background: #ffffff;
+    border: 1px solid #e6ecf3;
+    border-top: 4px solid #0084ff;
+    border-radius: 8px;
+    padding: 18px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.yuan_stat-blue { border-top-color: #0084ff; }
+.yuan_stat-green { border-top-color: #2f9e44; }
+.yuan_stat-orange { border-top-color: #e8590c; }
+.yuan_stat-name { font-size: 13px; color: #8590a6; }
+.yuan_stat-num { font-size: 32px; font-weight: 700; color: #1f2a37; line-height: 1.2; }
+.yuan_stat-sub { font-size: 12px; color: #b3bdcc; }
+
+/* ============ 仪表盘：图表网格 ============ */
+.yuan_chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+.yuan_chart-card {
+    background: #ffffff;
+    border: 1px solid #e6ecf3;
+    border-radius: 8px;
+    padding: 16px 18px 12px;
+}
+.yuan_chart-title {
+    margin: 0 0 10px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1f2a37;
+}
+.yuan_chart-canvas {
+    width: 100%;
+    height: 250px;
+    display: block;
+}
+
+/* ============ 工具栏（搜索 + 新增） ============ */
+.yuan_toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 14px;
+}
+.yuan_search-input {
+    width: 260px;
+    padding: 9px 12px;
+    font-size: 14px;
+    border: 1px solid #d4dce8;
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+.yuan_search-input:focus { border-color: #0084ff; }
+.yuan_btn-add { margin-left: auto; }
+
+/* ============ 按钮 ============ */
+.yuan_btn {
+    padding: 9px 16px;
+    font-size: 14px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+}
+.yuan_btn:hover { opacity: 0.88; }
+.yuan_btn:active { transform: scale(0.96); }
+.yuan_btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.yuan_btn-primary { background: #0084ff; color: #ffffff; }
+.yuan_btn-add { background: #2f9e44; color: #ffffff; }
+.yuan_btn-danger { background: #e03131; color: #ffffff; }
+.yuan_btn-plain { background: #ffffff; color: #55617a; border-color: #d4dce8; }
+.yuan_btn-logout { width: 100%; background: rgba(255, 255, 255, 0.1); color: #c7d2e4; border-color: rgba(255, 255, 255, 0.18); }
+.yuan_btn-page { background: #ffffff; color: #55617a; border-color: #d4dce8; padding: 7px 14px; font-size: 13px; }
+
+/* 小号操作按钮 */
+.yuan_btn-mini {
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    font-family: inherit;
+    margin-right: 6px;
+    transition: opacity 0.2s ease;
+}
+.yuan_btn-mini:hover { opacity: 0.8; }
+.yuan_btn-view { background: #eaf3ff; color: #0084ff; border-color: #bcd9ff; }
+.yuan_btn-edit { background: #fff4e6; color: #e8590c; border-color: #ffd8a8; }
+.yuan_btn-del { background: #fff0f0; color: #e03131; border-color: #ffc9c9; }
+
+/* ============ 表格 ============ */
+.yuan_table-wrap {
+    background: #ffffff;
+    border: 1px solid #e6ecf3;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+.yuan_table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+.yuan_table th {
+    background: #f7f9fc;
+    color: #55617a;
+    font-weight: 700;
+    text-align: left;
+    padding: 12px 14px;
+    border-bottom: 2px solid #e6ecf3;
+    white-space: nowrap;
+}
+.yuan_table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #eef2f7;
+    color: #1f2a37;
+    max-width: 280px;
+}
+.yuan_table tbody tr:hover { background: #f7faff; }
+.yuan_table .yuan_cell-cut {
+    display: inline-block;
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+.yuan_table-empty {
+    text-align: center;
+    color: #b3bdcc;
+    padding: 36px 0 !important;
+}
+
+/* 角色徽章 */
+.yuan_badge {
+    display: inline-block;
+    padding: 2px 10px;
+    font-size: 12px;
+    border-radius: 10px;
+}
+.yuan_badge-admin { background: #fff0f0; color: #e03131; }
+.yuan_badge-user { background: #eaf3ff; color: #0084ff; }
+
+/* ============ 分页 ============ */
+.yuan_pager {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+}
+.yuan_page-info { font-size: 13px; color: #8590a6; }
+.yuan_page-btns { display: flex; align-items: center; gap: 10px; }
+.yuan_page-num { font-size: 13px; color: #55617a; }
+
+/* ============ 弹窗 ============ */
+.yuan_modal-mask {
+    position: fixed;
+    inset: 0;
+    background: rgba(23, 35, 61, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+.yuan_modal {
+    width: 520px;
+    max-width: calc(100vw - 40px);
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 24px 26px;
+    animation: yuan_modalIn 0.28s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+.yuan_modal-small { width: 380px; }
+@keyframes yuan_modalIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.yuan_modal-title {
+    margin: 0 0 18px;
+    font-size: 18px;
+    font-weight: 700;
+}
+.yuan_modal-btns {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+/* 弹窗表单 */
+.yuan_form-body { display: flex; flex-direction: column; gap: 14px; }
+.yuan_form-row { display: flex; flex-direction: column; gap: 6px; }
+.yuan_form-label { font-size: 13px; color: #55617a; }
+.yuan_form-label .yuan_must { color: #e03131; margin-left: 2px; }
+.yuan_form-input {
+    padding: 9px 12px;
+    font-size: 14px;
+    border: 1px solid #d4dce8;
+    border-radius: 6px;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+}
+.yuan_form-input:focus { border-color: #0084ff; }
+.yuan_form-input:disabled { background: #f3f6fa; color: #8590a6; }
+textarea.yuan_form-input { resize: vertical; min-height: 84px; }
+.yuan_form-msg { min-height: 20px; margin-top: 10px; font-size: 13px; }
+.yuan_form-msg.yuan_msg-err { color: #e03131; }
+.yuan_form-msg.yuan_msg-ok { color: #2f9e44; }
+
+/* 详情弹窗 */
+.yuan_detail-body { display: flex; flex-direction: column; gap: 0; }
+.yuan_detail-row {
+    display: flex;
+    gap: 12px;
+    padding: 10px 2px;
+    border-bottom: 1px solid #eef2f7;
+    font-size: 14px;
+}
+.yuan_detail-row:last-child { border-bottom: none; }
+.yuan_detail-key {
+    width: 96px;
+    flex-shrink: 0;
+    color: #8590a6;
+}
+.yuan_detail-val {
+    flex: 1;
+    color: #1f2a37;
+    word-break: break-all;
+    white-space: pre-wrap;
+}
+
+/* 删除确认 */
+.yuan_confirm-text { font-size: 14px; color: #55617a; margin: 0; line-height: 1.7; }
+
+/* ============ 页脚 ============ */
+.yuan_footer {
+    text-align: center;
+    padding: 16px 20px 26px;
+    font-size: 12px;
+    color: #b3bdcc;
+}
+
+/* 窄屏适配 */
+@media (max-width: 960px) {
+    .yuan_stat-row, .yuan_chart-grid { grid-template-columns: 1fr; }
+    .yuan_sidebar { width: 180px; }
+}

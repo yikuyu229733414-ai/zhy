@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>后台管理 · 知乎模仿</title>
+    <!-- 姓名：张浩扬 | 学号：24001010302 | 建立时间：2026-11-19 14:29:19 | 大模型：Xiaomi MiMo-V2.6-Pro | 功能：后台管理页面（仪表盘 Canvas 图表 + 用户/问题/回答 3 个实体的增删改查 + 搜索 + 分页） -->
+    <link rel="stylesheet" href="./css/yuan_admin.css">
+</head>
+<body>
+    <!-- 左右布局：左侧菜单栏 + 右侧内容区 -->
+    <div class="yuan_admin-layout">
+
+        <!-- ===== 左侧边栏 ===== -->
+        <aside class="yuan_sidebar">
+            <div class="yuan_sidebar-logo">知乎<span class="yuan_sidebar-logoSub">模仿 · 后台</span></div>
+            <nav class="yuan_menu">
+                <a class="yuan_menu-item yuan_menu-on" data-yuan-view="yuan_dashboard"><i class="yuan_menu-dot"></i>仪表盘</a>
+                <a class="yuan_menu-item" data-yuan-view="yuan_user"><i class="yuan_menu-dot"></i>用户管理</a>
+                <a class="yuan_menu-item" data-yuan-view="yuan_question"><i class="yuan_menu-dot"></i>问题管理</a>
+                <a class="yuan_menu-item" data-yuan-view="yuan_answer"><i class="yuan_menu-dot"></i>回答管理</a>
+            </nav>
+            <div class="yuan_sidebar-foot">
+                <p class="yuan_admin-user">当前管理员：<b id="yuan_adminName">-</b></p>
+                <button id="yuan_logoutBtn" class="yuan_btn yuan_btn-logout" type="button">退出登录</button>
+            </div>
+        </aside>
+
+        <!-- ===== 右侧内容区 ===== -->
+        <main class="yuan_main">
+            <header class="yuan_main-top">
+                <h1 id="yuan_viewTitle" class="yuan_view-title">仪表盘</h1>
+                <a class="yuan_back-link" href="./index.html">← 返回前台首页</a>
+            </header>
+
+            <!-- 仪表盘：统计卡片 + 4 个 Canvas 图表（数据全部来自 /api/admin/stats 实时统计） -->
+            <section id="yuan_view-dashboard" class="yuan_view">
+                <div class="yuan_stat-row">
+                    <div class="yuan_stat-card yuan_stat-blue">
+                        <span class="yuan_stat-name">用户总数</span>
+                        <b id="yuan_statUser" class="yuan_stat-num">0</b>
+                        <span class="yuan_stat-sub">yuan_user 表</span>
+                    </div>
+                    <div class="yuan_stat-card yuan_stat-green">
+                        <span class="yuan_stat-name">问题总数</span>
+                        <b id="yuan_statQuestion" class="yuan_stat-num">0</b>
+                        <span class="yuan_stat-sub">yuan_question 表</span>
+                    </div>
+                    <div class="yuan_stat-card yuan_stat-orange">
+                        <span class="yuan_stat-name">回答总数</span>
+                        <b id="yuan_statAnswer" class="yuan_stat-num">0</b>
+                        <span class="yuan_stat-sub">yuan_answer 表</span>
+                    </div>
+                </div>
+                <div class="yuan_chart-grid">
+                    <div class="yuan_chart-card">
+                        <h3 class="yuan_chart-title">最近 7 天用户注册趋势（折线图）</h3>
+                        <canvas id="yuan_chartTrend" class="yuan_chart-canvas"></canvas>
+                    </div>
+                    <div class="yuan_chart-card">
+                        <h3 class="yuan_chart-title">各实体数据量对比（柱状图）</h3>
+                        <canvas id="yuan_chartBar" class="yuan_chart-canvas"></canvas>
+                    </div>
+                    <div class="yuan_chart-card">
+                        <h3 class="yuan_chart-title">问题浏览量 Top5（饼图）</h3>
+                        <canvas id="yuan_chartPie" class="yuan_chart-canvas"></canvas>
+                    </div>
+                    <div class="yuan_chart-card">
+                        <h3 class="yuan_chart-title">用户角色分布（环形图）</h3>
+                        <canvas id="yuan_chartRole" class="yuan_chart-canvas"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 实体管理：用户 / 问题 / 回答 共用（列表 + 搜索 + 分页 + 新增/编辑/详情/删除） -->
+            <section id="yuan_view-entity" class="yuan_view" style="display:none;">
+                <div class="yuan_toolbar">
+                    <input id="yuan_searchInput" class="yuan_search-input" type="text" placeholder="输入关键字搜索……">
+                    <button id="yuan_searchBtn" class="yuan_btn yuan_btn-primary" type="button">搜索</button>
+                    <button id="yuan_resetBtn" class="yuan_btn yuan_btn-plain" type="button">重置</button>
+                    <button id="yuan_addBtn" class="yuan_btn yuan_btn-add" type="button">＋ 新增</button>
+                </div>
+                <div class="yuan_table-wrap">
+                    <table class="yuan_table">
+                        <thead><tr id="yuan_tableHead"></tr></thead>
+                        <tbody id="yuan_tableBody"></tbody>
+                    </table>
+                </div>
+                <div class="yuan_pager">
+                    <span id="yuan_pageInfo" class="yuan_page-info">共 0 条</span>
+                    <div class="yuan_page-btns">
+                        <button id="yuan_prevBtn" class="yuan_btn yuan_btn-page" type="button">上一页</button>
+                        <span id="yuan_pageNum" class="yuan_page-num">第 1 / 1 页</span>
+                        <button id="yuan_nextBtn" class="yuan_btn yuan_btn-page" type="button">下一页</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 新增 / 编辑 弹窗 -->
+    <div id="yuan_modalForm" class="yuan_modal-mask" style="display:none;">
+        <div class="yuan_modal">
+            <h3 id="yuan_formTitle" class="yuan_modal-title">新增</h3>
+            <div id="yuan_formBody" class="yuan_form-body"></div>
+            <div id="yuan_formMsg" class="yuan_form-msg"></div>
+            <div class="yuan_modal-btns">
+                <button id="yuan_formCancel" class="yuan_btn yuan_btn-plain" type="button">取消</button>
+                <button id="yuan_formSave" class="yuan_btn yuan_btn-primary" type="button">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 详情弹窗 -->
+    <div id="yuan_modalDetail" class="yuan_modal-mask" style="display:none;">
+        <div class="yuan_modal">
+            <h3 class="yuan_modal-title">详情</h3>
+            <div id="yuan_detailBody" class="yuan_detail-body"></div>
+            <div class="yuan_modal-btns">
+                <button id="yuan_detailClose" class="yuan_btn yuan_btn-primary" type="button">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除确认弹窗 -->
+    <div id="yuan_modalConfirm" class="yuan_modal-mask" style="display:none;">
+        <div class="yuan_modal yuan_modal-small">
+            <h3 class="yuan_modal-title">确认删除</h3>
+            <p id="yuan_confirmText" class="yuan_confirm-text">确定要删除这条记录吗？删除后不可恢复。</p>
+            <div class="yuan_modal-btns">
+                <button id="yuan_confirmCancel" class="yuan_btn yuan_btn-plain" type="button">取消</button>
+                <button id="yuan_confirmOk" class="yuan_btn yuan_btn-danger" type="button">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="yuan_footer">学号：24001010302 · 姓名：张浩扬 · 后台管理（仪表盘图表 + 3 个实体增删改查 + 鉴权拦截）</footer>
+
+    <script src="./js/yuan_admin.js"></script>
+</body>
+</html>

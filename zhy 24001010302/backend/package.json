@@ -1,0 +1,20 @@
+{
+  "name": "yuan-zhihu-backend",
+  "version": "1.0.0",
+  "description": "知乎网站模仿（三级项目）后端：Node.js + Express + MySQL，接口 /api/ 前缀，端口 8302",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "张浩扬",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.10",
+    "express": "^5.3.0",
+    "multer": "^2.5.0",
+    "mysql2": "^3.24.6",
+    "pdf-parse": "^2.4.5",
+    "xlsx": "^0.18.5"
+  }
+}

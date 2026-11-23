@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 · 知乎模仿</title>
+    <!-- 姓名：张浩扬 | 学号：24001010302 | 建立时间：2026-11-19 13:36:32 | 大模型：Xiaomi MiMo-V2.6-Pro | 功能：登录页面（图形验证码 + token 保持登录状态 + 平滑动画） -->
+    <link rel="stylesheet" href="./css/yuan_login.css">
+</head>
+<body>
+    <!-- 动态渐变背景 + 漂浮光斑（纯 CSS 动画） -->
+    <div class="yuan_bg">
+        <div class="yuan_blob yuan_blob-1"></div>
+        <div class="yuan_blob yuan_blob-2"></div>
+        <div class="yuan_blob yuan_blob-3"></div>
+    </div>
+
+    <!-- 顶部导航条 -->
+    <header class="yuan_topbar">
+        <div class="yuan_topbar-inner">
+            <a class="yuan_logo" href="./index.html">知乎<span class="yuan_logo-sub">模仿</span></a>
+            <nav class="yuan_topnav">
+                <a href="./index.html">首页</a>
+                <a class="yuan_topnav-on" href="./login.html">登录</a>
+                <a href="./register.html">注册</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="yuan_wrap">
+        <div class="yuan_layout">
+        <!-- 左侧品牌面板（平面色块） -->
+        <aside class="yuan_brand">
+            <span class="yuan_brand-tag">知乎模仿 · 三级项目</span>
+            <h2 class="yuan_brand-title">登录后开启<br>完整站点体验</h2>
+            <p class="yuan_brand-sub">原生 HTML / CSS / JavaScript 前端 + Node.js / Express 后端 + MySQL 数据库，接口请求与响应全程输出留证。</p>
+            <ul class="yuan_brand-list">
+                <li><span class="yuan_brand-num">1</span>图形验证码保护账号安全</li>
+                <li><span class="yuan_brand-num">2</span>密码 sha256 加盐加密存储</li>
+                <li><span class="yuan_brand-num">3</span>token 保持登录状态</li>
+                <li><span class="yuan_brand-num">4</span>表单双端校验，错误清晰提示</li>
+            </ul>
+        </aside>
+
+        <!-- 登录卡片（入场动画） -->
+        <section id="yuan_loginCard" class="yuan_card">
+            <h1 class="yuan_card-title">欢迎回来</h1>
+            <p class="yuan_card-sub">登录后体验完整的知乎模仿站点功能</p>
+
+            <!-- 登录表单 -->
+            <form id="yuan_loginForm" class="yuan_form" novalidate>
+                <div class="yuan_field">
+                    <label class="yuan_label" for="yuan_username">用户名</label>
+                    <input id="yuan_username" class="yuan_input" type="text" placeholder="3~20 位字母、数字、中文或下划线" autocomplete="username" maxlength="20">
+                </div>
+                <div class="yuan_field">
+                    <label class="yuan_label" for="yuan_password">密码</label>
+                    <input id="yuan_password" class="yuan_input" type="password" placeholder="6~20 位密码" autocomplete="current-password" maxlength="20">
+                </div>
+                <div class="yuan_field">
+                    <label class="yuan_label" for="yuan_captchaCode">图形验证码</label>
+                    <div class="yuan_captcha-row">
+                        <input id="yuan_captchaCode" class="yuan_input yuan_input-captcha" type="text" placeholder="输入图中字符" maxlength="4">
+                        <div id="yuan_captchaBox" class="yuan_captcha-box" title="点击刷新验证码">
+                            <img id="yuan_captchaImg" class="yuan_captcha-img" alt="图形验证码">
+                        </div>
+                    </div>
+                </div>
+                <div class="yuan_row-between">
+                    <label class="yuan_checkbox">
+                        <input id="yuan_remember" type="checkbox" checked>
+                        <span>记住我</span>
+                    </label>
+                    <a class="yuan_link" href="./register.html">没有账号？去注册</a>
+                </div>
+                <div id="yuan_msg" class="yuan_msg"></div>
+                <button id="yuan_submitBtn" class="yuan_btn-main" type="submit">登 录</button>
+            </form>
+
+            <!-- 已登录面板（登录状态保持演示） -->
+            <div id="yuan_loggedPanel" class="yuan_logged" style="display:none;">
+                <div class="yuan_logged-check">✓</div>
+                <p class="yuan_logged-text">已登录：<b id="yuan_loggedName"></b></p>
+                <p class="yuan_logged-tip">登录状态已保持（token 存于 localStorage，服务端校验）</p>
+                <div class="yuan_row-center">
+                    <a class="yuan_btn-main yuan_btn-inline" href="./index.html">进入首页</a>
+                    <a id="yuan_adminLink" class="yuan_btn-main yuan_btn-inline" href="./admin.html" style="display:none;">进入后台管理</a>
+                    <button id="yuan_logoutBtn" class="yuan_btn-plain" type="button">退出登录</button>
+                </div>
+            </div>
+        </section>
+        </div>
+    </main>
+
+    <footer class="yuan_footer">学号：24001010302 · 姓名：张浩扬 · 登录与注册（密码加密存储 + 图形验证码）</footer>
+
+    <script src="./js/yuan_login.js"></script>
+</body>
+</html>

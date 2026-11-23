@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商业评论情感分析 · 知乎模仿</title>
+    <!-- 姓名：张浩扬 | 学号：24001010302 | 建立时间：2026-11-16 14:06:00 | 大模型：Xiaomi MiMo-V2.6-Pro | 功能：商业评论上传与 LLM 评价（好评/中评/差评 + 饼状图 + 有价值评论） -->
+    <link rel="stylesheet" href="./css/yuan_review.css">
+</head>
+<body>
+    <!-- 顶部导航条 -->
+    <header class="yuan_topbar">
+        <div class="yuan_topbar-inner">
+            <a class="yuan_logo" href="./index.html">知乎<span class="yuan_logo-sub">模仿</span></a>
+            <nav class="yuan_topnav">
+                <a href="./index.html">首页</a>
+                <a href="./database.html">数据库测试</a>
+                <a href="./chat.html">AI 聊天</a>
+                <a href="./kb-upload.html">知识库管理</a>
+                <a href="./kb-chat.html">智能客服</a>
+                <a class="yuan_topnav-on" href="./review.html">评论分析</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="yuan_wrap">
+        <!-- 页面标题 -->
+        <section class="yuan_review-head">
+            <h1 class="yuan_review-title">商业评论情感分析</h1>
+            <p class="yuan_review-sub">上传 Excel 商业评论文件 → 大模型逐条判断 好评 / 中评 / 差评 → 饼状图展示分布，并给出有价值的评论。返回结构化 JSON，发送给 LLM 的提示词与返回信息均输出到浏览器控制台与后端终端。</p>
+        </section>
+
+        <!-- 第一步：上传 Excel -->
+        <section class="yuan_panel">
+            <h2 class="yuan_panel-title">1. 上传商业评论 Excel</h2>
+            <p class="yuan_panel-tip">
+                支持 .xlsx / .xls 文件，格式：第一行为表头（A 列「编号」、B 列「评论内容」），每行一条评论。
+                <a class="yuan_link" href="/api/review/template">下载 Excel 模板</a>
+            </p>
+            <div class="yuan_upload-bar">
+                <input id="yuan_fileInput" class="yuan_file-input" type="file" accept=".xlsx,.xls">
+                <button id="yuan_uploadBtn" class="yuan_btn" type="button">上传并解析</button>
+                <button id="yuan_analyzeBtn" class="yuan_btn yuan_btn-main" type="button" disabled>开始 AI 评价</button>
+            </div>
+            <div id="yuan_statusBar" class="yuan_status"></div>
+            <ol id="yuan_previewList" class="yuan_preview-list"></ol>
+        </section>
+
+        <!-- 第二步：AI 评价结果 -->
+        <section id="yuan_resultSection" class="yuan_panel" style="display:none;">
+            <h2 class="yuan_panel-title">2. AI 评价结果</h2>
+
+            <!-- 统计卡片 -->
+            <div id="yuan_stats" class="yuan_stats"></div>
+
+            <!-- 饼状图 -->
+            <div class="yuan_pie-wrap">
+                <canvas id="yuan_pieCanvas" width="300" height="300"></canvas>
+                <ul id="yuan_pieLegend" class="yuan_pie-legend"></ul>
+            </div>
+
+            <!-- 有价值的评论 -->
+            <h3 class="yuan_sub-title">有价值的评论</h3>
+            <ul id="yuan_valuableList" class="yuan_valuable-list"></ul>
+
+            <!-- 全部评论分析结果 -->
+            <h3 class="yuan_sub-title">全部评论分析</h3>
+            <div class="yuan_table-wrap">
+                <table class="yuan_table">
+                    <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>评论内容</th>
+                            <th>评价</th>
+                            <th>置信度</th>
+                            <th>一句话摘要</th>
+                            <th>有价值</th>
+                        </tr>
+                    </thead>
+                    <tbody id="yuan_tableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- 返回 JSON -->
+            <h3 class="yuan_sub-title">返回 JSON</h3>
+            <details class="yuan_json-spec">
+                <summary>返回 JSON 数据结构约定（先设计的结构，见 backend/yuan_interface.md）</summary>
+                <pre id="yuan_jsonSpec"></pre>
+            </details>
+            <pre id="yuan_jsonView" class="yuan_json-view"></pre>
+            <button id="yuan_downloadJsonBtn" class="yuan_btn" type="button">下载结果 JSON</button>
+        </section>
+    </main>
+
+    <footer class="yuan_footer">学号：24001010302 · 姓名：张浩扬 · 商业评论情感分析（Harness Engineering 结构化输出）</footer>
+
+    <script src="./js/yuan_review.js"></script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+/* 姓名：张浩扬 | 学号：24001010302 | 建立时间：2026-11-16 14:40:00 | 大模型：Xiaomi MiMo-V2.6-Pro */
+/* 语音与图片识别页面样式：知乎风格，原生 CSS，类名统一 yuan_ 前缀 */
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+    color: #1f2a37;
+    background: linear-gradient(180deg, #eef3f8 0%, #f7fafc 40%, #ffffff 100%);
+}
+
+/* 顶部导航条 */
+.yuan_topbar {
+    background: #ffffff;
+    border-bottom: 1px solid #e5eaf0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.yuan_topbar-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 20px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.yuan_logo {
+    font-size: 22px;
+    font-weight: 700;
+    color: #0084ff;
+    text-decoration: none;
+}
+.yuan_logo-sub { font-size: 13px; color: #8590a6; margin-left: 4px; font-weight: 400; }
+.yuan_topnav a {
+    color: #55617a;
+    text-decoration: none;
+    font-size: 14px;
+    margin-left: 18px;
+    padding: 6px 2px;
+}
+.yuan_topnav a:hover { color: #0084ff; }
+.yuan_topnav a.yuan_topnav-on { color: #0084ff; border-bottom: 2px solid #0084ff; }
+
+/* 主体 */
+.yuan_wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 40px; }
+
+.yuan_media-head { padding: 18px 4px 6px; }
+.yuan_media-title { margin: 0 0 10px; font-size: 28px; }
+.yuan_media-sub { margin: 0; color: #5b6b80; font-size: 14px; line-height: 1.8; }
+
+/* 面板 */
+.yuan_panel {
+    background: #ffffff;
+    border: 1px solid #e5eaf0;
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin-top: 20px;
+    box-shadow: 0 4px 16px rgba(31, 42, 55, 0.05);
+}
+.yuan_panel-title { margin: 0 0 8px; font-size: 20px; }
+.yuan_panel-tip { margin: 0 0 14px; color: #78869b; font-size: 13px; line-height: 1.8; }
+.yuan_sub-title { margin: 18px 0 10px; font-size: 16px; }
+
+/* 上传区 */
+.yuan_upload-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.yuan_file-input {
+    font-size: 13px;
+    color: #55617a;
+    padding: 8px 10px;
+    border: 1px dashed #c3cfdd;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+.yuan_btn {
+    border: 1px solid #0084ff;
+    background: #ffffff;
+    color: #0084ff;
+    font-size: 14px;
+    padding: 9px 22px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.yuan_btn:hover { background: #eaf4ff; }
+.yuan_btn:disabled { border-color: #c3cfdd; color: #a6b1c0; background: #f4f6f8; cursor: not-allowed; }
+.yuan_btn-main { background: #0084ff; color: #ffffff; }
+.yuan_btn-main:hover { background: #0077e6; }
+
+/* 状态条 */
+.yuan_status {
+    margin-top: 12px;
+    font-size: 13px;
+    line-height: 1.8;
+    color: #55617a;
+    display: none;
+}
+.yuan_status.yuan_show { display: block; }
+.yuan_status-ok { color: #2f9e44; }
+.yuan_status-err { color: #e03131; }
+.yuan_status-load { color: #e8850c; }
+
+/* 音频 / 图片预览 */
+.yuan_audio { margin-top: 14px; width: 100%; max-width: 480px; }
+.yuan_img-preview {
+    margin-top: 14px;
+    max-width: 100%;
+    max-height: 320px;
+    border: 1px solid #e5eaf0;
+    border-radius: 10px;
+    display: block;
+    background: #f8fafc;
+}
+
+/* 结果区 */
+.yuan_result-box { margin-top: 6px; }
+.yuan_result-text {
+    margin: 0;
+    padding: 16px 18px;
+    background: #f6f9fc;
+    border: 1px solid #e5eaf0;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.9;
+    color: #26344a;
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-height: 60px;
+}
+
+/* JSON 区 */
+.yuan_json-spec {
+    margin-top: 16px;
+    font-size: 13px;
+    color: #55617a;
+}
+.yuan_json-spec summary { cursor: pointer; color: #0084ff; }
+.yuan_json-spec pre {
+    background: #f6f9fc;
+    border: 1px solid #e5eaf0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    overflow-x: auto;
+    line-height: 1.7;
+}
+.yuan_json-view {
+    margin: 12px 0 0;
+    padding: 14px 16px;
+    background: #1f2a37;
+    color: #d7e3f4;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    display: none;
+}
+.yuan_json-view.yuan_show { display: block; }
+
+/* 页脚 */
+.yuan_footer {
+    text-align: center;
+    color: #8590a6;
+    font-size: 12px;
+    padding: 20px 0 30px;
+}
+
+/* 窄屏适配 */
+@media (max-width: 720px) {
+    .yuan_topnav a { margin-left: 10px; font-size: 13px; }
+    .yuan_media-title { font-size: 22px; }
+    .yuan_panel { padding: 16px; }
+}

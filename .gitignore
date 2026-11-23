@@ -1,2 +1,10 @@
 # Trae 临时分享缓存，不纳入版本管理
 .trae-html-share-packages/
+
+# 依赖与敏感配置，不纳入版本管理
+node_modules/
+.env
+
+# zhy 24001010302 原独立仓库历史备份（嵌套 .git 重命名而来），不纳入版本管理
+.git_zhy_history/
+npminstall-debug.log

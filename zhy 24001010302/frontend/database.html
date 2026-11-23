@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据库连接测试 · 知乎网站模仿</title>
+    <!-- 姓名：张浩扬 | 学号：24001010302 | 时间：2026-11-09 | 大模型：Xiaomi MiMo-V2.6-Pro -->
+    <link rel="stylesheet" href="./css/yuan_database.css">
+</head>
+<body>
+    <!-- 顶部导航条 -->
+    <header class="yuan_topbar">
+        <div class="yuan_topbar-inner">
+            <a class="yuan_logo" href="./index.html">知乎<span class="yuan_logo-sub">模仿</span></a>
+            <nav class="yuan_topnav">
+                <a href="./index.html">首页</a>
+                <a class="yuan_topnav-on" href="./database.html">数据库测试</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="yuan_wrap">
+        <section class="yuan_panel">
+            <h2 class="yuan_panel-title">数据库连接测试</h2>
+            <p class="yuan_tip">输入 MySQL 的用户名与密码，点击「连接数据库」测试连接。主机与库名由后端读取 <code>backend/.env</code>（DB_HOST、DB_NAME）；连接成功时会自动创建数据库（如不存在）。返回结果同时输出到浏览器控制台。</p>
+
+            <div class="yuan_form">
+                <label class="yuan_field">
+                    <span class="yuan_field-label">用户名</span>
+                    <input class="yuan_input" id="yuan_userInput" type="text" placeholder="例如：root" value="root">
+                </label>
+                <label class="yuan_field">
+                    <span class="yuan_field-label">密码</span>
+                    <input class="yuan_input" id="yuan_passwordInput" type="password" placeholder="请输入数据库密码">
+                </label>
+                <button class="yuan_btn" id="yuan_connectBtn" type="button">连接数据库</button>
+            </div>
+
+            <div class="yuan_result" id="yuan_resultBox">
+                <span class="yuan_result-wait">等待测试：填写用户名与密码后点击「连接数据库」。</span>
+            </div>
+        </section>
+    </main>
+
+    <footer class="yuan_footer">学号：24001010302 · 姓名：张浩扬 · 知乎网站模仿（三级项目）</footer>
+
+    <script src="./js/yuan_database.js"></script>
+</body>
+</html>

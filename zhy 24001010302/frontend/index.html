@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知乎网站模仿 · 三级项目</title>
+    <!-- 姓名：张浩扬 | 学号：24001010302 | 时间：2026-11-09 | 大模型：Xiaomi MiMo-V2.6-Pro -->
+    <link rel="stylesheet" href="./css/yuan_index.css">
+</head>
+<body>
+    <!-- canvas 背景动画 -->
+    <canvas id="yuan_bgCanvas"></canvas>
+
+    <!-- 顶部导航条 -->
+    <header class="yuan_topbar">
+        <div class="yuan_topbar-inner">
+            <a class="yuan_logo" href="./index.html">知乎<span class="yuan_logo-sub">模仿</span></a>
+            <nav class="yuan_topnav">
+                <a class="yuan_topnav-on" href="./index.html">首页</a>
+                <a href="./database.html">数据库测试</a>
+                <a href="./chat.html">AI 聊天</a>
+                <a href="./kb-upload.html">知识库管理</a>
+                <a href="./kb-chat.html">智能客服</a>
+                <a href="./review.html">评论分析</a>
+                <a href="./media.html">语音图片识别</a>
+                <a href="./login.html">登录</a>
+                <a href="./register.html">注册</a>
+                <a href="./admin.html">后台管理</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="yuan_wrap">
+        <!-- 项目信息 -->
+        <section class="yuan_hero">
+            <p class="yuan_hero-tag">三级项目 · 仿站类</p>
+            <h1 class="yuan_hero-title">知乎网站模仿</h1>
+            <p class="yuan_hero-sub">全栈练习项目：原生 HTML / CSS / JavaScript 前端 + Node.js / Express 后端 + MySQL 数据库</p>
+            <ul class="yuan_meta">
+                <li><span>姓名</span><b>张浩扬</b></li>
+                <li><span>学号</span><b>24001010302</b></li>
+                <li><span>项目名称</span><b>知乎网站模仿</b></li>
+                <li><span>项目类别</span><b>模仿</b></li>
+            </ul>
+        </section>
+
+        <!-- 页面链接导航（主体） -->
+        <section class="yuan_panel">
+            <h2 class="yuan_panel-title">页面导航</h2>
+            <div class="yuan_grid">
+                <a class="yuan_card-link" href="./database.html">
+                    <div class="yuan_card-index">01</div>
+                    <h3 class="yuan_card-name">database.html</h3>
+                    <p class="yuan_card-desc">数据库连接测试：输入用户名、密码连接 MySQL，成功与错误均有提示。</p>
+                    <span class="yuan_card-go">进入页面 →</span>
+                </a>
+                <a class="yuan_card-link" href="./chat.html">
+                    <div class="yuan_card-index">02</div>
+                    <h3 class="yuan_card-name">chat.html</h3>
+                    <p class="yuan_card-desc">AI 聊天助手：调用 SiliconFlow 大模型接口完成对话，发送的提示词与接收的数据均输出到浏览器控制台。</p>
+                    <span class="yuan_card-go">进入页面 →</span>
+                </a>
+                <a class="yuan_card-link" href="./kb-upload.html">
+                    <div class="yuan_card-index">03</div>
+                    <h3 class="yuan_card-name">kb-upload.html</h3>
+                    <p class="yuan_card-desc">知识库管理（RAG）：上传本地 PDF / TXT 文件，后端解析分块入库，构建专属客服知识库。</p>
+                    <span class="yuan_card-go">进入页面 →</span>
+                </a>
+                <a class="yuan_card-link" href="./kb-chat.html">
+                    <div class="yuan_card-index">04</div>
+                    <h3 class="yuan_card-name">kb-chat.html</h3>
+                    <p class="yuan_card-desc">基于知识库的智能客服：检索知识库并调用大模型回答，发送给 LLM 与返回的数据均输出到控制台。</p>
+                    <span class="yuan_card-go">进入页面 →</span>
+                </a>
+                <a class="yuan_card-link" href="./review.html">
+                    <div class="yuan_card-index">05</div>
+                    <h3 class="yuan_card-name">review.html</h3>
+                    <p class="yuan_card-desc">商业评论情感分析：上传 Excel 评论文件，大模型逐条判断好评 / 中评 / 差评，饼状图展示分布并给出有价值的评论，返回结构化 JSON。</p>
+                    <span class="yuan_card-go">进入页面 →</span>
+                </a>
+                <a class="yuan_card-link" href="./media.html">
+                    <div class="yuan_card-index">06</div>
+                    <h3 class="yuan_card-name">media.html</h3>
+                    <p class="yuan_card-desc">语音与图片识别：上传音频用 Qwen ASR 转写文字，上传图片用 DeepSeek V4.1-Flash 描述内容并转写图中文字，返回 JSON，请求与响应输出到控制台。</p>
+                    <span class="yuan_card-go">进入页面 →</span>
+                </a>
+                <a class="yuan_card-link" href="./login.html">
+                    <div class="yuan_card-index">07</div>
+                    <h3 class="yuan_card-name">login.html</h3>
+                    <p class="yuan_card-desc">登录页面：图形验证码 + token 保持登录状态，表单含基本控件与校验，页面带平滑入场与交互动画。</p>
+                    <span class="yuan_card-go">进入页面 →</span>
+                </a>
+                <a class="yuan_card-link" href="./register.html">
+                    <div class="yuan_card-index">08</div>
+                    <h3 class="yuan_card-name">register.html</h3>
+                    <p class="yuan_card-desc">注册页面：表单校验 + 图形验证码，密码 sha256 加盐加密存储，数据库不保存明文。</p>
+                    <span class="yuan_card-go">进入页面 →</span>
+                </a>
+                <a class="yuan_card-link" href="./admin.html">
+                    <div class="yuan_card-index">09</div>
+                    <h3 class="yuan_card-name">admin.html</h3>
+                    <p class="yuan_card-desc">后台管理：管理员登录后进入，左右布局，仪表盘 Canvas 图表（真实统计数据），用户 / 问题 / 回答 3 个实体的增删改查 + 搜索 + 分页，未登录访问接口自动拦截。</p>
+                    <span class="yuan_card-go">进入页面 →</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="yuan_footer">学号：24001010302 · 姓名：张浩扬 · 知乎网站模仿（三级项目）</footer>
+
+    <script src="./js/yuan_index.js"></script>
+</body>
+</html>

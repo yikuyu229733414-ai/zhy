@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>语音与图片识别 · 知乎模仿</title>
+    <!-- 姓名：张浩扬 | 学号：24001010302 | 建立时间：2026-11-16 14:40:00 | 大模型：Xiaomi MiMo-V2.6-Pro | 功能：语音识别（Qwen ASR）与图片识别（DeepSeek V4.1-Flash 视觉） -->
+    <link rel="stylesheet" href="./css/yuan_media.css">
+</head>
+<body>
+    <!-- 顶部导航条 -->
+    <header class="yuan_topbar">
+        <div class="yuan_topbar-inner">
+            <a class="yuan_logo" href="./index.html">知乎<span class="yuan_logo-sub">模仿</span></a>
+            <nav class="yuan_topnav">
+                <a href="./index.html">首页</a>
+                <a href="./database.html">数据库测试</a>
+                <a href="./chat.html">AI 聊天</a>
+                <a href="./kb-upload.html">知识库管理</a>
+                <a href="./kb-chat.html">智能客服</a>
+                <a href="./review.html">评论分析</a>
+                <a class="yuan_topnav-on" href="./media.html">语音图片识别</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="yuan_wrap">
+        <!-- 页面标题 -->
+        <section class="yuan_media-head">
+            <h1 class="yuan_media-title">语音与图片识别</h1>
+            <p class="yuan_media-sub">语音识别使用 Qwen ASR（Qwen/Qwen3-ASR-1.7B），图片识别使用 DeepSeek V4.1-Flash 视觉模型。前端上传文件 → Express 中间层转发硅基流动接口 → 返回识别结果（JSON）。API Key 只保存在后端 backend/.env，请求与响应均输出到浏览器控制台与后端终端。</p>
+        </section>
+
+        <!-- 语音识别 -->
+        <section class="yuan_panel">
+            <h2 class="yuan_panel-title">1. 语音识别（Qwen ASR）</h2>
+            <p class="yuan_panel-tip">支持 wav / mp3 / m4a / flac / ogg / webm 等音频格式，单个文件不超过 20MB。</p>
+            <div class="yuan_upload-bar">
+                <input id="yuan_asrFileInput" class="yuan_file-input" type="file" accept="audio/*,.mp3,.wav,.m4a,.flac,.ogg,.webm">
+                <button id="yuan_asrBtn" class="yuan_btn yuan_btn-main" type="button">开始语音识别</button>
+            </div>
+            <audio id="yuan_asrAudio" class="yuan_audio" controls style="display:none;"></audio>
+            <div id="yuan_asrStatus" class="yuan_status"></div>
+            <div class="yuan_result-box">
+                <h3 class="yuan_sub-title">识别文本</h3>
+                <pre id="yuan_asrText" class="yuan_result-text">（尚未识别）</pre>
+            </div>
+            <details class="yuan_json-spec">
+                <summary>返回 JSON 数据结构约定</summary>
+                <pre>{
+  "code": 0,
+  "msg": "识别成功",
+  "data": {
+    "yuan_filename": "xxx.wav",
+    "yuan_text": "识别出的文本",
+    "yuan_model": "Qwen/Qwen3-ASR-1.7B",
+    "yuan_response": { "text": "识别出的文本", "usage": { "type": "duration", "seconds": 4 } }
+  }
+}</pre>
+            </details>
+            <pre id="yuan_asrJson" class="yuan_json-view"></pre>
+        </section>
+
+        <!-- 图片识别 -->
+        <section class="yuan_panel">
+            <h2 class="yuan_panel-title">2. 图片识别（DeepSeek V4.1-Flash）</h2>
+            <p class="yuan_panel-tip">支持 png / jpg / jpeg / gif / webp / bmp 图片，单个文件不超过 20MB。模型会描述图片内容，并把图中文字完整转写出来。</p>
+            <div class="yuan_upload-bar">
+                <input id="yuan_visionFileInput" class="yuan_file-input" type="file" accept="image/*,.png,.jpg,.jpeg,.gif,.webp,.bmp">
+                <button id="yuan_visionBtn" class="yuan_btn yuan_btn-main" type="button">开始图片识别</button>
+            </div>
+            <img id="yuan_visionPreview" class="yuan_img-preview" alt="图片预览" style="display:none;">
+            <div id="yuan_visionStatus" class="yuan_status"></div>
+            <div class="yuan_result-box">
+                <h3 class="yuan_sub-title">识别结果</h3>
+                <pre id="yuan_visionText" class="yuan_result-text">（尚未识别）</pre>
+            </div>
+            <details class="yuan_json-spec">
+                <summary>返回 JSON 数据结构约定</summary>
+                <pre>{
+  "code": 0,
+  "msg": "识别成功",
+  "data": {
+    "yuan_filename": "xxx.png",
+    "yuan_answer": "图片描述与文字转写",
+    "yuan_model": "deepseek-ai/DeepSeek-V4.1-Flash",
+    "yuan_llmRequest": { "model": "…", "messages": ["…"] },
+    "yuan_llmResponse": { "choices": ["…"] }
+  }
+}</pre>
+            </details>
+            <pre id="yuan_visionJson" class="yuan_json-view"></pre>
+        </section>
+    </main>
+
+    <footer class="yuan_footer">学号：24001010302 · 姓名：张浩扬 · 语音识别（Qwen ASR）+ 图片识别（DeepSeek V4.1-Flash）</footer>
+
+    <script src="./js/yuan_media.js"></script>
+</body>
+</html>

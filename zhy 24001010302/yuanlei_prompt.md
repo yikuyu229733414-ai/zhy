@@ -30,6 +30,10 @@ API Key：sk-zfmutpyevsutuhotpplhgoyabvugkosfwbflauklbhyvglnx
 - 提示词全文：
 完成知识库上传页面，和基于知识库的客服页面，构建两个要上传的文件，要求如下，知识库管理(RAG):基于本地文件(如PDF/TXT)上传、解析，构建专属自动客服或问答系统，包括知识库文件上传模块。发送给lm和从Ilm获得的信息在控制台输出。
 
+## 时间：2026-11-23 18:29:46
+- 大模型名称：DeepSeek-V4-Pro 正式版
+- 提示词全文：接着做（验证 RAG 知识库系统运行：启动后端、上传/列表/问答接口全流程跑通）
+
 ## 时间：2026-11-16 13:58:30
 - 大模型名称：Xiaomi MiMo-V2.6-Pro
 - 提示词全文：
@@ -68,3 +72,21 @@ API Key：sk-zfmutpyevsutuhotpplhgoyabvugkosfwbflauklbhyvglnx
 
 ## 2026-11-23 13:27:46 | 模型：Xiaomi MiMo-V2.6-Pro
 给我把zhy24001010302文件夹里的项目统合到上一个目录的总项目里上传到github再给我变成github网页的统合项目连接
+
+## 2026-11-23 14:01:38 | 模型：Xiaomi MiMo-V2.6-Pro
+现在回到zhy24001010302项目文件夹安装mcp:claude mcp add --scope project --transport http supabase "https://mcp.supabase.com/mcp?project_ref=pmzmsfapckfnzocnarvm&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching%2Cfeedback%2Cnotebooks" ,安装skill:npx skills add supabase/agent-skills
+
+## 2026-11-23 14:23:26 | 模型：Xiaomi MiMo-V2.6-Pro
+给我验证 superbase 和 trae 的验证 Authorize Trae
+
+## 2026-11-23 14:37:27 | 模型：Xiaomi MiMo-V2.6-Pro
+在trae里安装skill：npx skills add supabase/agent-skills
+
+## 2026-11-23 14:48:31 | 模型：Xiaomi MiMo-V2.6-Pro
+打开d盘的wps里的LLM应用设计-实验指导书和LLM应用设计-项目报告 根据我的项目完成这个项目报告 姓名 张浩扬 学号 24001010302
+
+---
+## 2026-11-26 13:37:24 | 模型：Xiaomi MiMo-V2.6-Pro
+完成-个基于supabase的ai聊天功能，llm api调用写在edge function里，我的api-key是:******（对话中已脱敏，实际复用 backend/.env 保存的 LLM_API_KEY）。
+curl 示例：POST https://api.siliconflow.cn/v1/chat/completions，model=deepseek-ai/DeepSeek-V4-Flash，
+system=你是一个有用的助手，user=你好，请介绍一下你自己

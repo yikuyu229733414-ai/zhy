@@ -146,6 +146,10 @@
 - 模型：DeepSeek-V4-Pro 正式版
 - 提示词原文：在zhy 24001010302完成知识库上传页面和基于知识库的客服页面（RAG），基于本地PDF/TXT上传解析构建专属客服问答系统，包括知识库文件上传模块，发送给LLM和从LLM获得的信息在控制台输出。
 
+## 2026-11-23 18:29:46
+- 模型：DeepSeek-V4-Pro 正式版
+- 提示词原文：接着做（验证 RAG 知识库系统：后端启动、上传/列表/问答接口全流程验证通过）
+
 
 
 ## 2026-11-16 13:58:30
@@ -204,3 +208,50 @@
 
 ## 2026-11-23 13:53:45 | 模型：Xiaomi MiMo-V2.6-Pro
 好的，执行吧
+
+## 2026-11-23 14:01:38 | 模型：Xiaomi MiMo-V2.6-Pro
+现在回到zhy24001010302项目文件夹安装mcp:claude mcp add --scope project --transport http supabase "https://mcp.supabase.com/mcp?project_ref=pmzmsfapckfnzocnarvm&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching%2Cfeedback%2Cnotebooks" ,安装skill:npx skills add supabase/agent-skills
+
+## 2026-11-23 14:23:26 | 模型：Xiaomi MiMo-V2.6-Pro
+给我验证 superbase 和 trae 的验证 Authorize Trae
+
+## 2026-11-23 14:37:27 | 模型：Xiaomi MiMo-V2.6-Pro
+在trae里安装skill：npx skills add supabase/agent-skills
+
+## 2026-11-23 14:48:31 | 模型：Xiaomi MiMo-V2.6-Pro
+打开d盘的wps里的LLM应用设计-实验指导书和LLM应用设计-项目报告 根据我的项目完成这个项目报告 姓名 张浩扬 学号 24001010302
+
+---
+## 任务记录
+- 当前时间：2026-11-23 18:47:45
+- 使用的模型：MiMo-V2.6-Pro（Xiaomi MiMo-V2.6-Pro）
+- 本次提示词原文：在trae里安装skill：npx skills add supabase/agent-skills
+- 说明：通过 skills CLI 将 supabase/agent-skills（含 supabase、supabase-postgres-best-practices）安装到 Trae（~\.trae\skills\）；GitHub 走 ghproxy.net 镜像克隆。随后继续完成 LLM 应用设计项目报告（24001010302-张浩扬.docx）。
+
+---
+## 任务记录
+- 当前时间：2026-11-23 19:15:31
+- 使用的模型：MiMo-V2.6-Pro
+- 本次提示词原文：完成一个新闻列表的设计与实现，后台和数据库使用supabase，cdn下载到本地，表里有20条有意义的模拟数据。数据库信息在根目录的database.md文件中记录。所有修改的文件都在frontend目录，不修改任何backend目录，使用supabase mcp
+
+---
+## 2026-11-24 17:19:32 | 模型：Tencent Hunyuan Hy
+- 本次提示词原文：帮我清理下d盘 → 选择：清理系统临时文件（清理 D 盘上的临时目录、回收站等，删除前列出清单让你确认）
+
+---
+## 任务记录
+- 当前时间：2026-11-26 13:37:24
+- 使用的模型：MiMo-V2.6-Pro（Xiaomi MiMo-V2.6-Pro）
+- 本次提示词原文：完成-个基于supabase的ai聊天功能，llm api调用写在edge function里，我的api-key是:******（对话中已脱敏，实际使用 backend/.env 中已保存的 LLM_API_KEY）。curl --request POST --url https://api.siliconflow.cn/v1/chat/completions -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_API_KEY" -d '{"model": "deepseek-ai/DeepSeek-V4-Flash","messages":[{"role":"system","content":"你是一个有用的助手"},{"role":"user","content":"你好，请介绍一下你自己"}]}'
+
+---
+## 任务记录
+- 当前时间：2026-11-26 13:47:00
+- 使用的模型：MiMo-V2.6-Pro（Xiaomi MiMo-V2.6-Pro）
+- 本次提示词原文：好的，执行吧（确认执行；Supabase AI 聊天任务已全部完成并验证通过，无需额外操作）
+
+---
+## 任务记录
+- 当前时间：2026-11-26 13:53:11
+- 使用的模型：MiMo-V2.6-Pro（Xiaomi MiMo-V2.6-Pro）
+- 本次提示词原文：根据Word文件（个人简历-袁磊-市场版.docx），完成我的简历的html版的设计，页面美观，符合典型简历的要求，有canvas背景动画 然后把更新的统合进index给我上传到github然后给我github网页

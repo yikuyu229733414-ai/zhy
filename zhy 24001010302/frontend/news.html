@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 姓名：张浩扬  建立时间：2026-11-23 19:33:59  模型：MiMo-V2.6-Pro  功能：新闻列表（Supabase 数据库驱动） -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新闻列表 · Supabase 数据驱动</title>
+    <style>
+        /* ===== 基础与变量 ===== */
+        :root {
+            --yl-primary: #1677ff;
+            --yl-primary-deep: #0e4292;
+            --yl-bg: #f0f2f5;
+            --yl-card: #ffffff;
+            --yl-text: #1f2329;
+            --yl-text-2: #646a73;
+            --yl-border: #e4e7ed;
+            --yl-danger: #d4380d;
+            --yl-radius: 12px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+            background: var(--yl-bg);
+            color: var(--yl-text);
+            line-height: 1.6;
+        }
+        .yl_page { max-width: 1080px; margin: 0 auto; padding: 0 20px 60px; }
+
+        /* ===== 顶部横幅 ===== */
+        .yl_header {
+            background: linear-gradient(135deg, var(--yl-primary-deep) 0%, var(--yl-primary) 100%);
+            color: #fff;
+            margin: 0 -20px 24px;
+            padding: 34px 40px 30px;
+            border-radius: 0 0 18px 18px;
+            position: relative;
+        }
+        .yl_home-link {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            font-size: 13px;
+            display: inline-block;
+            margin-bottom: 14px;
+            padding: 4px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 999px;
+            transition: background 0.2s;
+        }
+        .yl_home-link:hover { background: rgba(255, 255, 255, 0.15); }
+        .yl_title { font-size: 32px; letter-spacing: 2px; margin-bottom: 8px; }
+        .yl_sub { font-size: 14px; color: rgba(255, 255, 255, 0.82); max-width: 640px; }
+        .yl_badge-row { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .yl_src-badge {
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* ===== 工具栏 ===== */
+        .yl_toolbar {
+            background: var(--yl-card);
+            border: 1px solid var(--yl-border);
+            border-radius: var(--yl-radius);
+            padding: 18px 20px;
+            margin-bottom: 22px;
+        }
+        .yl_search-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .yl_search-input {
+            flex: 1;
+            min-width: 220px;
+            height: 42px;
+            padding: 0 16px;
+            font-size: 14px;
+            border: 1px solid var(--yl-border);
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .yl_search-input:focus {
+            border-color: var(--yl-primary);
+            box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.15);
+        }
+        .yl_btn {
+            height: 42px;
+            padding: 0 22px;
+            font-size: 14px;
+            border: 1px solid var(--yl-border);
+            border-radius: 8px;
+            background: #fff;
+            color: var(--yl-text);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .yl_btn:hover { border-color: var(--yl-primary); color: var(--yl-primary); }
+        .yl_btn-primary {
+            background: var(--yl-primary);
+            border-color: var(--yl-primary);
+            color: #fff;
+        }
+        .yl_btn-primary:hover { background: #0e5fd8; color: #fff; }
+        .yl_sort-select {
+            height: 42px;
+            padding: 0 12px;
+            font-size: 14px;
+            border: 1px solid var(--yl-border);
+            border-radius: 8px;
+            background: #fff;
+            color: var(--yl-text);
+            cursor: pointer;
+            outline: none;
+        }
+        .yl_chip-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+        .yl_chip {
+            padding: 6px 18px;
+            font-size: 13px;
+            border: 1px solid var(--yl-border);
+            border-radius: 999px;
+            background: #fff;
+            color: var(--yl-text-2);
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .yl_chip:hover { color: var(--yl-primary); border-color: var(--yl-primary); }
+        .yl_chip--active {
+            background: var(--yl-primary);
+            border-color: var(--yl-primary);
+            color: #fff;
+        }
+        .yl_status-line {
+            margin-top: 14px;
+            font-size: 12px;
+            color: var(--yl-text-2);
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+        .yl_status-line b { color: var(--yl-primary); font-weight: 600; }
+
+        /* ===== 新闻卡片列表 ===== */
+        .yl_news-list { display: flex; flex-direction: column; gap: 16px; }
+        .yl_news-card {
+            background: var(--yl-card);
+            border: 1px solid var(--yl-border);
+            border-left: 4px solid var(--yl-primary);
+            border-radius: var(--yl-radius);
+            padding: 20px 24px;
+            transition: box-shadow 0.25s, transform 0.25s;
+        }
+        .yl_news-card:hover {
+            box-shadow: 0 10px 28px rgba(31, 35, 41, 0.1);
+            transform: translateY(-2px);
+        }
+        .yl_badge-line { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .yl_cat-badge {
+            font-size: 12px;
+            padding: 3px 12px;
+            border-radius: 999px;
+            color: #fff;
+            background: var(--yl-primary);
+        }
+        .yl_top-badge {
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            color: var(--yl-danger);
+            background: rgba(212, 56, 13, 0.1);
+            border: 1px solid rgba(212, 56, 13, 0.3);
+        }
+        .yl_card-title {
+            font-size: 19px;
+            font-weight: 600;
+            line-height: 1.45;
+            cursor: pointer;
+            color: var(--yl-text);
+            transition: color 0.2s;
+        }
+        .yl_card-title:hover { color: var(--yl-primary); }
+        .yl_card-summary {
+            margin-top: 8px;
+            font-size: 14px;
+            color: var(--yl-text-2);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .yl_card-meta {
+            margin-top: 14px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            font-size: 12.5px;
+            color: var(--yl-text-2);
+        }
+        .yl_card-toggle {
+            margin-left: auto;
+            color: var(--yl-primary);
+            cursor: pointer;
+            user-select: none;
+        }
+        .yl_card-toggle:hover { text-decoration: underline; }
+        .yl_card-content {
+            display: none;
+            margin-top: 16px;
+            padding: 16px 18px;
+            background: #f7f9fc;
+            border-radius: 8px;
+            font-size: 14.5px;
+            color: #333a45;
+            white-space: pre-wrap;
+        }
+        .yl_news-card--open .yl_card-content { display: block; }
+        .yl_news-card--open .yl_card-summary { display: none; }
+
+        /* ===== 分类配色 ===== */
+        .yl_cat-tech     { border-left-color: #1677ff; }
+        .yl_cat-tech     .yl_cat-badge { background: #1677ff; }
+        .yl_cat-finance  { border-left-color: #d4380d; }
+        .yl_cat-finance  .yl_cat-badge { background: #d4380d; }
+        .yl_cat-edu      { border-left-color: #722ed1; }
+        .yl_cat-edu      .yl_cat-badge { background: #722ed1; }
+        .yl_cat-sport    { border-left-color: #08979c; }
+        .yl_cat-sport    .yl_cat-badge { background: #08979c; }
+        .yl_cat-culture  { border-left-color: #d46b08; }
+        .yl_cat-culture  .yl_cat-badge { background: #d46b08; }
+        .yl_cat-health   { border-left-color: #389e0d; }
+        .yl_cat-health   .yl_cat-badge { background: #389e0d; }
+        .yl_cat-world    { border-left-color: #1d39c4; }
+        .yl_cat-world    .yl_cat-badge { background: #1d39c4; }
+        .yl_cat-society  { border-left-color: #c41d7f; }
+        .yl_cat-society  .yl_cat-badge { background: #c41d7f; }
+
+        /* ===== 状态区（加载 / 空 / 错误） ===== */
+        .yl_state-box {
+            display: none;
+            background: var(--yl-card);
+            border: 1px dashed var(--yl-border);
+            border-radius: var(--yl-radius);
+            padding: 56px 20px;
+            text-align: center;
+            color: var(--yl-text-2);
+            font-size: 14px;
+        }
+        .yl_state-box--show { display: block; }
+        .yl_state-title { font-size: 17px; color: var(--yl-text); margin-bottom: 8px; font-weight: 600; }
+        .yl_state-box .yl_btn { margin-top: 18px; }
+        .yl_skeleton-list { display: flex; flex-direction: column; gap: 16px; }
+        .yl_skeleton-card {
+            background: var(--yl-card);
+            border: 1px solid var(--yl-border);
+            border-radius: var(--yl-radius);
+            padding: 20px 24px;
+        }
+        .yl_skeleton-line {
+            height: 14px;
+            border-radius: 7px;
+            margin-bottom: 12px;
+            background: linear-gradient(90deg, #eef0f3 25%, #e2e6eb 37%, #eef0f3 63%);
+            background-size: 400% 100%;
+            animation: yl_shimmer 1.4s ease infinite;
+        }
+        .yl_skeleton-line--title { width: 55%; height: 20px; }
+        .yl_skeleton-line--short { width: 35%; }
+        @keyframes yl_shimmer {
+            0% { background-position: 100% 50%; }
+            100% { background-position: 0 50%; }
+        }
+
+        /* ===== 页脚 ===== */
+        .yl_footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 12.5px;
+            color: var(--yl-text-2);
+        }
+        .yl_footer b { color: var(--yl-primary); }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 720px) {
+            .yl_header { padding: 26px 22px 22px; }
+            .yl_title { font-size: 25px; }
+            .yl_card-meta { gap: 10px; }
+            .yl_card-toggle { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="yl_page">
+        <!-- 顶部横幅 -->
+        <header class="yl_header">
+            <a class="yl_home-link" href="./index.html">← 返回首页</a>
+            <h1 class="yl_title">新闻中心</h1>
+            <p class="yl_sub">基于 Supabase 云数据库的新闻列表：supabase-js 本地引用（无 CDN）、20 条有意义的模拟数据，支持分类筛选、关键词搜索与排序。</p>
+            <div class="yl_badge-row">
+                <span class="yl_src-badge">数据表：yl_news</span>
+                <span class="yl_src-badge">后端：Supabase Data API</span>
+                <span class="yl_src-badge">客户端：supabase-js 2.x（本地）</span>
+            </div>
+        </header>
+
+        <!-- 工具栏 -->
+        <section class="yl_toolbar">
+            <div class="yl_search-row">
+                <input id="yl_searchInput" class="yl_search-input" type="text" placeholder="搜索新闻标题 / 摘要，回车即可检索…">
+                <button id="yl_searchBtn" class="yl_btn yl_btn-primary">搜索</button>
+                <button id="yl_refreshBtn" class="yl_btn">刷新</button>
+                <select id="yl_sortSelect" class="yl_sort-select" aria-label="排序方式">
+                    <option value="new">按发布时间</option>
+                    <option value="views">按浏览量</option>
+                </select>
+            </div>
+            <div id="yl_chipBar" class="yl_chip-bar"></div>
+            <div id="yl_statusLine" class="yl_status-line"></div>
+        </section>
+
+        <!-- 列表主体 -->
+        <main>
+            <div id="yl_newsList" class="yl_news-list"></div>
+            <div id="yl_stateBox" class="yl_state-box"></div>
+        </main>
+
+        <!-- 页脚 -->
+        <footer class="yl_footer">
+            <p>姓名：<b>张浩扬</b> · 学号：<b>24001010302</b> · 功能：新闻列表（Supabase 数据库驱动）</p>
+            <p>数据库信息详见项目根目录 database.md</p>
+        </footer>
+    </div>
+
+    <!-- supabase-js：CDN 已下载为本地文件，禁止外链 -->
+    <script src="./js/supabase.js"></script>
+    <script>
+        // 姓名：张浩扬  建立时间：2026-11-23 19:33:59  模型：MiMo-V2.6-Pro  功能：新闻列表（Supabase 数据驱动）— 查询 / 筛选 / 搜索 / 排序
+        // Supabase 连接配置（项目信息记录于项目根目录 database.md）
+        const yl_SUPABASE_URL = 'https://pmzmsfapckfnzocnarvm.supabase.co';
+        const yl_SUPABASE_ANON_KEY = 'sb_publishable_5SXAw8K1mM9yQ1glv4ZoIA_o4XWubx2';
+        const yl_tableName = 'yl_news';
+
+        const yl_categoryList = ['全部', '科技', '财经', '教育', '体育', '文化', '健康', '国际', '社会'];
+        const yl_categoryClassMap = {
+            '科技': 'yl_cat-tech',
+            '财经': 'yl_cat-finance',
+            '教育': 'yl_cat-edu',
+            '体育': 'yl_cat-sport',
+            '文化': 'yl_cat-culture',
+            '健康': 'yl_cat-health',
+            '国际': 'yl_cat-world',
+            '社会': 'yl_cat-society'
+        };
+
+        let yl_client = null;
+        let yl_currentCategory = '全部';
+        let yl_currentKeyword = '';
+        let yl_currentSort = 'new';
+
+        // 初始化 supabase 客户端（本地库暴露全局 supabase 对象）
+        function yl_initClient() {
+            if (typeof supabase === 'undefined' || !supabase.createClient) {
+                yl_renderError('supabase.js 本地库加载失败', '请确认 ./js/supabase.js 文件存在且完整。');
+                return false;
+            }
+            yl_client = supabase.createClient(yl_SUPABASE_URL, yl_SUPABASE_ANON_KEY);
+            return true;
+        }
+
+        // 构建并执行 Supabase 查询
+        async function yl_fetchNews() {
+            if (!yl_client) return;
+            yl_renderSkeleton();
+            try {
+                let yl_query = yl_client.from(yl_tableName).select('*');
+                if (yl_currentCategory !== '全部') {
+                    yl_query = yl_query.eq('yl_category', yl_currentCategory);
+                }
+                if (yl_currentKeyword !== '') {
+                    const yl_kw = yl_currentKeyword.replace(/[%,()]/g, '');
+                    yl_query = yl_query.or('yl_title.ilike.%' + yl_kw + '%,yl_summary.ilike.%' + yl_kw + '%');
+                }
+                if (yl_currentSort === 'views') {
+                    yl_query = yl_query.order('yl_views', { ascending: false });
+                } else {
+                    yl_query = yl_query.order('yl_is_top', { ascending: false }).order('yl_published_at', { ascending: false });
+                }
+                const yl_result = await yl_query;
+                if (yl_result.error) throw yl_result.error;
+                yl_renderList(yl_result.data || []);
+            } catch (yl_err) {
+                yl_renderError('数据加载失败', String(yl_err.message || yl_err));
+            }
+        }
+
+        // 渲染新闻列表
+        function yl_renderList(yl_rows) {
+            const yl_list = document.getElementById('yl_newsList');
+            const yl_state = document.getElementById('yl_stateBox');
+            if (!yl_rows.length) {
+                yl_list.innerHTML = '';
+                yl_renderStateBox('没有找到相关新闻', '试试更换分类或搜索关键词。', false);
+                yl_updateStatus(0);
+                return;
+            }
+            yl_state.className = 'yl_state-box';
+            yl_list.innerHTML = yl_rows.map(function (yl_row) {
+                const yl_catClass = yl_categoryClassMap[yl_row.yl_category] || 'yl_cat-tech';
+                return '' +
+                    '<article class="yl_news-card ' + yl_catClass + '">' +
+                        '<div class="yl_badge-line">' +
+                            '<span class="yl_cat-badge">' + yl_escapeHtml(yl_row.yl_category) + '</span>' +
+                            (yl_row.yl_is_top ? '<span class="yl_top-badge">置顶</span>' : '') +
+                        '</div>' +
+                        '<h3 class="yl_card-title">' + yl_escapeHtml(yl_row.yl_title) + '</h3>' +
+                        '<p class="yl_card-summary">' + yl_escapeHtml(yl_row.yl_summary) + '</p>' +
+                        '<div class="yl_card-meta">' +
+                            '<span class="yl_meta-author">来源：' + yl_escapeHtml(yl_row.yl_author || '佚名') + '</span>' +
+                            '<span class="yl_meta-date">' + yl_formatDate(yl_row.yl_published_at) + '</span>' +
+                            '<span class="yl_meta-views">浏览 ' + Number(yl_row.yl_views || 0).toLocaleString('zh-CN') + '</span>' +
+                            '<span class="yl_card-toggle">展开全文 ▾</span>' +
+                        '</div>' +
+                        '<div class="yl_card-content">' + yl_escapeHtml(yl_row.yl_content || '暂无正文。') + '</div>' +
+                    '</article>';
+            }).join('');
+            yl_updateStatus(yl_rows.length);
+        }
+
+        // 骨架屏（加载中）
+        function yl_renderSkeleton() {
+            const yl_list = document.getElementById('yl_newsList');
+            document.getElementById('yl_stateBox').className = 'yl_state-box';
+            let yl_html = '';
+            for (let yl_i = 0; yl_i < 3; yl_i++) {
+                yl_html += '' +
+                    '<div class="yl_skeleton-card">' +
+                        '<div class="yl_skeleton-line yl_skeleton-line--short"></div>' +
+                        '<div class="yl_skeleton-line yl_skeleton-line--title"></div>' +
+                        '<div class="yl_skeleton-line"></div>' +
+                        '<div class="yl_skeleton-line"></div>' +
+                    '</div>';
+            }
+            yl_list.innerHTML = '<div class="yl_skeleton-list">' + yl_html + '</div>';
+        }
+
+        // 状态提示（空结果 / 错误）
+        function yl_renderStateBox(yl_title, yl_desc, yl_needRetry) {
+            const yl_state = document.getElementById('yl_stateBox');
+            yl_state.className = 'yl_state-box yl_state-box--show';
+            yl_state.innerHTML = '' +
+                '<div class="yl_state-title">' + yl_escapeHtml(yl_title) + '</div>' +
+                '<div>' + yl_escapeHtml(yl_desc) + '</div>' +
+                (yl_needRetry ? '<button class="yl_btn yl_btn-primary" id="yl_retryBtn">重新加载</button>' : '');
+            if (yl_needRetry) {
+                document.getElementById('yl_retryBtn').addEventListener('click', yl_fetchNews);
+            }
+        }
+
+        function yl_renderError(yl_title, yl_desc) {
+            document.getElementById('yl_newsList').innerHTML = '';
+            yl_renderStateBox(yl_title, yl_desc, true);
+            yl_updateStatus(0);
+        }
+
+        // 状态行统计
+        function yl_updateStatus(yl_count) {
+            document.getElementById('yl_statusLine').innerHTML = '' +
+                '<span>当前分类：<b>' + yl_escapeHtml(yl_currentCategory) + '</b></span>' +
+                '<span>关键词：<b>' + (yl_currentKeyword ? yl_escapeHtml(yl_currentKeyword) : '无') + '</b></span>' +
+                '<span>共 <b>' + yl_count + '</b> 条新闻</span>' +
+                '<span>数据来源：<b>' + yl_tableName + '</b> 表（Supabase）</span>';
+        }
+
+        // 工具函数
+        function yl_escapeHtml(yl_text) {
+            if (yl_text === null || yl_text === undefined) return '';
+            return String(yl_text).replace(/[&<>"']/g, function (yl_ch) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[yl_ch];
+            });
+        }
+
+        function yl_formatDate(yl_iso) {
+            if (!yl_iso) return '';
+            const yl_d = new Date(yl_iso);
+            if (isNaN(yl_d.getTime())) return String(yl_iso);
+            const yl_pad = function (yl_n) { return yl_n < 10 ? '0' + yl_n : String(yl_n); };
+            return yl_d.getFullYear() + '-' + yl_pad(yl_d.getMonth() + 1) + '-' + yl_pad(yl_d.getDate()) +
+                ' ' + yl_pad(yl_d.getHours()) + ':' + yl_pad(yl_d.getMinutes());
+        }
+
+        // 事件绑定
+        function yl_bindEvents() {
+            // 分类标签（事件委托）
+            document.getElementById('yl_chipBar').addEventListener('click', function (yl_e) {
+                const yl_chip = yl_e.target.closest('.yl_chip');
+                if (!yl_chip) return;
+                document.querySelectorAll('.yl_chip').forEach(function (yl_c) {
+                    yl_c.classList.remove('yl_chip--active');
+                });
+                yl_chip.classList.add('yl_chip--active');
+                yl_currentCategory = yl_chip.getAttribute('data-yl-cat');
+                yl_fetchNews();
+            });
+            // 搜索
+            document.getElementById('yl_searchBtn').addEventListener('click', function () {
+                yl_currentKeyword = document.getElementById('yl_searchInput').value.trim();
+                yl_fetchNews();
+            });
+            document.getElementById('yl_searchInput').addEventListener('keydown', function (yl_e) {
+                if (yl_e.key === 'Enter') {
+                    yl_currentKeyword = yl_e.target.value.trim();
+                    yl_fetchNews();
+                }
+            });
+            // 刷新：清空筛选
+            document.getElementById('yl_refreshBtn').addEventListener('click', function () {
+                yl_currentCategory = '全部';
+                yl_currentKeyword = '';
+                yl_currentSort = 'new';
+                document.getElementById('yl_searchInput').value = '';
+                document.getElementById('yl_sortSelect').value = 'new';
+                document.querySelectorAll('.yl_chip').forEach(function (yl_c, yl_i) {
+                    yl_c.classList.toggle('yl_chip--active', yl_i === 0);
+                });
+                yl_fetchNews();
+            });
+            // 排序
+            document.getElementById('yl_sortSelect').addEventListener('change', function (yl_e) {
+                yl_currentSort = yl_e.target.value;
+                yl_fetchNews();
+            });
+            // 卡片展开 / 收起（事件委托）
+            document.getElementById('yl_newsList').addEventListener('click', function (yl_e) {
+                const yl_toggle = yl_e.target.closest('.yl_card-toggle');
+                const yl_title = yl_e.target.closest('.yl_card-title');
+                if (!yl_toggle && !yl_title) return;
+                const yl_card = yl_e.target.closest('.yl_news-card');
+                const yl_open = yl_card.classList.toggle('yl_news-card--open');
+                yl_card.querySelector('.yl_card-toggle').textContent = yl_open ? '收起全文 ▴' : '展开全文 ▾';
+            });
+        }
+
+        // 渲染分类标签
+        function yl_renderChips() {
+            document.getElementById('yl_chipBar').innerHTML = yl_categoryList.map(function (yl_cat, yl_i) {
+                return '<span class="yl_chip' + (yl_i === 0 ? ' yl_chip--active' : '') +
+                    '" data-yl-cat="' + yl_escapeHtml(yl_cat) + '">' + yl_escapeHtml(yl_cat) + '</span>';
+            }).join('');
+        }
+
+        // 页面初始化
+        yl_renderChips();
+        yl_bindEvents();
+        if (yl_initClient()) {
+            yl_fetchNews();
+        }
+    </script>
+</body>
+</html>

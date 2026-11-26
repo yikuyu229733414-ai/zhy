@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 姓名：张浩扬  建立时间：2026-11-26 13:37:24  模型：MiMo-V2.6-Pro  功能：AI 聊天（Supabase Edge Function 调用 LLM） -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 聊天 · Supabase Edge Function</title>
+    <style>
+        /* ===== 基础与变量 ===== */
+        :root {
+            --yl-primary: #1677ff;
+            --yl-primary-deep: #0e4292;
+            --yl-bg: #f0f2f5;
+            --yl-card: #ffffff;
+            --yl-text: #1f2329;
+            --yl-text-2: #646a73;
+            --yl-border: #e4e7ed;
+            --yl-radius: 12px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+            background: var(--yl-bg);
+            color: var(--yl-text);
+            line-height: 1.6;
+        }
+        .yl_page { max-width: 860px; margin: 0 auto; padding: 0 20px 40px; }
+
+        /* ===== 顶部横幅 ===== */
+        .yl_header {
+            background: linear-gradient(135deg, var(--yl-primary-deep) 0%, var(--yl-primary) 100%);
+            color: #fff;
+            margin: 0 -20px 22px;
+            padding: 32px 40px 28px;
+            border-radius: 0 0 18px 18px;
+        }
+        .yl_home-link {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            font-size: 13px;
+            display: inline-block;
+            margin-bottom: 14px;
+            padding: 4px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 999px;
+            transition: background 0.2s;
+        }
+        .yl_home-link:hover { background: rgba(255, 255, 255, 0.15); }
+        .yl_title { font-size: 30px; letter-spacing: 2px; margin-bottom: 8px; }
+        .yl_sub { font-size: 14px; color: rgba(255, 255, 255, 0.82); max-width: 640px; }
+        .yl_badge-row { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .yl_src-badge {
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* ===== 聊天窗口 ===== */
+        .yl_chat-box {
+            background: var(--yl-card);
+            border: 1px solid var(--yl-border);
+            border-radius: var(--yl-radius);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 620px;
+        }
+        .yl_chat-status {
+            padding: 10px 20px;
+            font-size: 12.5px;
+            color: var(--yl-text-2);
+            border-bottom: 1px solid var(--yl-border);
+            background: #fafbfc;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .yl_chat-status b { color: var(--yl-primary); font-weight: 600; }
+        .yl_reset-btn {
+            margin-left: auto;
+            font-size: 12px;
+            padding: 4px 14px;
+            border: 1px solid var(--yl-border);
+            border-radius: 999px;
+            background: #fff;
+            color: var(--yl-text-2);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .yl_reset-btn:hover { color: var(--yl-primary); border-color: var(--yl-primary); }
+
+        .yl_msg-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 22px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .yl_msg-row { display: flex; }
+        .yl_msg-row--user { justify-content: flex-end; }
+        .yl_msg-row--ai { justify-content: flex-start; }
+        .yl_msg-bubble {
+            max-width: 78%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14.5px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .yl_msg-row--user .yl_msg-bubble {
+            background: var(--yl-primary);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+        .yl_msg-row--ai .yl_msg-bubble {
+            background: #f2f4f7;
+            color: var(--yl-text);
+            border-bottom-left-radius: 4px;
+        }
+        .yl_msg-row--error .yl_msg-bubble {
+            background: rgba(212, 56, 13, 0.08);
+            color: #d4380d;
+            border: 1px solid rgba(212, 56, 13, 0.25);
+        }
+        .yl_msg-time {
+            font-size: 11px;
+            color: var(--yl-text-2);
+            margin-top: 6px;
+        }
+        .yl_msg-row--user .yl_msg-time { text-align: right; }
+        .yl_msg-welcome {
+            text-align: center;
+            color: var(--yl-text-2);
+            font-size: 13px;
+            padding: 26px 0 6px;
+        }
+        .yl_msg-typing { display: inline-flex; gap: 5px; align-items: center; }
+        .yl_msg-typing i {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--yl-text-2);
+            animation: yl_blink 1.2s infinite ease-in-out;
+        }
+        .yl_msg-typing i:nth-child(2) { animation-delay: 0.2s; }
+        .yl_msg-typing i:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes yl_blink {
+            0%, 80%, 100% { opacity: 0.25; transform: translateY(0); }
+            40% { opacity: 1; transform: translateY(-3px); }
+        }
+
+        /* ===== 输入区 ===== */
+        .yl_input-bar {
+            border-top: 1px solid var(--yl-border);
+            padding: 14px 16px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            background: #fafbfc;
+        }
+        .yl_input-text {
+            flex: 1;
+            min-height: 44px;
+            max-height: 120px;
+            padding: 11px 14px;
+            font-size: 14px;
+            font-family: inherit;
+            border: 1px solid var(--yl-border);
+            border-radius: 8px;
+            outline: none;
+            resize: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .yl_input-text:focus {
+            border-color: var(--yl-primary);
+            box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.15);
+        }
+        .yl_send-btn {
+            height: 44px;
+            padding: 0 26px;
+            font-size: 14px;
+            border: none;
+            border-radius: 8px;
+            background: var(--yl-primary);
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .yl_send-btn:hover { background: #0e5fd8; }
+        .yl_send-btn:disabled { background: #a0c4ff; cursor: not-allowed; }
+        .yl_input-tip {
+            padding: 0 18px 12px;
+            font-size: 11.5px;
+            color: var(--yl-text-2);
+            background: #fafbfc;
+        }
+
+        /* ===== 页脚 ===== */
+        .yl_footer {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--yl-text-2);
+        }
+    </style>
+</head>
+<body>
+    <div class="yl_page">
+        <!-- 顶部横幅 -->
+        <header class="yl_header">
+            <a class="yl_home-link" href="./index.html">← 返回首页</a>
+            <h1 class="yl_title">AI 聊天</h1>
+            <p class="yl_sub">基于 Supabase Edge Function 的智能对话：前端把消息发给云函数，云函数调用 SiliconFlow 大模型并返回回答，API Key 全程只保存在服务端。</p>
+            <div class="yl_badge-row">
+                <span class="yl_src-badge">LLM：SiliconFlow</span>
+                <span class="yl_src-badge">模型：DeepSeek-V4-Flash</span>
+                <span class="yl_src-badge">后端：Supabase Edge Function</span>
+            </div>
+        </header>
+
+        <!-- 聊天窗口 -->
+        <section class="yl_chat-box">
+            <div class="yl_chat-status">
+                <span>当前模型：<b>deepseek-ai/DeepSeek-V4-Flash</b></span>
+                <span>云函数：<b>yl-ai-chat</b></span>
+                <button class="yl_reset-btn" id="yl_resetBtn">清空对话</button>
+            </div>
+            <div class="yl_msg-list" id="yl_msgList">
+                <div class="yl_msg-welcome">你好，我是 AI 助手，请在下方输入消息开始对话（Enter 发送，Shift + Enter 换行）。</div>
+            </div>
+            <div class="yl_input-bar">
+                <textarea class="yl_input-text" id="yl_inputText" rows="1" placeholder="输入消息，例如：你好，请介绍一下你自己"></textarea>
+                <button class="yl_send-btn" id="yl_sendBtn">发送</button>
+            </div>
+            <div class="yl_input-tip">发送的提示词与接收的数据均输出到浏览器控制台（F12 查看）。</div>
+        </section>
+
+        <footer class="yl_footer">姓名：张浩扬 | 学号：24001010302 | AI 聊天 · Supabase Edge Function</footer>
+    </div>
+
+    <!-- supabase-js：CDN 已下载为本地文件，禁止外链 -->
+    <script src="./js/supabase.js"></script>
+    <script>
+        // 姓名：张浩扬  建立时间：2026-11-26 13:37:24  模型：MiMo-V2.6-Pro  功能：AI 聊天（Supabase Edge Function 调用 LLM）— 收发消息 / 多轮上下文
+        // Supabase 连接配置（项目信息记录于项目根目录 database.md）
+        const yl_SUPABASE_URL = 'https://pmzmsfapckfnzocnarvm.supabase.co';
+        const yl_SUPABASE_ANON_KEY = 'sb_publishable_5SXAw8K1mM9yQ1glv4ZoIA_o4XWubx2';
+        const yl_functionName = 'yl-ai-chat';
+
+        const yl_client = supabase.createClient(yl_SUPABASE_URL, yl_SUPABASE_ANON_KEY);
+
+        // 会话历史（多轮上下文，随请求发给云函数）
+        let yl_msgHistory = [];
+        let yl_isSending = false;
+
+        const yl_msgList = document.getElementById('yl_msgList');
+        const yl_inputText = document.getElementById('yl_inputText');
+        const yl_sendBtn = document.getElementById('yl_sendBtn');
+        const yl_resetBtn = document.getElementById('yl_resetBtn');
+
+        // 取当前时间 HH:mm
+        function yl_nowTime() {
+            const yl_d = new Date();
+            return String(yl_d.getHours()).padStart(2, '0') + ':' + String(yl_d.getMinutes()).padStart(2, '0');
+        }
+
+        // 追加一条消息气泡
+        function yl_appendMsg(yl_role, yl_content, yl_isError) {
+            const yl_welcome = yl_msgList.querySelector('.yl_msg-welcome');
+            if (yl_welcome) yl_welcome.remove();
+
+            const yl_row = document.createElement('div');
+            yl_row.className = 'yl_msg-row yl_msg-row--' + (yl_role === 'user' ? 'user' : 'ai') + (yl_isError ? ' yl_msg-row--error' : '');
+
+            const yl_wrap = document.createElement('div');
+            const yl_bubble = document.createElement('div');
+            yl_bubble.className = 'yl_msg-bubble';
+            yl_bubble.textContent = yl_content;
+
+            const yl_time = document.createElement('div');
+            yl_time.className = 'yl_msg-time';
+            yl_time.textContent = (yl_role === 'user' ? '我' : 'AI 助手') + ' · ' + yl_nowTime();
+
+            yl_wrap.appendChild(yl_bubble);
+            yl_wrap.appendChild(yl_time);
+            yl_row.appendChild(yl_wrap);
+            yl_msgList.appendChild(yl_row);
+            yl_msgList.scrollTop = yl_msgList.scrollHeight;
+            return yl_row;
+        }
+
+        // 显示 / 隐藏"正在思考"
+        function yl_showTyping() {
+            const yl_row = document.createElement('div');
+            yl_row.className = 'yl_msg-row yl_msg-row--ai';
+            yl_row.id = 'yl_typingRow';
+            yl_row.innerHTML = '<div class="yl_msg-bubble"><span class="yl_msg-typing"><i></i><i></i><i></i></span></div>';
+            yl_msgList.appendChild(yl_row);
+            yl_msgList.scrollTop = yl_msgList.scrollHeight;
+        }
+        function yl_hideTyping() {
+            const yl_row = document.getElementById('yl_typingRow');
+            if (yl_row) yl_row.remove();
+        }
+
+        // 发送消息：前端 -> Supabase Edge Function -> SiliconFlow LLM
+        async function yl_sendMessage() {
+            const yl_content = yl_inputText.value.trim();
+            if (!yl_content || yl_isSending) return;
+
+            yl_isSending = true;
+            yl_sendBtn.disabled = true;
+            yl_inputText.value = '';
+
+            // 渲染我的消息并加入历史
+            yl_appendMsg('user', yl_content);
+            yl_msgHistory.push({ role: 'user', content: yl_content });
+
+            // 发送给 LLM 的提示词（控制台输出）
+            console.log('[yl-ai-chat] 发送给 LLM 的提示词：', JSON.stringify(yl_msgHistory));
+
+            yl_showTyping();
+            try {
+                const yl_result = await yl_client.functions.invoke(yl_functionName, {
+                    body: { messages: yl_msgHistory }
+                });
+
+                yl_hideTyping();
+
+                if (yl_result.error) {
+                    // 错误信息输出到控制台
+                    console.error('[yl-ai-chat] 请求云函数失败：', yl_result.error);
+                    yl_appendMsg('ai', '请求失败：' + (yl_result.error.message || '未知错误'), true);
+                } else {
+                    const yl_data = yl_result.data;
+                    // 接收到的数据（控制台输出）
+                    console.log('[yl-ai-chat] 接收到的数据：', JSON.stringify(yl_data));
+
+                    if (yl_data && yl_data.code === 0 && yl_data.data && yl_data.data.reply) {
+                        const yl_reply = yl_data.data.reply;
+                        yl_appendMsg('ai', yl_reply);
+                        yl_msgHistory.push({ role: 'assistant', content: yl_reply });
+                    } else {
+                        console.error('[yl-ai-chat] 返回数据格式不正确：', yl_data);
+                        yl_appendMsg('ai', '回答失败：' + ((yl_data && yl_data.msg) || '返回数据格式不正确'), true);
+                    }
+                }
+            } catch (yl_err) {
+                yl_hideTyping();
+                console.error('[yl-ai-chat] 调用出错：', yl_err);
+                yl_appendMsg('ai', '调用出错：' + yl_err.message, true);
+            } finally {
+                yl_isSending = false;
+                yl_sendBtn.disabled = false;
+                yl_inputText.focus();
+            }
+        }
+
+        // 发送按钮
+        yl_sendBtn.addEventListener('click', yl_sendMessage);
+
+        // Enter 发送，Shift + Enter 换行
+        yl_inputText.addEventListener('keydown', function (yl_e) {
+            if (yl_e.key === 'Enter' && !yl_e.shiftKey) {
+                yl_e.preventDefault();
+                yl_sendMessage();
+            }
+        });
+
+        // 清空对话
+        yl_resetBtn.addEventListener('click', function () {
+            yl_msgHistory = [];
+            yl_msgList.innerHTML = '<div class="yl_msg-welcome">你好，我是 AI 助手，请在下方输入消息开始对话（Enter 发送，Shift + Enter 换行）。</div>';
+            console.log('[yl-ai-chat] 对话已清空');
+        });
+    </script>
+</body>
+</html>
